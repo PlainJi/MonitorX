@@ -5,15 +5,27 @@
 存在的问题，使用率百分比以6.25%的间隔区分，过于粗力度，动画效果过于单一。
 
 ## 系统框图
-![pic](diagram.png)
+![pic](resources/diagram.png)
 
 ## 硬件清单
-- [芒果派 MQ-Pro][1]
-- [屏幕、转接板][2]
+1. [芒果派 MQ-Pro][1]
+2. [8.8寸长条屏HSD088IPW1-A00分辨率1920X480亮度600可配驱动板][2]
 
 [1]:https://mangopi.org/mqpro
 [2]:https://item.taobao.com/item.htm?spm=a1z09.2.0.0.15a12e8dkxJw4h&id=636337115556&_u=74jn04q02da
 
-## 改进
-- 使用芒果派直驱显示屏，去掉HDMI接口板
+## 配置芒果派开机自启动
+1. `cp client/system-monitor.service /usr/lib/systemd/system`  
+2. `systemctl enable system-monitor.service`  
+3. `systemctl start system-monitor.service`  
 
+## 配置PC端开机自启动
+![pic](resources/1.png)
+![pic](resources/2.png)
+![pic](resources/3.png)
+
+## 实物图
+![pic](resources/demo.png)
+
+## 改进
+- 使用芒果派通过MIPI或RGB接口直驱显示屏，去掉HDMI接口板

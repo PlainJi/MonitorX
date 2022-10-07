@@ -1,0 +1,14 @@
+[Unit]
+Description=Run system monitor UI
+After=networking.service network-online.target
+Before=
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sleep 20
+ExecStart=/root/lv_port_linux_frame_buffer/sys_monitor_ui
+ExecStop=/usr/bin/pkill sys_monitor_ui
+ExecReload=/usr/bin/pkill sys_monitor_ui; /root/lv_port_linux_frame_buffer/sys_monitor_ui
