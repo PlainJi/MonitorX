@@ -1,8 +1,8 @@
-# LVGL for frame buffer device
+## 编译 & 运行
+1. `make`  
+2. `sudo ./sys_monitor_ui`  
 
-LVGL configured to work with /dev/fb0 on Linux.
-
-When cloning this repository, also make sure to download submodules (`git submodule update --init --recursive`) otherwise you will be missing key components.
-
-Check out this blog post for a step by step tutorial:
-https://blog.lvgl.io/2018-01-03/linux_fb
+## 配置芒果派开机自启动
+1. `cp client/system-monitor.service /usr/lib/systemd/system`  
+2. `systemctl enable system-monitor.service`  
+3. `systemctl start system-monitor.service`  

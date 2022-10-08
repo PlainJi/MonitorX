@@ -1,0 +1,5 @@
+cachelib==0.9.0
+psutil==5.9.2
+pythonnet==2.5.2
+pywin32==304
+WMI==1.5.1
