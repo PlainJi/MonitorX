@@ -12,14 +12,16 @@ void AutoUnit(int bytes, char *dest_buf);
 void CpuSetUsagePointer(float usage);
 void CpuSetUsagePercent(float usage);
 void CpuSetFrequency(float mhz);
+void CpuSetTempPointer(float usage);
 
 void GpuSetUsagePointer(float usage);
 void GpuSetUsagePercent(float usage);
 void GpuSetFrequency(float mhz);
+void GpuSetTempPointer(float usage);
 
-void MemSetUsagePointer(float usage);
+void MemSetUsage(float usage);
 void MemSetUsagePercent(float usage);
-void GMemSetUsagePointer(float usage);
+void GMemSetUsage(float usage);
 void GMemSetUsagePercent(float usage);
 
 void NetSetUpload(int bytes);
@@ -33,6 +35,7 @@ void SetWeek(char *buf);
 void SetDate(char *buf);
 
 void ui_controller_init(void);
+void update_time_from_local(void);
 void update_ui(char *buffer);
 
 #endif

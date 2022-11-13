@@ -4,17 +4,18 @@
 #include <stdio.h>
 #include <time.h>
 
-#define portMAX_DELAY			(0xffff)
-#define pdTRUE				(1)
+#define portMAX_DELAY				(0xffff)
+#define pdTRUE						(1)
 
-#define CPU_USAGE_POINTER_START		(-170)
-#define CPU_USAGE_POINTER_END		(1610)
-#define GPU_USAGE_POINTER_START		(-170)
-#define GPU_USAGE_POINTER_END		(1610)
-#define MEM_USAGE_POINTER_START		(-450)
-#define MEM_USAGE_POINTER_END		(2250)
-#define GMEM_USAGE_POINTER_START	(-450)
-#define GMEM_USAGE_POINTER_END		(2250)
+#define CPU_USAGE_POINTER_START		(-180)
+#define CPU_USAGE_POINTER_END		(1620)
+#define GPU_USAGE_POINTER_START		(-180)
+#define GPU_USAGE_POINTER_END		(1620)
+#define CPU_TEMP_POINTER_START		(300)
+#define CPU_TEMP_POINTER_END		(1500)
+#define GPU_TEMP_POINTER_START		(300)
+#define GPU_TEMP_POINTER_END		(1500)
+
 
 #define GET_ANGLE_BY_PERCENT(start, end, percent) (percent/100.0f*(end-start)+start)
 
@@ -42,7 +43,7 @@ void SetAnimation(lv_obj_t * TargetObject, int new_angle, int time)
 
 void ImageRotation(lv_obj_t *obj, int start, int end, float usage) {
 	int angle = (int)(usage / 100.0f * (end - start) + start);
-        lv_img_set_angle(obj, angle);
+    lv_img_set_angle(obj, angle);
 }
 
 void CpuSetUsagePointer(float usage) {
@@ -50,26 +51,31 @@ void CpuSetUsagePointer(float usage) {
 	SetAnimation(ui_CpuUsagePointer, angle, 950);
 }
 
+void CpuSetTempPointer(float usage) {
+	int angle = GET_ANGLE_BY_PERCENT(CPU_TEMP_POINTER_START, CPU_TEMP_POINTER_END, usage);
+	SetAnimation(ui_CpuTemp, angle, 950);
+}
 
 void GpuSetUsagePointer(float usage) {
 	int angle = GET_ANGLE_BY_PERCENT(GPU_USAGE_POINTER_START, GPU_USAGE_POINTER_END, usage);
-        SetAnimation(ui_GpuUsagePointer, angle, 950);
+    SetAnimation(ui_GpuUsagePointer, angle, 950);
 }
 
-
-void MemSetUsagePointer(float usage) {
-	int angle = GET_ANGLE_BY_PERCENT(MEM_USAGE_POINTER_START, MEM_USAGE_POINTER_END, usage);
-        SetAnimation(ui_MemUsagePointer, angle, 950);
+void GpuSetTempPointer(float usage) {
+	int angle = GET_ANGLE_BY_PERCENT(GPU_TEMP_POINTER_START, GPU_TEMP_POINTER_END, usage);
+	SetAnimation(ui_GpuTemp, angle, 950);
 }
 
+void MemSetUsage(float usage) {
+	lv_arc_set_value(ui_MemUsageArc, usage);
+}
 
-void GMemSetUsagePointer(float usage) {
-	int angle = GET_ANGLE_BY_PERCENT(GMEM_USAGE_POINTER_START, GMEM_USAGE_POINTER_END, usage);
-	SetAnimation(ui_GMemUsagePointer, angle, 950);
+void GMemSetUsage(float usage) {
+	lv_arc_set_value(ui_GMemUsageArc, usage);
 }
 
 void SetText(lv_obj_t *obj, char* str) {
-        lv_textarea_set_text(obj, str);
+    lv_textarea_set_text(obj, str);
 }
 
 void CpuSetUsagePercent(float usage) {
@@ -105,22 +111,22 @@ void AutoUnit(int bytes, char *dest_buf) {
 
 void NetSetUpload(int bytes) {
 	AutoUnit(bytes, buf);
-        lv_textarea_set_text(ui_Upload, buf);
+    lv_textarea_set_text(ui_Up, buf);
 }
 
 void NetSetDownload(int bytes) {
 	AutoUnit(bytes, buf);
-        lv_textarea_set_text(ui_Download, buf);
+    lv_textarea_set_text(ui_Down, buf);
 }
 
 void IoSetRead(int bytes) {
 	AutoUnit(bytes, buf);
-        lv_textarea_set_text(ui_Read, buf);
+    lv_textarea_set_text(ui_Read, buf);
 }
 
 void IoSetWrite(int bytes) {
 	AutoUnit(bytes, buf);
-        lv_textarea_set_text(ui_Write, buf);
+    lv_textarea_set_text(ui_Write, buf);
 }
 
 void CpuSetFrequency(float mhz) {
@@ -148,29 +154,29 @@ void GpuSetFrequency(float mhz) {
 }
 
 void SetTime(char *str) {
-        lv_textarea_set_text(ui_Time, str);
+    lv_textarea_set_text(ui_Time, str);
 }
 
 void SetWeek(char *str) {
-        lv_textarea_set_text(ui_Week, str);
+    lv_textarea_set_text(ui_Week, str);
 }
 
 void SetDate(char *str) {
-        lv_textarea_set_text(ui_Date, str);
+    lv_textarea_set_text(ui_Date, str);
 }
 
 void ui_controller_init(void) {
 	lv_img_set_angle(ui_CpuUsagePointer, CPU_USAGE_POINTER_START);
-        CpuSetUsagePercent(0.0f);
-        CpuSetFrequency(0.0f);
+    CpuSetUsagePercent(0.0f);
+    CpuSetFrequency(0.0f);
 
 	lv_img_set_angle(ui_GpuUsagePointer, GPU_USAGE_POINTER_START);
 	GpuSetUsagePercent(0.0f);
 	GpuSetFrequency(0.0f);
 
-	lv_img_set_angle(ui_MemUsagePointer, MEM_USAGE_POINTER_START);
+	//lv_img_set_angle(ui_MemUsagePointer, MEM_USAGE_POINTER_START);
 	MemSetUsagePercent(0.0f);
-	lv_img_set_angle(ui_GMemUsagePointer, GMEM_USAGE_POINTER_START);
+	//lv_img_set_angle(ui_GMemUsagePointer, GMEM_USAGE_POINTER_START);
 	GMemSetUsagePercent(0.0f);
 
 	NetSetUpload(0);
@@ -179,18 +185,18 @@ void ui_controller_init(void) {
 	IoSetRead(0);
 	IoSetWrite(0);
 
-	SetTime("--:--");
+	SetTime(" ");
 	SetWeek(" ");
 	SetDate(" ");
 }
 
-void update_time() {
+void update_time_from_local(void) {
 	char temp[32] = {0};
 	static char *week[] = {"Sun.", "Mon.", "Tus.", "Wed.", "Thu.", "Fri.", "Sat."};
 	time_t t = time(NULL);
 	struct tm *s_tm = localtime(&t);
 	sprintf(temp, "%d-%02d-%02d\n", s_tm->tm_year+1900, s_tm->tm_mon, s_tm->tm_mday);
-        SetDate(temp);
+    SetDate(temp);
 	sprintf(temp, "%02d:%02d\n", s_tm->tm_hour, s_tm->tm_min);
 	SetTime(temp);
 	sprintf(temp, "%s\n", week[s_tm->tm_wday]);
@@ -199,29 +205,32 @@ void update_time() {
 
 void update_ui(char *buffer) {
 	parse_json(buffer);
-	get_value("cpu_load");
-	get_value("gpu_load");
+	//get_value("cpu_load");
+	//get_value("gpu_load");
 
 	CpuSetUsagePointer(get_value("cpu_load"));
-        CpuSetUsagePercent(get_value("cpu_load"));
+    CpuSetUsagePercent(get_value("cpu_load"));
+	MemSetUsage(get_value("ram_load"));
+	MemSetUsagePercent(get_value("ram_load"));
 	CpuSetFrequency(get_value("cpu_clock"));
+	CpuSetTempPointer(get_value("cpu_temp"));
 
-        GpuSetUsagePointer(get_value("gpu_load"));
-        GpuSetUsagePercent(get_value("gpu_load"));
-        GpuSetFrequency(get_value("gpu_clock"));
+	GpuSetUsagePointer(get_value("gpu_load"));
+	GpuSetUsagePercent(get_value("gpu_load"));
+	GMemSetUsage(get_value("gram_load"));
+	GMemSetUsagePercent(get_value("gram_load"));
+	GpuSetFrequency(get_value("gpu_clock"));
+	GpuSetTempPointer(get_value("gpu_temp"));
 
-        MemSetUsagePointer(get_value("ram_load"));
-        MemSetUsagePercent(get_value("ram_load"));
-        GMemSetUsagePointer(get_value("gram_load"));
-        GMemSetUsagePercent(get_value("gram_load"));
-
-        NetSetUpload(get_value("link_up"));
-        NetSetDownload(get_value("link_dw"));
- 
+	NetSetUpload(get_value("link_up"));
+	NetSetDownload(get_value("link_dw"));
  	IoSetRead(get_value("io_write"));
-        IoSetWrite(get_value("io_read"));
+    IoSetWrite(get_value("io_read"));
 	
-	update_time();
+	//update_time_from_local();
+	SetDate(get_string("date"));
+	SetTime(get_string("time"));
+	SetWeek(get_string("week"));
 }
 
 

@@ -1,7 +1,7 @@
 // SquareLine LVGL GENERATED FILE
-// EDITOR VERSION: SquareLine Studio 1.1.0
-// LVGL VERSION: 8.2
-// PROJECT: SquareLine_Project
+// EDITOR VERSION: SquareLine Studio 1.1.1
+// LVGL VERSION: 8.3.3
+// PROJECT: DesktopBox
 
 #include "ui_helpers.h"
 

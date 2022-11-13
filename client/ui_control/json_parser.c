@@ -36,6 +36,19 @@ double get_value(char *key) {
 	return name->valuedouble;
 }
 
+char* get_string(char *key) {
+	if (!root) {
+		printf("not parsed!\n");
+		return NULL;
+	}
+	const cJSON *name = cJSON_GetObjectItemCaseSensitive(root, key);
+	if (cJSON_IsString(name))
+	{
+		//printf("%s: %lf\n", key, name->valuedouble);
+	}
+	return name->valuestring;
+}
+
 /*
  * char *test_string = "{\"cpu_load\": 16.0, \"cpu_temp\": 52.0, \"cpu_clock\": 4009.0, \"ram_load\": 57.0}";
  *

@@ -12,13 +12,14 @@
 #include "ui_control/network.h"
 #include "lib/thread_warpper.h"
 
-#define DISP_BUF_SIZE (480 * 1920)
+#define DISP_BUF_SIZE (800*480)
 
 int main(void)
 {
     /*LittlevGL init*/
     lv_init();
 
+    // display
     /*Linux frame buffer device init*/
     fbdev_init();
 
@@ -34,22 +35,22 @@ int main(void)
     lv_disp_drv_init(&disp_drv);
     disp_drv.draw_buf   = &disp_buf;
     disp_drv.flush_cb   = fbdev_flush;
-    disp_drv.hor_res    = 480;
-    disp_drv.ver_res    = 1920;
+    disp_drv.hor_res    = 800;
+    disp_drv.ver_res    = 480;
     disp_drv.sw_rotate	= 1;
-    disp_drv.rotated	= LV_DISP_ROT_270;
+    //disp_drv.rotated	= LV_DISP_ROT_270;
     lv_disp_drv_register(&disp_drv);
-    //lv_disp_set_rotation((lv_disp_t*)&disp_drv, LV_DISP_ROT_90);
 
+    // input
     evdev_init();
     static lv_indev_drv_t indev_drv_1;
     lv_indev_drv_init(&indev_drv_1); /*Basic initialization*/
-    indev_drv_1.type = LV_INDEV_TYPE_POINTER;
+    //indev_drv_1.type = LV_INDEV_TYPE_POINTER;
+    indev_drv_1.type = LV_INDEV_TYPE_NONE;
 
     /*This function will be called periodically (by the library) to get the mouse position and state*/
     indev_drv_1.read_cb = evdev_read;
     lv_indev_t *mouse_indev = lv_indev_drv_register(&indev_drv_1);
-
 
     /*Set a cursor for the mouse*/
     LV_IMG_DECLARE(mouse_cursor_icon)
@@ -62,7 +63,8 @@ int main(void)
     //lv_demo_widgets();
     //lv_demo_benchmark();
     ui_init();
-    ui_controller_init();
+    ui_Screen1_Start();
+    //ui_controller_init();
     task_creat(NULL, 90, 4*1024*1024, (FUNC)network_thread, NULL);
 
     /*Handle LitlevGL tasks (tickless mode)*/

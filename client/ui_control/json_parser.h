@@ -3,5 +3,6 @@
 
 int parse_json(char* str);
 double get_value(char *key);
+char* get_string(char *key);
 
 #endif

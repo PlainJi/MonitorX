@@ -48,7 +48,7 @@ void network_thread()
     while(1){
         len=recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);
         //write(STDIN_FILENO, buf, len);
-	update_ui(buf);
+	    update_ui(buf);
     }    
     close(confd);
 }
