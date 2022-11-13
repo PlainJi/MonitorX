@@ -8,14 +8,17 @@
 ![pic](res/diagram.png)
 
 ## 硬件清单
-1. [芒果派 MQ-Pro][1]
-2. [8.8寸长条屏HSD088IPW1-A00分辨率1920X480亮度600可配驱动板][2]
+1. [芒果派 MQ-R][1]
+2. [群创5寸RGB40pin液晶彩屏分辨率800*480带电容触摸通用显示屏模组][2]
 
-[1]:https://mangopi.org/mqpro
-[2]:https://item.taobao.com/item.htm?spm=a1z09.2.0.0.15a12e8dkxJw4h&id=636337115556&_u=74jn04q02da
+[1]:https://mangopi.org/mqr
+[2]:https://item.taobao.com/item.htm?spm=a1z09.2.0.0.4e1b2e8dejF06Z&id=644931601805&_u=e4jn04q6cd6
 
 ## 实物图
-![pic](res/demo.png)
+待补充
 
 ## 改进
-- 使用芒果派通过MIPI或RGB接口直驱显示屏，去掉HDMI接口板
+1. 触摸
+2. 天气
+3. 音量控制
+4. 播放暂停
