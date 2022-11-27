@@ -46,9 +46,10 @@ void network_thread()
     setsockopt(confd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&group,sizeof(group));
 
     while(1){
+        memset(buf, 0, sizeof(buf));
         len=recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);
-        //write(STDIN_FILENO, buf, len);
-	    update_ui(buf);
+        printf("recv %d: %s\n", len, buf);
+        update_ui(buf);
     }    
     close(confd);
 }
