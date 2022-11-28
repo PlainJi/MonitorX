@@ -1,6 +1,6 @@
 /**
  * @file lv_drv_conf.h
- * Configuration file for v8.2.0
+ * Configuration file for v8.3.0
  */
 
 /*
@@ -95,8 +95,8 @@
 #endif
 
 #if USE_SDL || USE_SDL_GPU
-#  define SDL_HOR_RES     480
-#  define SDL_VER_RES     320
+#  define SDL_HOR_RES     800
+#  define SDL_VER_RES     480
 
 /* Scale window by this factor (useful when simulating small screens) */
 #  define SDL_ZOOM        1
@@ -316,7 +316,7 @@
  *  Linux frame buffer device (/dev/fbx)
  *-----------------------------------------*/
 #ifndef USE_FBDEV
-#  define USE_FBDEV           1
+#  define USE_FBDEV           0
 #endif
 
 #if USE_FBDEV
@@ -439,7 +439,7 @@
  * Mouse or touchpad as evdev interface (for Linux based systems)
  *------------------------------------------------*/
 #ifndef USE_EVDEV
-#  define USE_EVDEV           1
+#  define USE_EVDEV           0
 #endif
 
 #ifndef USE_BSD_EVDEV
@@ -447,7 +447,7 @@
 #endif
 
 #if USE_EVDEV || USE_BSD_EVDEV
-#  define EVDEV_NAME   "/dev/input/event10"        /*You can use the "evtest" Linux tool to get the list of devices and test them*/
+#  define EVDEV_NAME   "/dev/input/event1"        /*You can use the "evtest" Linux tool to get the list of devices and test them*/
 #  define EVDEV_SWAP_AXES         0               /*Swap the x and y axes of the touchscreen*/
 
 #  define EVDEV_CALIBRATE         0               /*Scale and offset the touchscreen coordinates by using maximum and minimum values for each axis*/
