@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "json_parser.h"
-#include "../lib/cJSON.h"
+#include "../lib/cJSON/cJSON.h"
 
 static cJSON *root = NULL;
 
