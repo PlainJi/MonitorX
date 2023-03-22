@@ -16,9 +16,8 @@ void StartCpuPointer_Animation(lv_obj_t * TargetObject, int delay);
 void StartGpuPointer_Animation(lv_obj_t * TargetObject, int delay);
 void StartCpuTemp_Animation(lv_obj_t * TargetObject, int delay);
 void StartGpuTemp_Animation(lv_obj_t * TargetObject, int delay);
-void ui_event_Screen1(lv_event_t * e);
-void ui_Screen1_Start(void);
-extern lv_obj_t * ui_Screen1;
+void ui_event_Monitor(lv_event_t * e);
+extern lv_obj_t * ui_Monitor;
 extern lv_obj_t * ui_PanelMonitor;
 extern lv_obj_t * ui_PanelMonitorCpu;
 extern lv_obj_t * ui_CpuModel;
@@ -46,6 +45,23 @@ extern lv_obj_t * ui_Up;
 extern lv_obj_t * ui_Down;
 extern lv_obj_t * ui_Read;
 extern lv_obj_t * ui_Write;
+void ui_event_Git(lv_event_t * e);
+extern lv_obj_t * ui_Git;
+extern lv_obj_t * ui_ContributionPanel;
+extern lv_obj_t * ui_username;
+extern lv_obj_t * ui_year;
+extern lv_obj_t * ui_Git_ImgButton2;
+void ui_event_Bili(lv_event_t * e);
+extern lv_obj_t * ui_Bili;
+extern lv_obj_t * ui_LabelLikes;
+extern lv_obj_t * ui_LabelFollowers;
+extern lv_obj_t * ui_LabelViews;
+extern lv_obj_t * ui_views;
+extern lv_obj_t * ui_followers;
+extern lv_obj_t * ui_likes;
+extern lv_obj_t * ui_nickname;
+extern lv_obj_t * ui_userid;
+extern lv_obj_t * ui_Bili_ImgButton3;
 
 
 LV_IMG_DECLARE(ui_img_bg_png);    // assets\bg.png
@@ -53,17 +69,24 @@ LV_IMG_DECLARE(ui_img_big_pointer_png);    // assets\big_pointer.png
 LV_IMG_DECLARE(ui_img_mem_usage1_png);    // assets\mem_usage1.png
 LV_IMG_DECLARE(ui_img_mem_usage2_png);    // assets\mem_usage2.png
 LV_IMG_DECLARE(ui_img_small_pointer_png);    // assets\small_pointer.png
+LV_IMG_DECLARE(ui_img_git_released_png);    // assets\git_released.png
+LV_IMG_DECLARE(ui_img_git_pressed_png);    // assets\git_pressed.png
+LV_IMG_DECLARE(ui_img_bili_released_png);    // assets\bili_released.png
+LV_IMG_DECLARE(ui_img_bili_pressed_png);    // assets\bili_pressed.png
 
 
+LV_FONT_DECLARE(ui_font_ShangShou20);
 LV_FONT_DECLARE(ui_font_ShangShou24);
 LV_FONT_DECLARE(ui_font_ShangShou28);
 LV_FONT_DECLARE(ui_font_ShangShou32);
-LV_FONT_DECLARE(ui_font_ShangShou40);
 LV_FONT_DECLARE(ui_font_ShangShou38);
-LV_FONT_DECLARE(ui_font_ShangShou20);
+LV_FONT_DECLARE(ui_font_ShangShou40);
 
 
 void ui_init(void);
+void ui_Monitor_screen_init(void);
+void ui_Git_screen_init(void);
+void ui_Bili_screen_init(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

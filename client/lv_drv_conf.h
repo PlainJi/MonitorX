@@ -25,6 +25,8 @@
 /*********************
  * DISPLAY INTERFACE
  *********************/
+#define HOR_RES     800
+#define VER_RES     480
 
 /*------------
  *  Common
@@ -95,8 +97,8 @@
 #endif
 
 #if USE_SDL || USE_SDL_GPU
-#  define SDL_HOR_RES     800
-#  define SDL_VER_RES     480
+#  define SDL_HOR_RES     HOR_RES
+#  define SDL_VER_RES     VER_RES
 
 /* Scale window by this factor (useful when simulating small screens) */
 #  define SDL_ZOOM        1
@@ -320,7 +322,8 @@
 #endif
 
 #if USE_FBDEV
-#  define FBDEV_PATH          "/dev/fb0"
+#  define FBDEV_PATH                "/dev/fb0"
+#  define FBDEV_DISPLAY_POWER_ON    1
 #endif
 
 /*-----------------------------------------

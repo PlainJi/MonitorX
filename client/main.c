@@ -1,15 +1,16 @@
-#include "lvgl/lvgl.h"
-#include "lvgl/demos/lv_demos.h"
-#include "lvgl/examples/lv_examples.h"
+#include "lvgl.h"
+#include "lv_drv_conf.h"
+#include "demos/lv_demos.h"
+#include "examples/lv_examples.h"
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
-#include "ui/ui.h"
-#include "ui/ui_helpers.h"
-#include "ui_control/ui_controller.h"
-#include "ui_control/network.h"
-#include "lib/thread_warpper.h"
+#include "ui.h"
+#include "ui_helpers.h"
+#include "ui_controller.h"
+#include "monitor.h"
+#include "thirdparty/thread_warpper.h"
 
 #if USE_SDL
 #include <SDL2/SDL.h>
@@ -23,15 +24,15 @@ static void init_simulator(void)
    * how much time were elapsed Create an SDL thread to do this*/
   //SDL_CreateThread(tick_thread, "tick", NULL);
 
-  /*Create a display buffer*/
+  // Create a display buffer
   static lv_disp_draw_buf_t disp_buf1;
   static lv_color_t buf1_1[SDL_HOR_RES * 100];
   static lv_color_t buf1_2[SDL_HOR_RES * 100];
   lv_disp_draw_buf_init(&disp_buf1, buf1_1, buf1_2, SDL_HOR_RES * 100);
 
-  /*Create a display*/
+  // Create a display
   static lv_disp_drv_t disp_drv;
-  lv_disp_drv_init(&disp_drv); /*Basic initialization*/
+  lv_disp_drv_init(&disp_drv);
   disp_drv.draw_buf = &disp_buf1;
   disp_drv.flush_cb = sdl_display_flush;
   disp_drv.hor_res = SDL_HOR_RES;
@@ -46,33 +47,32 @@ static void init_simulator(void)
   lv_group_t * g = lv_group_create();
   lv_group_set_default(g);
 
-  /* Add the mouse as input device
-   * Use the 'mouse' driver which reads the PC's mouse*/
+  // Add the mouse as input device
+  // Use the 'mouse' driver which reads the PC's mouse
   static lv_indev_drv_t indev_drv_1;
-  lv_indev_drv_init(&indev_drv_1); /*Basic initialization*/
+  lv_indev_drv_init(&indev_drv_1);
   indev_drv_1.type = LV_INDEV_TYPE_POINTER;
-
-  /*This function will be called periodically (by the library) to get the mouse position and state*/
+  // This function will be called periodically (by the library) to get the mouse position and state
   indev_drv_1.read_cb = sdl_mouse_read;
   lv_indev_t *mouse_indev = lv_indev_drv_register(&indev_drv_1);
 
   static lv_indev_drv_t indev_drv_2;
-  lv_indev_drv_init(&indev_drv_2); /*Basic initialization*/
+  lv_indev_drv_init(&indev_drv_2);
   indev_drv_2.type = LV_INDEV_TYPE_KEYPAD;
   indev_drv_2.read_cb = sdl_keyboard_read;
   lv_indev_t *kb_indev = lv_indev_drv_register(&indev_drv_2);
   lv_indev_set_group(kb_indev, g);
+
   static lv_indev_drv_t indev_drv_3;
-  lv_indev_drv_init(&indev_drv_3); /*Basic initialization*/
+  lv_indev_drv_init(&indev_drv_3);
   indev_drv_3.type = LV_INDEV_TYPE_ENCODER;
   indev_drv_3.read_cb = sdl_mousewheel_read;
-
   lv_indev_t * enc_indev = lv_indev_drv_register(&indev_drv_3);
   lv_indev_set_group(enc_indev, g);
 
-  /*Set a cursor for the mouse*/
-  LV_IMG_DECLARE(mouse_cursor_icon); /*Declare the image file.*/
-  lv_obj_t * cursor_obj = lv_img_create(lv_scr_act()); /*Create an image object for the cursor */
+  // Set a cursor for the mouse
+  LV_IMG_DECLARE(mouse_cursor_icon);                        /*Declare the image file.*/
+  lv_obj_t * cursor_obj = lv_img_create(lv_scr_act());      /*Create an image object for the cursor */
   lv_img_set_src(cursor_obj, &mouse_cursor_icon);           /*Set the image source*/
   lv_indev_set_cursor(mouse_indev, cursor_obj);             /*Connect the image  object to the driver*/
 }
@@ -80,25 +80,27 @@ static void init_simulator(void)
 #elif USE_FBDEV
 #include "lv_drivers/display/fbdev.h"
 #include "lv_drivers/indev/evdev.h"
-#define DISP_BUF_SIZE (800*480)
+#define DISP_BUF_SIZE (HOR_RES*VER_RES)
 
 static void init_fbdev(void)
 {
     // display
-    /*Linux frame buffer device init*/
+    // Linux frame buffer device init
     fbdev_init();
-    /*A small buffer for LittlevGL to draw the screen's content*/
+    // A small buffer for LittlevGL to draw the screen's content
     static lv_color_t buf[DISP_BUF_SIZE];
-    /*Initialize a descriptor for the buffer*/
+
+    // Initialize a descriptor for the buffer
     static lv_disp_draw_buf_t disp_buf;
     lv_disp_draw_buf_init(&disp_buf, buf, NULL, DISP_BUF_SIZE);
-    /*Initialize and register a display driver*/
+
+    // Initialize and register a display driver
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
     disp_drv.draw_buf   = &disp_buf;
     disp_drv.flush_cb   = fbdev_flush;
-    disp_drv.hor_res    = 800;
-    disp_drv.ver_res    = 480;
+    disp_drv.hor_res    = HOR_RES;
+    disp_drv.ver_res    = VER_RES;
     disp_drv.sw_rotate	= 1;
     //disp_drv.rotated	= LV_DISP_ROT_270;
     lv_disp_drv_register(&disp_drv);
@@ -106,24 +108,25 @@ static void init_fbdev(void)
     // input
     evdev_init();
     static lv_indev_drv_t indev_drv_1;
-    lv_indev_drv_init(&indev_drv_1); /*Basic initialization*/
+    lv_indev_drv_init(&indev_drv_1);                        /*Basic initialization*/
     indev_drv_1.type = LV_INDEV_TYPE_POINTER;
     //indev_drv_1.type = LV_INDEV_TYPE_NONE;
     //indev_drv_1.type = LV_INDEV_TYPE_KEYPAD;
-    /*This function will be called periodically (by the library) to get the mouse position and state*/
+    // This function will be called periodically (by the library) to get the mouse position and state
     indev_drv_1.read_cb = evdev_read;
     lv_indev_t *mouse_indev = lv_indev_drv_register(&indev_drv_1);
-    /*Set a cursor for the mouse*/
+    // Set a cursor for the mouse
     LV_IMG_DECLARE(mouse_cursor_icon)
-    lv_obj_t * cursor_obj = lv_img_create(lv_scr_act()); /*Create an image object for the cursor */
-    lv_img_set_src(cursor_obj, &mouse_cursor_icon);           /*Set the image source*/
-    lv_indev_set_cursor(mouse_indev, cursor_obj);             /*Connect the image  object to the driver*/
+    lv_obj_t * cursor_obj = lv_img_create(lv_scr_act());    /*Create an image object for the cursor */
+    lv_img_set_src(cursor_obj, &mouse_cursor_icon);         /*Set the image source*/
+    lv_indev_set_cursor(mouse_indev, cursor_obj);           /*Connect the image  object to the driver*/
 }
 #endif
 
+pthread_mutex_t lvgl_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 int main(void)
 {
-    /*LittlevGL init*/
     lv_init();
 
 #if USE_SDL
@@ -132,17 +135,20 @@ int main(void)
     init_fbdev();
 #endif
 
-    /*Create a Demo*/
     //lv_demo_widgets();
     //lv_demo_benchmark();
+    //json_parser_test();
+    
     ui_init();
-    ui_Screen1_Start();
-    //ui_controller_init();
-    task_creat(NULL, 90, 4*1024*1024, (FUNC)network_thread, NULL);
+    ui_controller_init();
+    task_creat("monitor", 90, 32*1024, (FUNC)monitor_thread, NULL);
+    task_creat("git", 90, 128*1024, (FUNC)git_thread, NULL);
 
     /*Handle LitlevGL tasks (tickless mode)*/
     while(1) {
+        pthread_mutex_lock(&lvgl_mutex);
         lv_timer_handler();
+        pthread_mutex_unlock(&lvgl_mutex);
         usleep(5000);
     }
 
