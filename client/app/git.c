@@ -7,17 +7,18 @@
 #include "json_parser.h"
 #include "ui_controller.h"
 
-ui_git_t **git_info;
+git_t **git_info;
 int end_year = 0, year_cnt = 0;
-char git_updating = 1;
+bool git_updating = true;
+char git_updating_percent = 0;
 char url_buf[64];
 CURLcode res;
 CURL *curl = NULL;
 struct MemoryStruct chunk;
 
-int git_curl_req(int year, ui_git_t *info) {
+int git_curl_req(int year, git_t *info) {
     snprintf(url_buf, sizeof(url_buf), "%s%d.json", URL_GIT, year);
-    printf("requesting %s\n", url_buf);
+    printf("curl %s\n", url_buf);
     chunk.size = 0;
     curl_easy_setopt(curl, CURLOPT_URL, url_buf);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -52,22 +53,22 @@ int git_init(void) {
     year_cnt = end_year - START_YEAR + 1;
     printf("git years from %d to %d, total %d years!\n", START_YEAR, end_year, year_cnt);
 
-    // malloc buffer for pointers to ui_git_t
-    git_info = malloc(sizeof(ui_git_t*)*year_cnt);
+    // malloc buffer for pointers to git_t
+    git_info = malloc(sizeof(git_t*)*year_cnt);
     if (!git_info) {
         printf("git_init1 Out of memory!\n");
         return 1;
     }
     memset(git_info, 0, sizeof(git_info)*year_cnt);
 
-    // malloc buffer for ui_git_t of each year
+    // malloc buffer for git_t of each year
     for (int i=0; i<year_cnt; i++) {
-        git_info[i] = malloc(sizeof(ui_git_t));
+        git_info[i] = malloc(sizeof(git_t));
         if (!git_info) {
             printf("git_init2, out of memory!\n");
             return 2;
         }
-        memset(git_info[i], 0, sizeof(ui_git_t));
+        memset(git_info[i], 0, sizeof(git_t));
     }
 
     memset(&chunk, 0, sizeof(chunk));
@@ -103,22 +104,24 @@ void git_thread(void) {
 
     int current_year = START_YEAR;
     while(1) {
-        ui_update_git_status(git_updating);
+        ui_update_git_status(git_updating_percent);
         if (git_updating) {
             int temp = current_year-START_YEAR;
             if (!git_curl_req(current_year, git_info[temp]) ) {
-                //printf("%d %d\n", git_info[temp]->year, git_info[temp]->max);
                 current_year++;
+                git_updating_percent = (current_year-START_YEAR)*100/(end_year-START_YEAR);
                 if (current_year > end_year) {
+                    git_updating_percent = 100;
                     current_year = START_YEAR;
-                    git_updating = 0;
+                    git_updating = false;
                     pthread_mutex_lock(&lvgl_mutex);
+                    ui_update_git_status(git_updating_percent);
                     ui_update_git(git_info);
                     pthread_mutex_unlock(&lvgl_mutex);
                 }
             }
         }
-        usleep(10*1000);
+        usleep(500*1000);
     }
 
     git_uninit();

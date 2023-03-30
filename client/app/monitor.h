@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct _ui_monitor_t {
+typedef struct _monitor_t {
     double cpu_load;
     double ram_load;
     double cpu_clock;
@@ -19,7 +19,7 @@ typedef struct _ui_monitor_t {
 	char date[16];
     char time[16];
     char week[8];
-}ui_monitor_t;
+}monitor_t;
 
 void monitor_thread(void);
 

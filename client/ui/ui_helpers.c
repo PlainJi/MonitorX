@@ -186,4 +186,7 @@ void _ui_checked_set_text_value(lv_obj_t * trg, lv_obj_t * src, char * txt_on, c
     else lv_label_set_text(trg, txt_off);
 }
 
-
+void _ui_slider_set_value(void *a, int32_t v)
+{
+    lv_slider_set_value((lv_obj_t *)a, v, LV_ANIM_OFF);
+}

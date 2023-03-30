@@ -39,14 +39,17 @@ void ui_controller_init(void);
 void update_time_from_local(void);
 void ui_Start(void);
 
-void ui_update_monitor(ui_monitor_t *pMonitor);
+void ui_update_monitor(monitor_t *pMonitor);
 
 void ui_git_init(int end_year);
-void ui_update_git_status(char status);
-void ui_update_contribution_panel(ui_git_t *info);
+void ui_update_git_status(char percent);
+void ui_update_contribution_panel(git_t *info);
 void ui_update_contribution_panel_by_year(int year);
-void ui_update_git(ui_git_t **git_info);
+void ui_update_git(git_t **git_info);
 
-void ui_update_bili(char *buffer);
+void ui_bili_init(void);
+void ui_update_bili_status(char percent);
+void ui_update_bili_relation(bili_relation_t *relation);
+void ui_update_bili(bili_t *info);
 
 #endif

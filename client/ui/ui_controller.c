@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 #include "monitor.h"
 #include "git.h"
 #include "bili.h"
@@ -21,11 +22,15 @@
 #define GPU_TEMP_POINTER_START		(300)
 #define GPU_TEMP_POINTER_END		(1500)
 
+#define CONTRIBUTION_PANEL_W		(750)
+#define CONTRIBUTION_PANEL_H		(105)
 
 #define GET_ANGLE_BY_PERCENT(start, end, percent) (percent/100.0f*(end-start)+start)
 
+extern pthread_mutex_t lvgl_mutex;
+
 char buf[32] = {0};		// monitor temp string buffer
-ui_git_t **ui_git_info;	// same as git_info**
+git_t **ui_git_info;	// same as git_info**
 int ui_git_end_year = 0;
 
 void SetAnimation(lv_obj_t * TargetObject, int new_angle, int time)
@@ -81,28 +86,24 @@ void GMemSetUsage(float usage) {
 	lv_arc_set_value(ui_GMemUsageArc, usage);
 }
 
-void SetText(lv_obj_t *obj, char* str) {
-	lv_textarea_set_text(obj, str);
-}
-
 void CpuSetUsagePercent(float usage) {
 	sprintf(buf, "%d%%", (int)usage);
-	SetText(ui_CpuUsagePercent, buf);
+	lv_textarea_set_text(ui_CpuUsagePercent, buf);
 }
 
 void GpuSetUsagePercent(float usage) {
 	sprintf(buf, "%d%%", (int)usage);
-	SetText(ui_GpuUsagePercent, buf);
+	lv_textarea_set_text(ui_GpuUsagePercent, buf);
 }
 
 void MemSetUsagePercent(float usage) {
 	sprintf(buf, "%d%%", (int)usage);
-	SetText(ui_MemUsagePercent, buf);
+	lv_textarea_set_text(ui_MemUsagePercent, buf);
 }
 
 void GMemSetUsagePercent(float usage) {
 	sprintf(buf, "%d%%", (int)usage);
-	SetText(ui_GMemUsagePercent, buf);
+	lv_textarea_set_text(ui_GMemUsagePercent, buf);
 }
 
 void AutoUnit(int bytes, char *dest_buf) {
@@ -141,10 +142,10 @@ void CpuSetFrequency(float mhz) {
 	if (mhz > 999.0f) {
 		temp = mhz / 1000.0f;
 		sprintf(buf, "%3.1fGHz", (double)temp);
-		SetText(ui_CpuFrequency, buf);
+		lv_textarea_set_text(ui_CpuFrequency, buf);
 	} else {
 		sprintf(buf, "%dMHz", (int)mhz);
-		SetText(ui_CpuFrequency, buf);
+		lv_textarea_set_text(ui_CpuFrequency, buf);
 	}
 }
 
@@ -153,10 +154,10 @@ void GpuSetFrequency(float mhz) {
 	if (mhz > 999.0f) {
 		temp = mhz / 1000.0f;
 		sprintf(buf, "%3.1fGHz", (double)temp);
-		SetText(ui_GpuFrequency, buf);
+		lv_textarea_set_text(ui_GpuFrequency, buf);
 	} else {
 		sprintf(buf, "%dMHz", (int)mhz);
-		SetText(ui_GpuFrequency, buf);
+		lv_textarea_set_text(ui_GpuFrequency, buf);
 	}
 }
 
@@ -219,7 +220,7 @@ void ui_controller_init(void) {
 	ui_Start();
 }
 
-void ui_update_monitor(ui_monitor_t *pMonitor) {
+void ui_update_monitor(monitor_t *pMonitor) {
 	CpuSetUsagePointer(pMonitor->cpu_load);
 	CpuSetUsagePercent(pMonitor->cpu_load);
 	MemSetUsage(pMonitor->ram_load);
@@ -247,7 +248,7 @@ void ui_update_monitor(ui_monitor_t *pMonitor) {
 
 /////////////////////////////////////////////////////////////////////////////
 
-static uint8_t ui_git_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(750, 142)];
+static uint8_t ui_git_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CONTRIBUTION_PANEL_W, CONTRIBUTION_PANEL_H)];
 lv_obj_t *ui_git_canvas;
 lv_color_t color_bg0, color_bd0;
 lv_color_t color_bg1, color_bd1;
@@ -258,7 +259,7 @@ lv_draw_rect_dsc_t ui_git_dsc;
 
 void ui_git_init(int end_year) {
 	// init username
-	SetText(ui_username, "PlainJi");
+	lv_textarea_set_text(ui_TextGitUserName, "PlainJi");
 
 	// init year
 	ui_git_end_year = end_year;
@@ -291,19 +292,37 @@ void ui_git_init(int end_year) {
 
     // init contribute panel
     ui_git_canvas = lv_canvas_create(ui_ContributionPanel);
-    lv_canvas_set_buffer(ui_git_canvas, ui_git_cbuf, 750, 142, LV_IMG_CF_TRUE_COLOR);
-    lv_canvas_fill_bg(ui_git_canvas, lv_color_make(0xff, 0xff, 0xff), LV_OPA_COVER);
+	lv_obj_set_width(ui_git_canvas, CONTRIBUTION_PANEL_W);
+    lv_obj_set_height(ui_git_canvas, CONTRIBUTION_PANEL_H);
+    lv_canvas_set_buffer(ui_git_canvas, ui_git_cbuf, CONTRIBUTION_PANEL_W, CONTRIBUTION_PANEL_H, LV_IMG_CF_TRUE_COLOR);
+	lv_canvas_fill_bg(ui_git_canvas, lv_color_make(0xff, 0xff, 0xff), LV_OPA_COVER);
+	//lv_obj_set_style_radius(ui_git_canvas, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+	//lv_obj_set_style_bg_color(ui_git_canvas, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    //lv_obj_set_style_bg_opa(ui_git_canvas, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    //lv_obj_set_style_border_width(ui_git_canvas, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     lv_obj_center(ui_git_canvas);
 	ui_update_contribution_panel(NULL);
 }
 
-void ui_update_git_status(char status) {
-	//pthread_mutex_lock(&lvgl_mutex);
-	//printf("ui_update_git_status: %d\n", status);
-	//pthread_mutex_unlock(&lvgl_mutex);
+void ui_update_git_status(char percent) {
+	static char cur_percent = 0;
+
+	if (cur_percent != percent) {
+		pthread_mutex_lock(&lvgl_mutex);
+		if (percent != 100) {
+			lv_obj_clear_flag(ui_Git_Slider_Loading, LV_OBJ_FLAG_HIDDEN);
+		}
+		StartLoading_Animation(ui_Git_Slider_Loading, cur_percent, percent, 500);
+		if (percent == 100) {
+			lv_obj_add_flag(ui_Git_Slider_Loading, LV_OBJ_FLAG_HIDDEN);
+		}
+		pthread_mutex_unlock(&lvgl_mutex);
+		cur_percent = percent;
+	}
 }
 
-void ui_update_contribution_panel(ui_git_t *info) {
+void ui_update_contribution_panel(git_t *info) {
 	const int x_start = 5;
 	const int y_start = 5;
 	const int w_h = 11;
@@ -352,7 +371,7 @@ void ui_update_contribution_panel_by_year(int year) {
 	}
 }
 
-void ui_update_git(ui_git_t **info) {
+void ui_update_git(git_t **info) {
 	ui_git_info = info;
 	char dd_buf[8];
 	lv_dropdown_get_selected_str(ui_year, dd_buf, sizeof(dd_buf));
@@ -360,8 +379,53 @@ void ui_update_git(ui_git_t **info) {
 	ui_update_contribution_panel(ui_git_info[year-START_YEAR]);
 }
 
-void ui_update_bili(char *buffer) {
-	
+//////////////////////////////////////////////////////////////////////////////
+
+void ui_bili_init(void) {
+	char bili_buf[32] = {0};
+
+	snprintf(bili_buf, sizeof(bili_buf), "ID: %s", BILI_MID_STR);
+	lv_textarea_set_text(ui_TextBiliUserID, bili_buf);
+}
+
+void ui_update_bili_status(char percent) {
+	static char cur_percent = 0;
+	if (cur_percent != percent) {
+		pthread_mutex_lock(&lvgl_mutex);
+		if (percent != 100) {
+			lv_obj_clear_flag(ui_Bili_Slider_Loading, LV_OBJ_FLAG_HIDDEN);
+		}
+		StartLoading_Animation(ui_Bili_Slider_Loading, cur_percent, percent, 800);
+		if (percent == 100) {
+			lv_obj_add_flag(ui_Bili_Slider_Loading, LV_OBJ_FLAG_HIDDEN);
+		}
+		pthread_mutex_unlock(&lvgl_mutex);
+		cur_percent = percent;
+	}
+}
+
+void ui_update_bili_relation(bili_relation_t *relation) {
+	char bili_buf[16] = {0};
+
+	snprintf(bili_buf, sizeof(bili_buf), "%d", relation->follower);
+	lv_textarea_set_text(ui_TextFollower, bili_buf);
+}
+
+void ui_update_bili(bili_t *info_all) {
+	char bili_buf[32] = {0};
+
+	snprintf(bili_buf, sizeof(bili_buf), "ID: %s", info_all->userid);
+	lv_textarea_set_text(ui_TextBiliUserID, bili_buf);
+	lv_textarea_set_text(ui_TextBiliUserName, info_all->username);
+
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->like);
+	lv_textarea_set_text(ui_TextLike, bili_buf);
+
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->coin);
+	lv_textarea_set_text(ui_TextCoin, bili_buf);
+
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->favorite);
+	lv_textarea_set_text(ui_TextFavorite, bili_buf);
 }
 
 

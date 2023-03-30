@@ -1,16 +1,19 @@
 #include "lvgl.h"
 #include "lv_drv_conf.h"
-#include "demos/lv_demos.h"
-#include "examples/lv_examples.h"
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
+#include "thirdparty/thread_warpper.h"
 #include "ui.h"
 #include "ui_helpers.h"
 #include "ui_controller.h"
 #include "monitor.h"
-#include "thirdparty/thread_warpper.h"
+#include "git.h"
+#include "bili.h"
+
+// #include "demos/lv_demos.h"
+// #include "examples/lv_examples.h"
 
 #if USE_SDL
 #include <SDL2/SDL.h>
@@ -143,6 +146,7 @@ int main(void)
     ui_controller_init();
     task_creat("monitor", 90, 32*1024, (FUNC)monitor_thread, NULL);
     task_creat("git", 90, 128*1024, (FUNC)git_thread, NULL);
+    task_creat("bili", 90, 128*1024, (FUNC)bili_thread, NULL);
 
     /*Handle LitlevGL tasks (tickless mode)*/
     while(1) {

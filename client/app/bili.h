@@ -2,28 +2,62 @@
 
 #include "curldef.h"
 
-typedef struct _ui_bili_t {
-    char userid[32];
-    int following;
-    int follower;
-    int whisper;
-    int black;
-    int likes;
-    int archive_views;
-    int article_views;
-}ui_bili_t;
+//#define BILI_MID_STR        "28457"       // 司波图
+//#define BILI_MID_STR        "20259914"    // 稚辉君
+//#define BILI_MID_STR        "389426697"   // 胡仑贝尔
+#define BILI_MID_STR        "15027304"    // tangmash
+#define URL_BILI_RELATION   "https://api.bilibili.com/x/relation/stat?vmid="                // 389426697
+#define URL_BILI_VIDEO_LIST "https://api.bilibili.com/x/space/arc/search?mid="              // 389426697&pn=1&ps=50
+#define URL_BILI_VIDEO_INFO "https://api.bilibili.com/x/web-interface/archive/stat?aid="    // 590023490
 
-typedef struct _VIDEO_INFO {
-	char aid[10];	// 590023490
-	char bid[13];	// BV1pq4y1D7Da
-	int  view;		// 播放数
-	int  danmu;		// 弹幕数
-	int  reply;		// 评论数
-	int  favorite;	// 收藏数
-	int  coin;		// 硬币数
-	int  share;		// 分享数
-	int  like;		// 点赞数
-}VIDEO_INFO, *pVIDEO_INFO;
+typedef struct _bili_t {
+    char userid[16];	// 用户ID
+    char username[32];	// 用户名
+    int following;		// 总关注
+    int follower;		// 粉丝数   1
+    int videos;			// 总视频   1
+    int view;			// 总播放   1
+    int danmu;			// 总弹幕
+    int reply;			// 总评论
+    int like;			// 总点赞   1
+    int coin;			// 总硬币   1
+    int favorite;		// 总收藏   1
+    int share;			// 总分享
+}bili_t;
 
+typedef struct _bili_relation_t {
+    char mid[32];		// 
+    int following; 		// 关注数
+    int whisper;		// 
+    int black;			// 
+    int follower;		// 粉丝数
+}bili_relation_t;
+
+typedef struct _bili_video_list_t {
+    int count;
+    int ps;
+    int pn;
+    char author[128];
+    char *video_list_buf;
+}bili_video_list_t;
+
+typedef struct _bili_video_info_t {
+    int  aid;		// 590023490
+    int  view;		// 播放数
+    int  danmu;		// 弹幕数
+    int  reply;		// 评论数
+    int  favorite;	// 收藏数
+    int  coin;		// 硬币数
+    int  share;		// 分享数
+    int  like;		// 点赞数
+}bili_video_info_t;
+
+int bili_curl_req(char *url);
+int bili_req_relation(void);
+int bili_req_video_list(void);
+int bili_req_video_detail(int cnt);
+int bili_get_summary(void);
+int bili_init(void);
+int bili_uninit(void);
 void bili_thread(void);
 

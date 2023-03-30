@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
 // https://api.bilibili.com/x/relation/stat?vmid=389426697
 const char *bili_relation = "{ 	\
   \"code\": 0,				\
@@ -80,6 +81,7 @@ const char *git_test = "{		\
     }							\
   ]								\
 }";
+*/
 
 int get_root(const char *str, cJSON **root) {
 	*root = cJSON_Parse(str);
@@ -148,7 +150,7 @@ int get_string_from_node(cJSON *node, char *key, char *buf, int len) {
 	return 0;
 }
 
-int parse_monitor_info(const char *str, ui_monitor_t *ui_monitor) {
+int parse_monitor_info(const char *str, monitor_t *ui_monitor) {
 	int res = 0;
 	cJSON *root = NULL;
 
@@ -158,7 +160,7 @@ int parse_monitor_info(const char *str, ui_monitor_t *ui_monitor) {
 			break;
 		}
 
-		memset(ui_monitor, 0, sizeof(ui_monitor_t));
+		memset(ui_monitor, 0, sizeof(monitor_t));
 		get_double_from_node(root, "cpu_load", &ui_monitor->cpu_load);
 		get_double_from_node(root, "ram_load", &ui_monitor->ram_load);
 		get_double_from_node(root, "cpu_clock", &ui_monitor->cpu_clock);
@@ -183,7 +185,7 @@ int parse_monitor_info(const char *str, ui_monitor_t *ui_monitor) {
 	return res;
 }
 
-int parse_git_info(const char *str, ui_git_t *ui_git) {
+int parse_git_info(const char *str, git_t *ui_git) {
 	cJSON *root = NULL;
 	cJSON *contributions = NULL;
 	cJSON *week = NULL;
@@ -202,7 +204,7 @@ int parse_git_info(const char *str, ui_git_t *ui_git) {
 			break;
 		}
 
-		memset(ui_git, 0, sizeof(ui_git_t));
+		memset(ui_git, 0, sizeof(git_t));
 		get_string_from_node(root, "username", ui_git->username, sizeof(ui_git->username));
 		get_int_from_node(root, "year", &ui_git->year);
 		get_string_from_node(root, "year", temp_year, sizeof(temp_year));
@@ -235,7 +237,7 @@ int parse_git_info(const char *str, ui_git_t *ui_git) {
 	return res;
 }
 
-int parse_bili_relation(const char *str, ui_bili_t *ui_bili) {
+int parse_bili_relation(const char *str, bili_relation_t *ui_bili) {
 	cJSON *root = NULL;
 	cJSON *code = NULL;
 	cJSON *data = NULL;
@@ -261,6 +263,85 @@ int parse_bili_relation(const char *str, ui_bili_t *ui_bili) {
 	return res;
 }
 
+int parse_bili_video_list(const char *str, bili_video_list_t *list_buf) {
+	cJSON *root = NULL;
+		// code
+		cJSON *data = NULL;
+			cJSON *page = NULL;
+				// pn
+				// ps
+				// count
+			cJSON *list = NULL;
+				cJSON *vList = NULL;
+					cJSON *item = NULL;
+						// author
+						// aid
+	int res = 0;
+	int status = 0;
+	int aid = 0;
+	int cnt = 0;
+
+	do {
+		if (get_root(str, &root)) { res = 1; break; }
+			if (get_int_from_node(root, "code", &status)) { res=2; break; }
+			//printf("status: %d\n", status);
+			if (status != 0) { res=3; break; }
+
+			if (get_node(root, "data", &data)) { res=4; break; }
+				if (get_node(data, "page", &page)) { res=5; break; }
+					if (get_int_from_node(page, "pn", &list_buf->pn)) { res=6; break; }
+					if (get_int_from_node(page, "ps", &list_buf->ps)) { res=7; break; }
+					if (get_int_from_node(page, "count", &list_buf->count)) { res=8; break; }
+					if (list_buf->video_list_buf == NULL) {
+						list_buf->video_list_buf = realloc(list_buf->video_list_buf, list_buf->count * sizeof(aid));
+						if (list_buf->video_list_buf == NULL) { res=9; break; }
+					}
+					//printf("pn=%d, ps=%d, cnt=%d\n", list_buf->pn, list_buf->ps, list_buf->count);
+				if (get_node(data, "list", &list)) { res=10; break; }
+					if (get_node(list, "vlist", &vList)) { res=11; break; }
+						cJSON_ArrayForEach(item, vList) {
+							if (get_int_from_node(item, "aid", &aid)) { res=12; break; }
+							//printf("aid = %d\n", aid);
+							int offset = ((list_buf->pn-1) * list_buf->ps + cnt) * sizeof(aid); cnt++;
+							memcpy(list_buf->video_list_buf+offset, &aid, sizeof(aid));
+							if (!list_buf->author[0]) {
+								if (get_string_from_node(item, "author", list_buf->author, sizeof(list_buf->author))) { res=13; break; }
+								//printf("author: %s\n", list_buf->author);
+							}
+						}
+	}while(0);
+
+	cJSON_Delete(root);
+	return res;
+}
+
+int parse_bili_video_detail(const char *str, bili_video_info_t *info) {
+	cJSON *root = NULL;
+	cJSON *data = NULL;
+	int res = 0;
+	int status = 0;
+
+	do {
+		if (get_root(str, &root)) {res = 1;break;}
+		if (get_int_from_node(root, "code", &status)) {res=2;break;}
+		if (status != 0) {res=3; break;}
+		
+		if (get_node(root, "data", &data)) {res=4; break;}
+			if (get_int_from_node(data, "aid", &info->aid)) {res=5;break;}
+			if (get_int_from_node(data, "view", &info->view)) {res=6;break;}
+			if (get_int_from_node(data, "danmaku", &info->danmu)) {res=7;break;}
+			if (get_int_from_node(data, "reply", &info->reply)) {res=8;break;}
+			if (get_int_from_node(data, "favorite", &info->favorite)) {res=9;break;}
+			if (get_int_from_node(data, "coin", &info->coin)) {res=10;break;}
+			if (get_int_from_node(data, "share", &info->share)) {res=11;break;}
+			if (get_int_from_node(data, "like", &info->like)) {res=12;break;}
+	}while(0);
+	
+	cJSON_Delete(root);
+	return res;
+}
+
+/*
 int parse_bili_space(const char *str, ui_bili_t *ui_bili) {
 	cJSON *root = NULL;
 	cJSON *code = NULL;
@@ -289,13 +370,15 @@ int parse_bili_space(const char *str, ui_bili_t *ui_bili) {
 	cJSON_Delete(root);
 	return res;
 }
+*/
 
+/*
 void json_parser_test(void) {
-	ui_monitor_t ui_monitor;
-	ui_git_t ui_git;
+	monitor_t ui_monitor;
+	git_t ui_git;
 	ui_bili_t ui_bili;
-	memset(&ui_monitor, 0, sizeof(ui_monitor_t));
-	memset(&ui_git, 0, sizeof(ui_git_t));
+	memset(&ui_monitor, 0, sizeof(monitor_t));
+	memset(&ui_git, 0, sizeof(git_t));
 	memset(&ui_bili, 0, sizeof(ui_bili_t));
 
 	parse_git_info(git_test, &ui_git);
@@ -312,6 +395,7 @@ void json_parser_test(void) {
 	
 	printf("following=%d likes=%d\n", ui_bili.following, ui_bili.likes);
 }
+*/
 
 /*
  * char *test_string = "{\"cpu_load\": 16.0, \"cpu_temp\": 52.0, \"cpu_clock\": 4009.0, \"ram_load\": 57.0}";

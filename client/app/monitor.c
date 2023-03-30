@@ -48,7 +48,7 @@ void monitor_thread(void)
     //5.设置客户端加入多播组
     setsockopt(confd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&group,sizeof(group));
 
-    ui_monitor_t ui_monitor;
+    monitor_t ui_monitor;
     while(1){
         memset(buf, 0, sizeof(buf));
         len=recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);
