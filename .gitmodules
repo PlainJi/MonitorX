@@ -4,3 +4,6 @@
 [submodule "client/lvgl"]
 	path = client/lvgl
 	url = https://github.com/lvgl/lvgl.git
+[submodule "client/thirdparty/iniparser"]
+	path = client/thirdparty/iniparser
+	url = https://github.com/ndevilla/iniparser.git

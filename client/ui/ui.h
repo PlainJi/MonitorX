@@ -18,7 +18,6 @@ void StartCpuTemp_Animation(lv_obj_t * TargetObject, int delay);
 void StartGpuTemp_Animation(lv_obj_t * TargetObject, int delay);
 void StartLoading_Animation(lv_obj_t * TargetObject, int v1, int v2, int time);
 void kb_event_cb(lv_event_t * e);
-void keyboard_init(lv_obj_t *screen, lv_obj_t *targetText, int x, int y);
 void ui_event_Monitor(lv_event_t * e);
 extern lv_obj_t * ui_Monitor;
 extern lv_obj_t * ui_PanelMonitor;

@@ -6,14 +6,16 @@
 #include "ui.h"
 #include "ui_helpers.h"
 #include "ui_controller.h"
+#include "config.h"
 #include <stdio.h>
+#include <time.h>
 
 ///////////////////// VARIABLES ////////////////////
-void StartCpuPointer_Animation(lv_obj_t * TargetObject, int delay);
-void StartGpuPointer_Animation(lv_obj_t * TargetObject, int delay);
-void StartCpuTemp_Animation(lv_obj_t * TargetObject, int delay);
-void StartGpuTemp_Animation(lv_obj_t * TargetObject, int delay);
-void ui_event_Monitor(lv_event_t * e);
+extern bool git_updating;
+extern time_t git_last_update_time;
+extern bool bili_updating;
+extern time_t bili_last_update_relation;
+extern time_t bili_last_update_stat;
 
 // screen monitor
 lv_obj_t * ui_Monitor;
@@ -227,38 +229,47 @@ void StartLoading_Animation(lv_obj_t * TargetObject, int v1, int v2, int time)
 
 void kb_event_cb(lv_event_t * e)
 {
+    int ret = 0;
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * ta = lv_event_get_target(e);
     lv_obj_t * kb = lv_event_get_user_data(e);
-    if(code == LV_EVENT_FOCUSED) {
-        printf("focused!\n");
+    if(code == LV_EVENT_LONG_PRESSED) {
         lv_keyboard_set_textarea(kb, ta);
         lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        if (ta == ui_TextGitUserName) {
+            git_stop_update();
+        } else if (ta == ui_TextBiliUserName) {
+            bili_stop_update();
+        }
     }
     if(code == LV_EVENT_DEFOCUSED) {
-        printf("defocused!\n");
-        lv_keyboard_set_textarea(kb, NULL);
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+        
     }
     if (code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
-        printf("defocused!\n");
-        lv_keyboard_set_textarea(kb, NULL);
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_clear_state(ta, LV_STATE_FOCUSED);
+        //lv_event_send(ta, LV_EVENT_DEFOCUSED, NULL);
+        const char *input = lv_textarea_get_text(ta);
+        if (ta == ui_TextGitUserName) {
+            if (ui_git_check_username(input)) {
+                ret = 1;
+            } else {
+                config_set_git_username(input);
+                git_reset();
+            }
+        } else if (ta == ui_TextBiliUserName) {
+            if (ui_bili_check_userid(input)) {
+                ret = 1;
+            } else {
+                config_set_bili_userid(input);
+                bili_reset();
+            }
+        }
+        if (!ret) {
+            lv_keyboard_set_textarea(kb, NULL);
+            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+            lv_indev_reset(NULL, ta);
+        }
     }
 }
-
-void keyboard_init(lv_obj_t *screen, lv_obj_t *targetText, int x, int y)
-{
-    lv_obj_t *kb = lv_keyboard_create(screen);
-    lv_obj_set_x(kb, x);
-    lv_obj_set_y(kb, y);
-    lv_keyboard_set_textarea(kb, targetText);
-    lv_keyboard_set_mode(kb, LV_KEYBOARD_MODE_NUMBER);
-    lv_obj_add_event_cb(targetText, kb_event_cb, LV_EVENT_ALL, kb);
-    lv_obj_add_state(targetText, LV_STATE_FOCUSED);
-}
-
 
 ///////////////////// FUNCTIONS ////////////////////
 void ui_event_Monitor(lv_event_t * e)
@@ -294,9 +305,6 @@ void ui_event_Git(lv_event_t * e)
         lv_dropdown_get_selected_str(ui_year, buf, sizeof(buf));
         ui_update_contribution_panel_by_year(atoi(buf));
     }
-    if (event_code == LV_EVENT_LONG_PRESSED && target == ui_TextGitUserName) {
-        keyboard_init(ui_Git, ui_TextGitUserName, 0, 0);
-    }
 }
 
 void ui_event_Bili(lv_event_t * e)
@@ -308,9 +316,6 @@ void ui_event_Bili(lv_event_t * e)
     }
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         _ui_screen_change(ui_Git, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 500, 0);
-    }
-    if (event_code == LV_EVENT_LONG_PRESSED && target == ui_TextBiliUserName) {
-        keyboard_init(ui_Bili, ui_TextBiliUserName, 0, 0);
     }
 }
 
@@ -327,8 +332,7 @@ void ui_Monitor_screen_init(void)
     lv_obj_set_height(ui_PanelMonitor, 480);
     lv_obj_set_x(ui_PanelMonitor, 0);
     lv_obj_set_y(ui_PanelMonitor, -20);
-    lv_obj_clear_flag(ui_PanelMonitor, LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE |
-                      LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+    lv_obj_clear_flag(ui_PanelMonitor, LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE);     /// Flags
     lv_obj_set_style_radius(ui_PanelMonitor, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_PanelMonitor, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_PanelMonitor, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -787,16 +791,15 @@ void ui_Git_screen_init(void)
     lv_obj_set_style_bg_opa(ui_Git, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_TextGitUserName = lv_textarea_create(ui_Git);
-    lv_obj_set_width(ui_TextGitUserName, 150);
+    lv_obj_set_width(ui_TextGitUserName, 200);
     lv_obj_set_height(ui_TextGitUserName, LV_SIZE_CONTENT);    /// 40
     lv_obj_set_x(ui_TextGitUserName, -240);
     lv_obj_set_y(ui_TextGitUserName, -30);
     lv_obj_set_align(ui_TextGitUserName, LV_ALIGN_CENTER);
     lv_textarea_set_text(ui_TextGitUserName, "");
-    lv_textarea_set_placeholder_text(ui_TextGitUserName, "Username");
+    lv_textarea_set_placeholder_text(ui_TextGitUserName, "Input Username");
     lv_textarea_set_one_line(ui_TextGitUserName, true);
-    lv_obj_add_flag(ui_TextGitUserName, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
-    //lv_obj_clear_flag(ui_TextGitUserName, LV_OBJ_FLAG_CLICK_FOCUSABLE);     /// Flags
+    lv_obj_add_flag(ui_TextGitUserName, LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
     lv_obj_set_style_text_align(ui_TextGitUserName, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_TextGitUserName, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_TextGitUserName, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -822,7 +825,8 @@ void ui_Git_screen_init(void)
     lv_obj_set_x(ui_ContributionPanel, 0);
     lv_obj_set_y(ui_ContributionPanel, 100);
     lv_obj_set_align(ui_ContributionPanel, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_ContributionPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_clear_flag(ui_ContributionPanel, LV_OBJ_FLAG_SCROLLABLE);        // Flags
+    lv_obj_add_flag(ui_ContributionPanel, LV_OBJ_FLAG_CLICKABLE);           // Flags
     lv_obj_set_style_radius(ui_ContributionPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     //lv_obj_set_style_bg_color(ui_ContributionPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ContributionPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -836,10 +840,7 @@ void ui_Git_screen_init(void)
     lv_obj_set_x(ui_Git_ImgButtonLogo, 0);
     lv_obj_set_y(ui_Git_ImgButtonLogo, -90);
     lv_obj_set_align(ui_Git_ImgButtonLogo, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_Git_ImgButtonLogo,
-                      LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE |
-                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
-                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+    //lv_obj_clear_flag(ui_Git_ImgButtonLogo, );     /// Flags
 
     ui_Git_Slider_Loading = lv_slider_create(ui_Git);
     lv_obj_set_width(ui_Git_Slider_Loading, 177);
@@ -902,7 +903,7 @@ void ui_Bili_screen_init(void)
     lv_obj_set_align(ui_TextBiliUserName, LV_ALIGN_CENTER);
     lv_textarea_set_max_length(ui_TextBiliUserName, 128);
     lv_textarea_set_text(ui_TextBiliUserName, "");
-    lv_textarea_set_placeholder_text(ui_TextBiliUserName, "");
+    lv_textarea_set_placeholder_text(ui_TextBiliUserName, "Input UserID");
     lv_textarea_set_one_line(ui_TextBiliUserName, true);
     lv_obj_add_flag(ui_TextBiliUserName, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
     //lv_obj_clear_flag(ui_TextBiliUserName, LV_OBJ_FLAG_CLICK_FOCUSABLE);

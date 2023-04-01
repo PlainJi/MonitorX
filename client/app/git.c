@@ -6,18 +6,25 @@
 #include "curl/easy.h"
 #include "json_parser.h"
 #include "ui_controller.h"
+#include "config.h"
 
 git_t **git_info;
 int end_year = 0, year_cnt = 0;
+time_t git_last_update_time = 0;
 bool git_updating = true;
 char git_updating_percent = 0;
-char url_buf[64];
+char url_buf[128];
 CURLcode res;
 CURL *curl = NULL;
 struct MemoryStruct chunk;
+extern pthread_mutex_t lvgl_mutex;
 
-int git_curl_req(int year, git_t *info) {
-    snprintf(url_buf, sizeof(url_buf), "%s%d.json", URL_GIT, year);
+int git_curl_req(const char *username, int year, git_t *info) {
+    if (username) {
+        snprintf(url_buf, sizeof(url_buf), "%s/%s/%d.json", URL_GIT, username, year);
+    } else {
+        snprintf(url_buf, sizeof(url_buf), "%s/%s/%d.json", URL_GIT, conf.git_username, year);
+    }
     printf("curl %s\n", url_buf);
     chunk.size = 0;
     curl_easy_setopt(curl, CURLOPT_URL, url_buf);
@@ -40,6 +47,17 @@ int git_curl_req(int year, git_t *info) {
     }
 
     return 0;
+}
+
+int git_check_username(const char *username) {
+    git_t tmp;
+    memset(&tmp, 0, sizeof(tmp));
+    printf("[GIT CHECK]\n");
+    return git_curl_req(username, 2008, &tmp);
+}
+
+void git_reset(void) {
+    git_last_update_time = 0;
 }
 
 int git_init(void) {
@@ -88,7 +106,37 @@ void git_uninit(void) {
     curl_global_cleanup();
 }
 
-extern pthread_mutex_t lvgl_mutex;
+void git_stop_update(void) {
+    printf("git stop update!\n");
+    git_last_update_time = time(NULL);
+    git_updating = false;
+}
+
+void update_contribution_wall(void) {
+    int current_year = START_YEAR;
+    git_updating = true;
+
+    while (git_updating) {
+        ui_update_git_status(git_updating_percent);
+        int temp = current_year-START_YEAR;
+        if (!git_curl_req(NULL, current_year, git_info[temp]) ) {
+            current_year++;
+            git_updating_percent = (current_year-START_YEAR)*100/(end_year-START_YEAR);
+            if (current_year > end_year) {
+                git_updating_percent = 100;
+                current_year = START_YEAR;
+                git_updating = false;
+                pthread_mutex_lock(&lvgl_mutex);
+                ui_update_git_status(git_updating_percent);
+                ui_update_git(git_info);
+                pthread_mutex_unlock(&lvgl_mutex);
+                git_last_update_time = time(NULL);
+                printf("git update contribution: %s\n", asctime(localtime(&git_last_update_time)));
+            }
+        }
+        usleep(500*1000);
+    }
+}
 
 void git_thread(void) {
     printf("%s\n", curl_version());
@@ -101,27 +149,12 @@ void git_thread(void) {
     pthread_mutex_lock(&lvgl_mutex);
     ui_git_init(end_year);
     pthread_mutex_unlock(&lvgl_mutex);
-
-    int current_year = START_YEAR;
+    
     while(1) {
-        ui_update_git_status(git_updating_percent);
-        if (git_updating) {
-            int temp = current_year-START_YEAR;
-            if (!git_curl_req(current_year, git_info[temp]) ) {
-                current_year++;
-                git_updating_percent = (current_year-START_YEAR)*100/(end_year-START_YEAR);
-                if (current_year > end_year) {
-                    git_updating_percent = 100;
-                    current_year = START_YEAR;
-                    git_updating = false;
-                    pthread_mutex_lock(&lvgl_mutex);
-                    ui_update_git_status(git_updating_percent);
-                    ui_update_git(git_info);
-                    pthread_mutex_unlock(&lvgl_mutex);
-                }
-            }
+        if (time(NULL) - git_last_update_time > conf.git_update_cont_itv_h*3600) {
+            update_contribution_wall();
         }
-        usleep(500*1000);
+        sleep(1);
     }
 
     git_uninit();

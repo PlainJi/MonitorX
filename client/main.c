@@ -11,6 +11,7 @@
 #include "monitor.h"
 #include "git.h"
 #include "bili.h"
+#include "config.h"
 
 // #include "demos/lv_demos.h"
 // #include "examples/lv_examples.h"
@@ -141,9 +142,8 @@ int main(void)
     //lv_demo_widgets();
     //lv_demo_benchmark();
     //json_parser_test();
-    
+    read_config();
     ui_init();
-    ui_controller_init();
     task_creat("monitor", 90, 32*1024, (FUNC)monitor_thread, NULL);
     task_creat("git", 90, 128*1024, (FUNC)git_thread, NULL);
     task_creat("bili", 90, 128*1024, (FUNC)bili_thread, NULL);
@@ -155,6 +155,7 @@ int main(void)
         pthread_mutex_unlock(&lvgl_mutex);
         usleep(5000);
     }
+    free_config_resource();
 
     return 0;
 }

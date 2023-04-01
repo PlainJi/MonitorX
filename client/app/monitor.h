@@ -21,5 +21,6 @@ typedef struct _monitor_t {
     char week[8];
 }monitor_t;
 
+void ui_monitor_init(void);
 void monitor_thread(void);
 

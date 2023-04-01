@@ -48,12 +48,14 @@ CFLAGS 				+= -std=gnu99 -O0 -g -Wall -Wshadow -Wundef -Wextra -Wno-comment \
 					   -Wempty-body -Wstack-usage=8192
 
 DEFINES				+= -DLV_BUILD_TEST=0 -DUSE_EVDEV=1
-INC_PATH 			+= -I./ -I./lvgl/ -I./ui/ -I./app/ -I./thirdparty/cJSON/
+INC_PATH 			+= -I./ -I./lvgl/ -I./ui/ -I./app/ -I./thirdparty/cJSON/ -I./thirdparty/iniparser/src/
 LD_LIBS	 			+= -lcurl -lssl -lcrypto -lz -pthread
 BIN 				:= $(BIN_DIR)/$(PROJECT).$(target)
 COMPILE				= $(CC) $(CFLAGS) $(INC_PATH) $(DEFINES)
 # Automatically include all source files
-SRCS 				:= $(shell find $(SRC_DIR) -type f -name '*.c' -not -path '*/\.*')
+SRCS 				:= $(shell find $(SRC_DIR) -type f -name '*.c' \
+						-not -path './thirdparty/iniparser/test/*' \
+						-not -path './thirdparty/iniparser/example/*')
 OBJECTS    			:= $(patsubst $(SRC_DIR)%, $(BUILD_DIR)%, $(SRCS:.$(SRC_EXT)=.$(OBJ_EXT)))
 
 all: default

@@ -20,6 +20,7 @@
 #define MAXLINE             4096
 #define GROUP               "239.0.0.1"
 
+monitor_t ui_monitor;
 extern pthread_mutex_t lvgl_mutex;
 
 void monitor_thread(void)
@@ -48,7 +49,7 @@ void monitor_thread(void)
     //5.设置客户端加入多播组
     setsockopt(confd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&group,sizeof(group));
 
-    monitor_t ui_monitor;
+    ui_monitor_init();
     while(1){
         memset(buf, 0, sizeof(buf));
         len=recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);

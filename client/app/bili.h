@@ -5,7 +5,7 @@
 //#define BILI_MID_STR        "28457"       // 司波图
 //#define BILI_MID_STR        "20259914"    // 稚辉君
 //#define BILI_MID_STR        "389426697"   // 胡仑贝尔
-#define BILI_MID_STR        "15027304"    // tangmash
+//#define BILI_MID_STR        "15027304"    // tangmash
 #define URL_BILI_RELATION   "https://api.bilibili.com/x/relation/stat?vmid="                // 389426697
 #define URL_BILI_VIDEO_LIST "https://api.bilibili.com/x/space/arc/search?mid="              // 389426697&pn=1&ps=50
 #define URL_BILI_VIDEO_INFO "https://api.bilibili.com/x/web-interface/archive/stat?aid="    // 590023490
@@ -37,7 +37,8 @@ typedef struct _bili_video_list_t {
     int count;
     int ps;
     int pn;
-    char author[128];
+    char author[32];
+    int buf_len;
     char *video_list_buf;
 }bili_video_list_t;
 
@@ -53,11 +54,16 @@ typedef struct _bili_video_info_t {
 }bili_video_info_t;
 
 int bili_curl_req(char *url);
-int bili_req_relation(void);
+int bili_req_relation(const char *userid, bili_relation_t *info);
+int bili_check_userid(const char *userid);
 int bili_req_video_list(void);
 int bili_req_video_detail(int cnt);
 int bili_get_summary(void);
+void bili_reset(void);
 int bili_init(void);
 int bili_uninit(void);
+void bili_stop_update(void);
+void update_relation(void);
+void update_detail(void);
 void bili_thread(void);
 

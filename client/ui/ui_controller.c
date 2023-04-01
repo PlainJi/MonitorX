@@ -9,6 +9,7 @@
 #include "monitor.h"
 #include "git.h"
 #include "bili.h"
+#include "config.h"
 
 #define portMAX_DELAY				(0xffff)
 #define pdTRUE						(1)
@@ -186,38 +187,11 @@ void update_time_from_local(void) {
 	SetWeek(temp);
 }
 
-void ui_Start(void) {
+void ui_monitor_init(void) {
 	StartGpuTemp_Animation(ui_GpuTemp, 0);
     StartCpuTemp_Animation(ui_CpuTemp, 0);
     StartGpuPointer_Animation(ui_GpuUsagePointer, 0);
     StartCpuPointer_Animation(ui_CpuUsagePointer, 0);
-}
-
-void ui_controller_init(void) {
-	// lv_img_set_angle(ui_CpuUsagePointer, CPU_USAGE_POINTER_START);
-	// CpuSetUsagePercent(0.0f);
-	// CpuSetFrequency(0.0f);
-
-	// lv_img_set_angle(ui_GpuUsagePointer, GPU_USAGE_POINTER_START);
-	// GpuSetUsagePercent(0.0f);
-	// GpuSetFrequency(0.0f);
-
-	// //lv_img_set_angle(ui_MemUsagePointer, MEM_USAGE_POINTER_START);
-	// MemSetUsagePercent(0.0f);
-	// //lv_img_set_angle(ui_GMemUsagePointer, GMEM_USAGE_POINTER_START);
-	// GMemSetUsagePercent(0.0f);
-
-	// NetSetUpload(0);
-	// NetSetDownload(0);
-
-	// IoSetRead(0);
-	// IoSetWrite(0);
-
-	// SetTime(" ");
-	// SetWeek(" ");
-	// SetDate(" ");
-
-	ui_Start();
 }
 
 void ui_update_monitor(monitor_t *pMonitor) {
@@ -259,7 +233,7 @@ lv_draw_rect_dsc_t ui_git_dsc;
 
 void ui_git_init(int end_year) {
 	// init username
-	lv_textarea_set_text(ui_TextGitUserName, "PlainJi");
+	lv_textarea_set_text(ui_TextGitUserName, conf.git_username);
 
 	// init year
 	ui_git_end_year = end_year;
@@ -303,6 +277,15 @@ void ui_git_init(int end_year) {
 
     lv_obj_center(ui_git_canvas);
 	ui_update_contribution_panel(NULL);
+
+	// init keyboard
+	lv_obj_t *kb_git = lv_keyboard_create(ui_Git);
+    lv_obj_set_x(kb_git, 0);
+    lv_obj_set_y(kb_git, 0);
+    lv_keyboard_set_mode(kb_git, LV_KEYBOARD_MODE_TEXT_LOWER);
+    lv_keyboard_set_popovers(kb_git, true);
+	lv_obj_add_flag(kb_git, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_event_cb(ui_TextGitUserName, kb_event_cb, LV_EVENT_ALL, kb_git);
 }
 
 void ui_update_git_status(char percent) {
@@ -379,13 +362,35 @@ void ui_update_git(git_t **info) {
 	ui_update_contribution_panel(ui_git_info[year-START_YEAR]);
 }
 
+int ui_git_check_username(const char *username) {
+	char error_msg[128];
+
+	int ret = git_check_username(username);
+	if (ret) {
+		snprintf(error_msg, sizeof(error_msg), "  Invalid username, error code: %d.", ret);
+		lv_obj_t *msg_box = lv_msgbox_create(ui_Git, "Error", error_msg, NULL, true);
+		lv_obj_center(msg_box);
+		return 1;
+	}
+	return 0;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 void ui_bili_init(void) {
 	char bili_buf[32] = {0};
 
-	snprintf(bili_buf, sizeof(bili_buf), "ID: %s", BILI_MID_STR);
+	snprintf(bili_buf, sizeof(bili_buf), "ID: %s", conf.bili_userid);
 	lv_textarea_set_text(ui_TextBiliUserID, bili_buf);
+
+	// init keyboard
+	lv_obj_t *kb_bili = lv_keyboard_create(ui_Bili);
+    lv_obj_set_x(kb_bili, 0);
+    lv_obj_set_y(kb_bili, 0);
+    lv_keyboard_set_mode(kb_bili, LV_KEYBOARD_MODE_TEXT_LOWER);
+    lv_keyboard_set_popovers(kb_bili, true);
+	lv_obj_add_flag(kb_bili, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_event_cb(ui_TextBiliUserName, kb_event_cb, LV_EVENT_ALL, kb_bili);
 }
 
 void ui_update_bili_status(char percent) {
@@ -428,7 +433,18 @@ void ui_update_bili(bili_t *info_all) {
 	lv_textarea_set_text(ui_TextFavorite, bili_buf);
 }
 
+int ui_bili_check_userid(const char *userid) {
+	char error_msg[128];
 
+	int ret = bili_check_userid(userid);
+	if (ret) {
+		snprintf(error_msg, sizeof(error_msg), "  Invalid userID, please check your input. ErrNo. %d.", ret);
+		lv_obj_t *msg_box = lv_msgbox_create(ui_Bili, "Error", error_msg, NULL, true);
+		lv_obj_center(msg_box);
+		return 1;
+	}
+	return 0;
+}
 
 
 

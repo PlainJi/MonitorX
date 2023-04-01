@@ -35,10 +35,8 @@ void SetTime(char *buf);
 void SetWeek(char *buf);
 void SetDate(char *buf);
 
-void ui_controller_init(void);
 void update_time_from_local(void);
-void ui_Start(void);
-
+void ui_monitor_init(void);
 void ui_update_monitor(monitor_t *pMonitor);
 
 void ui_git_init(int end_year);
@@ -46,10 +44,12 @@ void ui_update_git_status(char percent);
 void ui_update_contribution_panel(git_t *info);
 void ui_update_contribution_panel_by_year(int year);
 void ui_update_git(git_t **git_info);
+int ui_git_check_username(const char *username);
 
 void ui_bili_init(void);
 void ui_update_bili_status(char percent);
 void ui_update_bili_relation(bili_relation_t *relation);
 void ui_update_bili(bili_t *info);
+int ui_bili_check_userid(const char *userid);
 
 #endif
