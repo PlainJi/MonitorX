@@ -11,16 +11,16 @@ TARGET_T113 		= t113
 ifeq ($(target), $(TARGET_T113))
 	TOOL_PREFIX		:= arm-openwrt-linux-muslgnueabi-
 	DEFINES 		:= -DUSE_FBDEV=1
-	INC_PATH 		:= -I./thirdparty/curl/t113/include -I./thirdparty/freetype/t113/include/freetype2
-	LD_PATH			:= -L./thirdparty/curl/t113/lib -L./thirdparty/freetype/t113/lib
-	CFLAGS			:= -Wl,-rpath=./thirdparty/curl/t113/lib:./thirdparty/freetype/t113/lib
+	CFLAGS			:= -Wl,-rpath=./thirdparty/shared/t113/lib
+	INC_PATH 		:= -I./thirdparty/shared/t113/include -I./thirdparty/shared/t113/include/freetype2
+	LD_PATH			:= -L./thirdparty/shared/t113/lib
 	LD_LIBS			:= 
 else ifeq ($(target), $(TARGET_X86))
 	TOOL_PREFIX		:= 
 	DEFINES			:= -DUSE_SDL=1
-	INC_PATH 		:= -I./thirdparty/curl/x86/include -I./thirdparty/freetype/x86/include/freetype2
-	LD_PATH			:= -L./thirdparty/curl/x86/lib -L./thirdparty/freetype/x86/lib
-	CFLAGS			:= -Wl,-rpath=./thirdparty/curl/x86/lib:./thirdparty/freetype/x86/lib
+	CFLAGS			:= -Wl,-rpath=./thirdparty/shared/x86/lib
+	INC_PATH 		:= -I./thirdparty/shared/x86/include -I./thirdparty/shared/x86/include/freetype2
+	LD_PATH			:= -L./thirdparty/shared/x86/lib
 	LD_LIBS			:= -lSDL2
 else
 $(error "Usage: make target=[x86|t113]")
@@ -48,7 +48,8 @@ CFLAGS 				+= -std=gnu99 -O0 -g -Wall -Wshadow -Wundef -Wextra -Wno-comment \
 					   -Wempty-body -Wstack-usage=8192
 
 DEFINES				+= -DUSE_EVDEV=1 -DLV_BUILD_TEST=0
-INC_PATH 			+= -I./ -I./lvgl/ -I./ui/ -I./app/ -I./thirdparty/cJSON/ -I./thirdparty/iniparser/src/
+INC_PATH 			+= -I./ -I./lvgl/ -I./ui/ -I./app/ -I./thirdparty/cJSON/ \
+						-I./thirdparty/iniparser/src/ -I./thirdparty/thread/
 LD_LIBS	 			+= -lcurl -lssl -lcrypto -lz -pthread -lfreetype
 BIN 				:= $(BIN_DIR)/$(PROJECT).$(target)
 COMPILE				= $(CC) $(CFLAGS) $(INC_PATH) $(DEFINES)

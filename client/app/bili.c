@@ -81,7 +81,7 @@ int bili_req_video_list(void) {
         }
         int left = bili_video_list.count - bili_video_list.pn * bili_video_list.ps;
         if (left > 0) pn++; else break;
-        sleep(1);
+        usleep(500*1000);
     }while(1);
 
     return res;

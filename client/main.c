@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
-#include "thirdparty/thread_warpper.h"
+#include "thread_warpper.h"
 #include "ui.h"
 #include "ui_helpers.h"
 #include "ui_controller.h"
