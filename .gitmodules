@@ -4,3 +4,7 @@
 [submodule "client/thirdparty/iniparser"]
 	path = client/thirdparty/iniparser
 	url = https://github.com/ndevilla/iniparser.git
+[submodule "client/lvgl"]
+	path = client/lvgl
+	url = git@github.com:PlainJi/lvgl.git
+	branch = release/v8.3
