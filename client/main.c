@@ -139,15 +139,18 @@ int main(void)
     init_fbdev();
 #endif
 
+#if LV_BUILD_EXAMPLES
     //lv_demo_widgets();
     //lv_demo_benchmark();
+    lv_example_freetype_1();
     //json_parser_test();
+#else
     read_config();
     ui_init();
     task_creat("monitor", 90, 32*1024, (FUNC)monitor_thread, NULL);
     task_creat("git", 90, 128*1024, (FUNC)git_thread, NULL);
     task_creat("bili", 90, 128*1024, (FUNC)bili_thread, NULL);
-
+#endif
     /*Handle LitlevGL tasks (tickless mode)*/
     while(1) {
         pthread_mutex_lock(&lvgl_mutex);

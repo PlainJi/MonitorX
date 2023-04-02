@@ -292,12 +292,17 @@ int parse_bili_video_list(const char *str, bili_video_list_t *list_buf) {
 					if (get_int_from_node(page, "pn", &list_buf->pn)) { res=6; break; }
 					if (get_int_from_node(page, "ps", &list_buf->ps)) { res=7; break; }
 					if (get_int_from_node(page, "count", &list_buf->count)) { res=8; break; }
-					if (list_buf->video_list_buf == NULL || list_buf->count*sizeof(aid) != list_buf->buf_len) {
+					if (list_buf->video_list_buf == NULL || \
+						( (list_buf->count!=0) && (list_buf->count*sizeof(aid)!=list_buf->buf_len) ) ) {
 						list_buf->video_list_buf = realloc(list_buf->video_list_buf, list_buf->count * sizeof(aid));
 						if (list_buf->video_list_buf == NULL) { res=9; break; }
 						list_buf->buf_len = list_buf->count * sizeof(aid);
 					}
 					//printf("pn=%d, ps=%d, cnt=%d\n", list_buf->pn, list_buf->ps, list_buf->count);
+				if (!list_buf->count) {
+					strncpy(list_buf->author, "unknown", sizeof(list_buf->author));
+					break;
+				}
 				if (get_node(data, "list", &list)) { res=10; break; }
 					if (get_node(list, "vlist", &vList)) { res=11; break; }
 						cJSON_ArrayForEach(item, vList) {

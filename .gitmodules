@@ -1,9 +1,6 @@
 [submodule "client/lv_drivers"]
 	path = client/lv_drivers
 	url = https://github.com/lvgl/lv_drivers.git
-[submodule "client/lvgl"]
-	path = client/lvgl
-	url = https://github.com/lvgl/lvgl.git
 [submodule "client/thirdparty/iniparser"]
 	path = client/thirdparty/iniparser
 	url = https://github.com/ndevilla/iniparser.git

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 20 px
  * Bpp: 1
- * Opts: --bpp 1 --size 20 --font E:\1.Project\DesktopBox\lvgl_proj_desktop\assets\ShangShouBiaoBangTi-2.ttf -o E:\1.Project\DesktopBox\lvgl_proj_desktop\assets\ui_font_ShangShou20.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
+ * Opts: 
  ******************************************************************************/
 
 #include "ui.h"
@@ -412,7 +412,11 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     0x70,
 
     /* U+007E "~" */
-    0x73, 0xff, 0xb3, 0xc0
+    0x73, 0xff, 0xb3, 0xc0,
+
+    /* U+FE40 "﹀" */
+    0x80, 0x1e, 0x7, 0xf9, 0xf7, 0xfe, 0x1f, 0x80,
+    0x60
 };
 
 
@@ -516,7 +520,8 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
     {.bitmap_index = 1185, .adv_w = 101, .box_w = 5, .box_h = 14, .ofs_x = 1, .ofs_y = -1},
     {.bitmap_index = 1194, .adv_w = 60, .box_w = 3, .box_h = 14, .ofs_x = 1, .ofs_y = -2},
     {.bitmap_index = 1200, .adv_w = 101, .box_w = 5, .box_h = 14, .ofs_x = 1, .ofs_y = -1},
-    {.bitmap_index = 1209, .adv_w = 152, .box_w = 9, .box_h = 3, .ofs_x = 1, .ofs_y = 4}
+    {.bitmap_index = 1209, .adv_w = 152, .box_w = 9, .box_h = 3, .ofs_x = 1, .ofs_y = 4},
+    {.bitmap_index = 1213, .adv_w = 281, .box_w = 12, .box_h = 6, .ofs_x = 3, .ofs_y = 0}
 };
 
 /*---------------------
@@ -530,6 +535,10 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
 {
     {
         .range_start = 32, .range_length = 95, .glyph_id_start = 1,
+        .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
+    },
+    {
+        .range_start = 65088, .range_length = 1, .glyph_id_start = 96,
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
     }
 };
@@ -552,7 +561,7 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
     .cmaps = cmaps,
     .kern_dsc = NULL,
     .kern_scale = 0,
-    .cmap_num = 1,
+    .cmap_num = 2,
     .bpp = 1,
     .kern_classes = 0,
     .bitmap_format = 0,

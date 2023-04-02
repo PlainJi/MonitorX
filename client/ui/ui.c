@@ -11,6 +11,7 @@
 #include <time.h>
 
 ///////////////////// VARIABLES ////////////////////
+static lv_style_t style_my_font;
 extern bool git_updating;
 extern time_t git_last_update_time;
 extern bool bili_updating;
@@ -791,7 +792,7 @@ void ui_Git_screen_init(void)
     lv_obj_set_style_bg_opa(ui_Git, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_TextGitUserName = lv_textarea_create(ui_Git);
-    lv_obj_set_width(ui_TextGitUserName, 200);
+    lv_obj_set_width(ui_TextGitUserName, 250);
     lv_obj_set_height(ui_TextGitUserName, LV_SIZE_CONTENT);    /// 40
     lv_obj_set_x(ui_TextGitUserName, -240);
     lv_obj_set_y(ui_TextGitUserName, -30);
@@ -801,7 +802,8 @@ void ui_Git_screen_init(void)
     lv_textarea_set_one_line(ui_TextGitUserName, true);
     lv_obj_add_flag(ui_TextGitUserName, LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
     lv_obj_set_style_text_align(ui_TextGitUserName, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_TextGitUserName, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_TextGitUserName, &ui_font_ShangShou32, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui_TextGitUserName, 3, 0);
     lv_obj_set_style_bg_color(ui_TextGitUserName, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_TextGitUserName, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_TextGitUserName, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -814,7 +816,7 @@ void ui_Git_screen_init(void)
     lv_obj_set_y(ui_year, -30);
     lv_obj_set_align(ui_year, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_year, LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
-    lv_obj_set_style_text_font(ui_year, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_year, &ui_font_ShangShou32, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_year, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_year, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_year, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -840,7 +842,6 @@ void ui_Git_screen_init(void)
     lv_obj_set_x(ui_Git_ImgButtonLogo, 0);
     lv_obj_set_y(ui_Git_ImgButtonLogo, -90);
     lv_obj_set_align(ui_Git_ImgButtonLogo, LV_ALIGN_CENTER);
-    //lv_obj_clear_flag(ui_Git_ImgButtonLogo, );     /// Flags
 
     ui_Git_Slider_Loading = lv_slider_create(ui_Git);
     lv_obj_set_width(ui_Git_Slider_Loading, 177);
@@ -890,7 +891,7 @@ void ui_Bili_screen_init(void)
     lv_obj_set_style_text_color(ui_TextBiliUserID, lv_color_hex(0x3B3B3B), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_TextBiliUserID, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_TextBiliUserID, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_TextBiliUserID, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_TextBiliUserID, &ui_font_ShangShou14, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_TextBiliUserID, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_TextBiliUserID, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_TextBiliUserID, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -906,11 +907,11 @@ void ui_Bili_screen_init(void)
     lv_textarea_set_placeholder_text(ui_TextBiliUserName, "Input UserID");
     lv_textarea_set_one_line(ui_TextBiliUserName, true);
     lv_obj_add_flag(ui_TextBiliUserName, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
-    //lv_obj_clear_flag(ui_TextBiliUserName, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     lv_obj_set_style_text_letter_space(ui_TextBiliUserName, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui_TextBiliUserName, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_TextBiliUserName, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_TextBiliUserName, &ui_font_ShangShou32, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_style(ui_TextBiliUserName, &style_my_font, 0);
+    //lv_obj_set_style_text_font(ui_TextBiliUserName, &ui_font_ShangShou32, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_TextBiliUserName, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_TextBiliUserName, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_TextBiliUserName, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -1068,9 +1069,22 @@ void ui_Bili_screen_init(void)
 
 void ui_init(void)
 {
+    // init font
+    static lv_ft_info_t info;
+    info.name = "./thirdparty/FangZhengHeiTi-GBK-1.ttf";
+    info.weight = 32;
+    info.style = FT_FONT_STYLE_NORMAL;
+    info.mem = NULL;
+    if(!lv_ft_font_init(&info)) {
+        LV_LOG_ERROR("init font failed.");
+        return;
+    }
+    lv_style_init(&style_my_font);
+    lv_style_set_text_font(&style_my_font, info.font);
+
     lv_disp_t * dispp = lv_disp_get_default();
-    lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
-                                               true, LV_FONT_DEFAULT);
+    lv_theme_t * theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), \
+                                lv_palette_main(LV_PALETTE_RED), true, LV_FONT_DEFAULT);
     lv_disp_set_theme(dispp, theme);
     ui_Monitor_screen_init();
     ui_Git_screen_init();

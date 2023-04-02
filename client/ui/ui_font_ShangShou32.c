@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 32 px
  * Bpp: 1
- * Opts: --bpp 1 --size 32 --font E:\1.Project\DesktopBox\lvgl_proj\assets\ShangShouBiaoBangTi-2.ttf -o E:\1.Project\DesktopBox\lvgl_proj\assets\ui_font_ShangShou32.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
+ * Opts: 
  ******************************************************************************/
 
 #include "ui.h"
@@ -627,7 +627,13 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
 
     /* U+007E "~" */
     0x0, 0x1c, 0xf0, 0x77, 0xf1, 0xff, 0xff, 0xe3,
-    0xfb, 0x83, 0xce, 0x0, 0x0
+    0xfb, 0x83, 0xce, 0x0, 0x0,
+
+    /* U+FE40 "﹀" */
+    0x0, 0x0, 0x18, 0x0, 0xf, 0xc0, 0x7, 0xfc,
+    0x1, 0xff, 0xe0, 0xff, 0xff, 0x3f, 0xcf, 0xff,
+    0xe0, 0x7f, 0xf0, 0x7, 0xfc, 0x0, 0x3e, 0x0,
+    0x1, 0x0, 0x0
 };
 
 
@@ -731,7 +737,8 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
     {.bitmap_index = 2919, .adv_w = 162, .box_w = 9, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
     {.bitmap_index = 2946, .adv_w = 96, .box_w = 4, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
     {.bitmap_index = 2958, .adv_w = 162, .box_w = 8, .box_h = 24, .ofs_x = 1, .ofs_y = -3},
-    {.bitmap_index = 2982, .adv_w = 244, .box_w = 14, .box_h = 7, .ofs_x = 1, .ofs_y = 6}
+    {.bitmap_index = 2982, .adv_w = 244, .box_w = 14, .box_h = 7, .ofs_x = 1, .ofs_y = 6},
+    {.bitmap_index = 2995, .adv_w = 450, .box_w = 19, .box_h = 11, .ofs_x = 5, .ofs_y = 4}
 };
 
 /*---------------------
@@ -745,6 +752,10 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
 {
     {
         .range_start = 32, .range_length = 95, .glyph_id_start = 1,
+        .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
+    },
+    {
+        .range_start = 65088, .range_length = 1, .glyph_id_start = 96,
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
     }
 };
@@ -767,7 +778,7 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
     .cmaps = cmaps,
     .kern_dsc = NULL,
     .kern_scale = 0,
-    .cmap_num = 1,
+    .cmap_num = 2,
     .bpp = 1,
     .kern_classes = 0,
     .bitmap_format = 0,

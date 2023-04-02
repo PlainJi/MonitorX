@@ -104,6 +104,7 @@ int bili_req_video_detail(int cnt) {
 }
 
 int bili_get_summary(void) {
+    memset(&bili_info_all, 0, sizeof(bili_info_all));
     strncpy(bili_info_all.userid, conf.bili_userid, sizeof(bili_info_all.userid));
     strncpy(bili_info_all.username, bili_video_list.author, sizeof(bili_info_all.username));
     bili_info_all.following = bili_relation.following;
@@ -184,10 +185,12 @@ void update_detail(void) {
         if (bili_video_list.video_list_buf) free(bili_video_list.video_list_buf);
         memset(&bili_video_list, 0, sizeof(bili_video_list));
     } else {
-        bili_video_infos = realloc(bili_video_infos, bili_video_list.count * sizeof(bili_video_info_t));
-        if (!bili_video_infos) {
-            printf("malloc bili_video_infos failed!\n");
-            return;
+        if (bili_video_list.count) {
+            bili_video_infos = realloc(bili_video_infos, bili_video_list.count * sizeof(bili_video_info_t));
+            if (!bili_video_infos) {
+                printf("malloc bili_video_infos failed!\n");
+                return;
+            }
         }
     }
 
@@ -210,8 +213,8 @@ void update_detail(void) {
             bili_get_summary();
             pthread_mutex_lock(&lvgl_mutex);
             ui_update_bili(&bili_info_all);
-            ui_update_bili_status(bili_updating_percent);
             pthread_mutex_unlock(&lvgl_mutex);
+            ui_update_bili_status(bili_updating_percent);
             bili_last_update_stat = time(NULL);
             bili_updating = false;
             printf("update_bili_status: %s\n", asctime(localtime(&bili_last_update_stat)));

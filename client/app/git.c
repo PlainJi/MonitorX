@@ -127,9 +127,9 @@ void update_contribution_wall(void) {
                 current_year = START_YEAR;
                 git_updating = false;
                 pthread_mutex_lock(&lvgl_mutex);
-                ui_update_git_status(git_updating_percent);
                 ui_update_git(git_info);
                 pthread_mutex_unlock(&lvgl_mutex);
+                ui_update_git_status(git_updating_percent);
                 git_last_update_time = time(NULL);
                 printf("git update contribution: %s\n", asctime(localtime(&git_last_update_time)));
             }

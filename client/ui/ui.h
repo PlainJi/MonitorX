@@ -88,6 +88,7 @@ LV_IMG_DECLARE(ui_img_coin_png);
 LV_IMG_DECLARE(ui_img_favorite_png);
 LV_IMG_DECLARE(ui_img_follower_png);
 
+LV_FONT_DECLARE(ui_font_ShangShou14);
 LV_FONT_DECLARE(ui_font_ShangShou20);
 LV_FONT_DECLARE(ui_font_ShangShou24);
 LV_FONT_DECLARE(ui_font_ShangShou28);
