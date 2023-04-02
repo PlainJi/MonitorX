@@ -387,7 +387,7 @@ void ui_bili_init(void) {
 	lv_obj_t *kb_bili = lv_keyboard_create(ui_Bili);
     lv_obj_set_x(kb_bili, 0);
     lv_obj_set_y(kb_bili, 0);
-    lv_keyboard_set_mode(kb_bili, LV_KEYBOARD_MODE_TEXT_LOWER);
+    lv_keyboard_set_mode(kb_bili, LV_KEYBOARD_MODE_NUMBER);
     lv_keyboard_set_popovers(kb_bili, true);
 	lv_obj_add_flag(kb_bili, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_event_cb(ui_TextBiliUserName, kb_event_cb, LV_EVENT_ALL, kb_bili);
