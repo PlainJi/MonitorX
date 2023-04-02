@@ -99,6 +99,7 @@ LV_FONT_DECLARE(ui_font_ShangShou40);
 
 void ui_init(void);
 void ui_Monitor_screen_init(void);
+void ui_Git_add_text(lv_obj_t *obj, int x, int y, const char *string);
 void ui_Git_screen_init(void);
 void ui_Bili_screen_init(void);
 

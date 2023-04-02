@@ -54,6 +54,19 @@ lv_obj_t * ui_Git;
 lv_obj_t * ui_TextGitUserName;
 lv_obj_t * ui_year;
 lv_obj_t * ui_ContributionPanel;
+lv_obj_t * ui_TextGitJan;
+lv_obj_t * ui_TextGitJan;
+lv_obj_t * ui_TextGitFeb;
+lv_obj_t * ui_TextGitMar;
+lv_obj_t * ui_TextGitApr;
+lv_obj_t * ui_TextGitMay;
+lv_obj_t * ui_TextGitJun;
+lv_obj_t * ui_TextGitJul;
+lv_obj_t * ui_TextGitAug;
+lv_obj_t * ui_TextGitSep;
+lv_obj_t * ui_TextGitOct;
+lv_obj_t * ui_TextGitNov;
+lv_obj_t * ui_TextGitDec;
 lv_obj_t * ui_Git_ImgButtonLogo;
 lv_obj_t * ui_Git_Slider_Loading;
 
@@ -783,6 +796,25 @@ void ui_Monitor_screen_init(void)
     lv_obj_add_event_cb(ui_Monitor, ui_event_Monitor, LV_EVENT_ALL, NULL);
 
 }
+
+void ui_Git_add_text(lv_obj_t *obj, int x, int y, const char *string) {
+    lv_obj_set_width(obj, 50);
+    lv_obj_set_height(obj, LV_SIZE_CONTENT);    /// 40
+    lv_obj_set_x(obj, x);
+    lv_obj_set_y(obj, y);
+    lv_obj_set_align(obj, LV_ALIGN_CENTER);
+    lv_textarea_set_text(obj, string);
+    lv_textarea_set_placeholder_text(obj, "");
+    lv_textarea_set_one_line(obj, true);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);     /// Flags
+    lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(obj, &ui_font_ShangShou14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(obj, 0, 0);
+    lv_obj_set_style_bg_color(obj, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
 void ui_Git_screen_init(void)
 {
     ui_Git = lv_obj_create(NULL);
@@ -833,6 +865,43 @@ void ui_Git_screen_init(void)
     //lv_obj_set_style_bg_color(ui_ContributionPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ContributionPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_ContributionPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    double pos = -360;
+    ui_TextGitJan = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitJan, (int)pos, 40, "Jan");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitFeb = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitFeb, (int)pos, 40, "Feb");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitMar = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitMar, (int)pos, 40, "Mar");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitApr = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitApr, (int)pos, 40, "Apr");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitMay = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitMay, (int)pos, 40, "May");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitJun = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitJun, (int)pos, 40, "Jun");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitJul = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitJul, (int)pos, 40, "Jul");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitAug = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitAug, (int)pos, 40, "Aug");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitSep = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitSep, (int)pos, 40, "Sep");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitOct = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitOct, (int)pos, 40, "Oct");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitNov = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitNov, (int)pos, 40, "Nov");
+    pos += ((357+360)/12.0 + 2);
+    ui_TextGitDec = lv_textarea_create(ui_Git);
+    ui_Git_add_text(ui_TextGitDec, (int)pos, 40, "Dec");
 
     ui_Git_ImgButtonLogo = lv_imgbtn_create(ui_Git);
     lv_imgbtn_set_src(ui_Git_ImgButtonLogo, LV_IMGBTN_STATE_RELEASED, NULL, &ui_img_git_released_png, NULL);
