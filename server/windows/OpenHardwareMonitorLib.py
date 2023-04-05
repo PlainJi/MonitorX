@@ -47,6 +47,14 @@ class OpenHardwareMonitor:
         for hw_index in range(0, len(self.c.Hardware)):
             hw_type = self.HardwareType[self.c.Hardware[hw_index].HardwareType]
             ret[hw_type] = dict()
+            if hw_type == 'CPU':
+                ret[hw_type]['Name'] = self.c.Hardware[hw_index].Name.split()[-1]
+            if hw_type == 'GpuNvidia':
+                name = self.c.Hardware[hw_index].Name
+                if 'GTX' in name:
+                    ret[hw_type]['Name'] = 'GTX-' + name.replace(' ', '').split('GTX')[-1]
+                elif 'RTX' in name:
+                    ret[hw_type]['Name'] = 'RTX-' + name.replace(' ', '').split('RTX')[-1]
             for ss_index in range(0, len(self.c.Hardware[hw_index].Sensors)):
                 ss_type = self.SensorType[self.c.Hardware[hw_index].Sensors[ss_index].SensorType]
                 name = self.c.Hardware[hw_index].Sensors[ss_index].Name
