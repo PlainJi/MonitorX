@@ -1,0 +1,14 @@
+[Unit]
+Description=System Monitor Service
+After=network.target
+
+[Service]
+Type=simple
+#User=nobody
+Restart=on-failure
+RestartSec=5s
+WorkingDirectory=/opt/MonitorX/
+ExecStart=python3 /opt/MonitorX/SystemMonitor.py
+
+[Install]
+WantedBy=multi-user.target

@@ -9,11 +9,31 @@ from cachelib import SimpleCache
 class Monitor:
     def __init__(self):
         self.cache = SimpleCache()
+
+        self.cpu_model = self.GetCpuModel()
+        print('cpu model:', self.cpu_model)
+        self.gpu_model, self.gpu_cnt = self.GetGpuInfo()
+        print('detect {} {} gpus.'.format(self.gpu_cnt, self.gpu_model))
+
+
+    def GetCpuModel(self):
+        cpu_model = 'CPU'
+        tmpStr = os.popen('cat /proc/cpuinfo |grep "model name" | head -n 1').readlines()
+        if len(tmpStr) and 'CPU' in tmpStr[0]:
+            cpu_model = tmpStr[0].split('CPU')[0].strip().split(' ')[-1]
+        return cpu_model
+
+
+    def GetGpuInfo(self):
         tmpStr = os.popen('nvidia-smi -L').readlines()
-        self.gpu_cnt = 0
+        gpu_cnt = 0
+        gpu_model = 'unknown'
         if len(tmpStr) and 'GPU' in tmpStr[0]:
-            self.gpu_cnt = len(tmpStr)
-        print('detect {} gpus.'.format(self.gpu_cnt))
+            gpu_cnt = len(tmpStr)
+            gpu_model_l = tmpStr[0].split('(')[0].strip().split(' ')[-2:]
+            gpu_model = gpu_model_l[0] + '-' + gpu_model_l[1]
+        return gpu_model, gpu_cnt
+
 
     def GetGpuClock(self):
         cnt = 0
@@ -27,6 +47,7 @@ class Monitor:
             avg_clock = sum(clocks) / len(clocks)
         return avg_clock
 
+
     def update(self):
         hw_monitor = dict()
         tempratures = psutil.sensors_temperatures()
@@ -37,6 +58,7 @@ class Monitor:
         hw_monitor['week'] = time.strftime("%a", time.localtime()) + '.'
 
         # CPU
+        hw_monitor['cpu_model'] = self.cpu_model
         hw_monitor['cpu_load'] = psutil.cpu_percent()
         package_temps = [i for i in tempratures['coretemp'] if 'Package' in i[0] ]
         hw_monitor['cpu_temp'] = int(sum([i[1] for i in package_temps]) / len(package_temps))
@@ -53,8 +75,9 @@ class Monitor:
         gpu_stat.print_json(tmpStr)
         tmpJson = json.loads(tmpStr.getvalue())
         gpus = tmpJson['gpus']
+        hw_monitor['gpu_model'] = self.gpu_model
         hw_monitor['gpu_load'] = sum([i['utilization.gpu'] for i in gpus]) / len(gpus)
-        hw_monitor['gram_load'] = sum([i['memory.used'] for i in gpus]) / sum([i['memory.total'] for i in gpus]) * 100
+        hw_monitor['gram_load'] = int(sum([i['memory.used'] for i in gpus]) / sum([i['memory.total'] for i in gpus]) * 100)
         hw_monitor['gpu_temp'] = sum([i['temperature.gpu'] for i in gpus]) / len(gpus)
         hw_monitor['gpu_clock'] = self.GetGpuClock()
 

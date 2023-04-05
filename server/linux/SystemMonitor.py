@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import time, json
@@ -12,6 +13,6 @@ if __name__ == '__main__':
         output_dict = monitor.update()
         output = json.dumps(output_dict)
         output += '\n'
-        print(output)
         send(output.encode())
+        print(output.encode())
         time.sleep(1)
