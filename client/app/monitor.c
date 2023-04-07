@@ -52,8 +52,8 @@ void monitor_thread(void)
     ui_monitor_init();
     while(1){
         memset(buf, 0, sizeof(buf));
-        len=recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);
-        printf("recv %ld: %s\n", (long int)len, buf);
+        recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);
+        //printf("recv %ld: %s\n", (long int)len, buf);
         if (!parse_monitor_info(buf, &ui_monitor)) {
             pthread_mutex_lock(&lvgl_mutex);
             ui_update_monitor(&ui_monitor);
