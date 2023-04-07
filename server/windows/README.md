@@ -1,18 +1,20 @@
+## 准备工作  
+1. 安装了python3，pip3，配置好了环境变量  
+2. 在python安装目录和子目录中找到`python39.dll` 和 `pywintypes39.dll` 拷贝到 `……/python安装目录/lib/site-packages/win32` 目录下  
+
 ## 安装依赖库  
 `pip3 install -r requirements.txt`  
 
 ## 安装  
- - `python.ext MonitorX.py --start auto install`  
- - `python.ext MonitorX.py start`  
+ - `python.exe MonitorX.py --start auto install`  
+ - `python.exe MonitorX.py start`  
 
 ## 卸载  
-- `python.ext MonitorX.py stop`  
-- `python.ext MonitorX.py remove`  
+- `python.exe MonitorX.py stop`  
+- `python.exe MonitorX.py remove`  
 
-
-## 注意
-- 代码中通过加载DLL的方式调用了开源的`OpenHardwareMonitorLib`，加载DLL的安装包名为 `pythonnet`，而实际使用时为 `import clr`
-- 测试时脚本需要以管理员身份运行
+## 注意  
+- 代码中通过加载DLL的方式调用了开源的`OpenHardwareMonitorLib`，加载DLL的安装包名为 `pythonnet`，而实际使用时为 `import clr`  
 
 ## 数据格式
 ```
@@ -39,10 +41,6 @@
 }
 ```
 
-
-## 配置PC端开机自启动
-1. 前置条件：安装了python3，pip3，配置好了环境变量  
-2. 在python安装目录和子目录中找到`python39.dll` 和 `pywintypes39.dll` 拷贝到 `……/python安装目录/lib/site-packages/win32` 目录下，即可以服务的形式在预研  
 ![pic](pic/prepare.png)
 ![pic](pic/install_uninstall.png)
 ![pic](pic/check.png)
