@@ -11,8 +11,6 @@ if __name__ == '__main__':
 
     while True:
         output_dict = monitor.update()
-        output = json.dumps(output_dict)
-        output += '\n'
-        send(output.encode())
-        print(output.encode())
+        output = json.dumps(output_dict).encode()
+        send(output)
         time.sleep(1)

@@ -1,12 +1,8 @@
 
-# -*- coding: utf-8 -*-
-
-import ctypes, sys, time, logging, json
-import win32api, win32gui
+import time, json
 from network import send
-from psutilib import GetNetWork,GetIoReadWrite
+from psutilib import GetNetWork, GetIoReadWrite
 from OpenHardwareMonitorLib import UpdateMonitor
-
 
 def generate_output():
     hw_monitor = UpdateMonitor()
@@ -41,43 +37,18 @@ def generate_output():
 
     # NET
     network = GetNetWork()
-    hw_monitor['summary']['link_up'] = network['up']
-    hw_monitor['summary']['link_dw'] = network['down']
+    hw_monitor['summary']['link_up'] = network['link_up']
+    hw_monitor['summary']['link_dw'] = network['link_dw']
 
     # IO
     io = GetIoReadWrite()
-    hw_monitor['summary']['io_write'] = io['write']
-    hw_monitor['summary']['io_read'] = io['read']
+    hw_monitor['summary']['io_write'] = io['io_write']
+    hw_monitor['summary']['io_read'] = io['io_read']
 
     return hw_monitor['summary']
 
-def is_admin():
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
-        return False
-
-if __name__ == '__main__':
-    t = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
-    logging.basicConfig(filename="E:/2.code/python/system_monitor/" + t + ".log", filemode="w", format="%(asctime)s %(name)s:%(levelname)s:%(message)s",
-                        datefmt="%Y-%m-%d %H:%M:%S", level=logging.DEBUG)
-    logging.info(time.asctime())
-
-    # run as service
-    ct = win32api.GetConsoleTitle()
-    hd = win32gui.FindWindow(0, ct)
-    win32gui.ShowWindow(hd, 0)
-
-    if is_admin():
-        while True:
-            output_dict = generate_output()
-            logging.info(output_dict)
-            print(output_dict)
-            output = json.dumps(output_dict)
-            output += '\n'
-            send(output.encode())
-            time.sleep(1)
-    else:
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
-
-    logging.error("exit!\n")
+def monitor_once():
+    output_dict = generate_output()
+    output = json.dumps(output_dict).encode()
+    send(output)
+    time.sleep(1)
