@@ -4,7 +4,7 @@
 # This is done in .vscode/task.json
 #
 
-PROJECT 			?= sys_monitor
+PROJECT 			?= monitorX
 TARGET_X86			= x86
 TARGET_T113 		= t113
 
@@ -73,12 +73,15 @@ default: $(OBJECTS)
 	@echo 'LD_LIBS $(LD_LIBS)'
 	@echo 'LINK $(BIN)'
 	@$(CC) -o $(BIN) $(OBJECTS) $(CFLAGS) $(LD_PATH) ${LD_LIBS}
-	
 #	@echo 'STRIP $(BIN)'
 #	@$(STRIP) $(BIN)
+	@mkdir -p output/$(target)/thirdparty/shared/$(target)
+	@cp $(BIN) output/$(target)/
+	@cp -rf thirdparty/shared/$(target)/lib/ output/$(target)/thirdparty/shared/$(target)/
 
 clean:
 	rm -rf $(WORKING_DIR)
+	rm -rf output
 
 install: ${BIN}
 	install -d ${DESTDIR}/usr/lib/${PROJECT}/bin

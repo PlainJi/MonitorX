@@ -2,10 +2,7 @@
 
 #include "curldef.h"
 
-//#define BILI_MID_STR        "28457"       // 司波图
-//#define BILI_MID_STR        "20259914"    // 稚辉君
 //#define BILI_MID_STR        "389426697"   // 胡仑贝尔
-//#define BILI_MID_STR        "15027304"    // tangmash
 #define URL_BILI_RELATION   "https://api.bilibili.com/x/relation/stat?vmid="                // 389426697
 #define URL_BILI_VIDEO_LIST "https://api.bilibili.com/x/space/arc/search?mid="              // 389426697&pn=1&ps=50
 #define URL_BILI_VIDEO_INFO "https://api.bilibili.com/x/web-interface/archive/stat?aid="    // 590023490

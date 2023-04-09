@@ -249,14 +249,14 @@ int parse_bili_relation(const char *str, bili_relation_t *ui_bili) {
 	int status = 0;
 
 	do {
-		if (get_root(str, &root)) {
-			res = 1;
-			break;
-		}
+		if (get_root(str, &root)) { res = 1; break; }
 		if (get_int_from_node(root, "code", &status)) {res=2; break;}
-		if (status != 0) {res=3; break;}
-		if (get_node(root, "data", &data)) {res=4; break;}
+		if (status != 0) {
+			printf("bili relation status: %d\n", status);
+			res=3; break;
+		}
 
+		if (get_node(root, "data", &data)) {res=4; break;}
 		get_int_from_node(data, "following", &ui_bili->following);
 		get_int_from_node(data, "follower", &ui_bili->follower);
 		get_int_from_node(data, "whisper", &ui_bili->whisper);
@@ -288,8 +288,10 @@ int parse_bili_video_list(const char *str, bili_video_list_t *list_buf) {
 	do {
 		if (get_root(str, &root)) { res = 1; break; }
 			if (get_int_from_node(root, "code", &status)) { res=2; break; }
-			//printf("status: %d\n", status);
-			if (status != 0) { res=3; break; }
+			if (status != 0) {
+				printf("bili video list status: %d\n", status);
+				res=3; break;
+			}
 
 			if (get_node(root, "data", &data)) { res=4; break; }
 				if (get_node(data, "page", &page)) { res=5; break; }
@@ -334,7 +336,10 @@ int parse_bili_video_detail(const char *str, bili_video_info_t *info) {
 	do {
 		if (get_root(str, &root)) {res = 1;break;}
 		if (get_int_from_node(root, "code", &status)) {res=2;break;}
-		if (status != 0) {res=3; break;}
+		if (status != 0) {
+			printf("bili video detail status: %d\n", status);
+			res=3; break;
+		}
 		
 		if (get_node(root, "data", &data)) {res=4; break;}
 			if (get_int_from_node(data, "aid", &info->aid)) {res=5;break;}

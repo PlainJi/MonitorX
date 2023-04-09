@@ -256,6 +256,7 @@ void kb_event_cb(lv_event_t * e)
         }
     } else if (code == LV_EVENT_CANCEL) {
         if (ta == ui_TextGitUserName) {
+            lv_textarea_set_text(ui_TextGitUserName, conf.git_username);
             git_start_update();
         } else if (ta == ui_TextBiliUserName) {
             bili_start_update();
