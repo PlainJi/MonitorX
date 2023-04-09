@@ -161,13 +161,17 @@ int parse_monitor_info(const char *str, monitor_t *ui_monitor) {
 		}
 
 		memset(ui_monitor, 0, sizeof(monitor_t));
+		get_string_from_node(root, "cpu_model", ui_monitor->cpu_model, sizeof(ui_monitor->cpu_model));
 		get_double_from_node(root, "cpu_load", &ui_monitor->cpu_load);
 		get_double_from_node(root, "ram_load", &ui_monitor->ram_load);
+		get_string_from_node(root, "ram_capacity", ui_monitor->ram_capacity, sizeof(ui_monitor->ram_capacity));
 		get_double_from_node(root, "cpu_clock", &ui_monitor->cpu_clock);
 		get_double_from_node(root, "cpu_temp", &ui_monitor->cpu_temp);
 
+		get_string_from_node(root, "gpu_model", ui_monitor->gpu_model, sizeof(ui_monitor->gpu_model));
 		get_double_from_node(root, "gpu_load", &ui_monitor->gpu_load);
 		get_double_from_node(root, "gram_load", &ui_monitor->gram_load);
+		get_string_from_node(root, "gram_capacity", ui_monitor->gram_capacity, sizeof(ui_monitor->gram_capacity));
 		get_double_from_node(root, "gpu_clock", &ui_monitor->gpu_clock);
 		get_double_from_node(root, "gpu_temp", &ui_monitor->gpu_temp);
 

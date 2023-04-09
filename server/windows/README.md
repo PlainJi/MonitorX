@@ -27,13 +27,13 @@
     "cpu_temp":33,              # Celsius  
     "cpu_clock":802,            # MHz
     "ram_load":31,              # Percentage  
-    "ram_total":"16GB",         # String  
+    "ram_capacity":"16GB",      # String  
     "gpu_model":"GTX-1080",     # String  
     "gpu_load":0,               # Percentage  
     "gpu_temp":30,              # Celsius  
     "gpu_clock":139,            # MHz
     "gram_load":11,             # Percentage  
-    "gram_total":"8GB",         # String  
+    "gram_capacity":"8GB",      # String  
     "link_up":1959.25,          # bytes/s  
     "link_dw":5777.35,          # bytes/s  
     "io_write":7710,            # bytes/s  

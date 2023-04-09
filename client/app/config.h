@@ -17,9 +17,9 @@ typedef struct _sys_config_t {
 
 extern sys_config_t conf;
 
-int read_config(void);
+int config_init(void);
 void set_git_username(const char *username);
 void config_set_git_username(const char *username);
 void config_set_bili_userid(const char *id);
 int save_config(void);
-void free_config_resource(void);
+void config_uninit(void);

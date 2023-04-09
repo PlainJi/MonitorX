@@ -67,7 +67,7 @@ class Monitor:
         # RAM
         mem = psutil.virtual_memory()
         hw_monitor['ram_load'] = mem[2]
-        hw_monitor['ram_total'] = str(int(round((mem[0] / 1024 / 1024 / 1024), 0))) + 'GB'
+        hw_monitor['ram_capacity'] = str(int(round((mem[0] / 1024 / 1024 / 1024), 0))) + 'GB'
 
         # GPU
         gpu_stat = gpustat.GPUStatCollection.new_query()
@@ -78,6 +78,7 @@ class Monitor:
         hw_monitor['gpu_model'] = self.gpu_model
         hw_monitor['gpu_load'] = sum([i['utilization.gpu'] for i in gpus]) / len(gpus)
         hw_monitor['gram_load'] = int(sum([i['memory.used'] for i in gpus]) / sum([i['memory.total'] for i in gpus]) * 100)
+        hw_monitor['gram_capacity'] = str(int(sum([i['memory.total'] for i in gpus]) / 1024)) + 'GB'
         hw_monitor['gpu_temp'] = sum([i['temperature.gpu'] for i in gpus]) / len(gpus)
         hw_monitor['gpu_clock'] = self.GetGpuClock()
 

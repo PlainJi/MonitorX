@@ -56,8 +56,12 @@ int git_check_username(const char *username) {
     return git_curl_req(username, 2008, &tmp);
 }
 
+// lvgl is not thread-safe by default.
+// But in event and timer it's valid.
+// Beshre this func is only called in kb_event_cb.
 void git_reset(void) {
     git_last_update_time = 0;
+    ui_update_contribution_panel(NULL);
 }
 
 int git_init(void) {
@@ -110,6 +114,11 @@ void git_stop_update(void) {
     printf("git stop update!\n");
     git_last_update_time = time(NULL);
     git_updating = false;
+}
+
+void git_start_update(void) {
+    printf("git start update!\n");
+    git_last_update_time = 0;
 }
 
 void update_contribution_wall(void) {

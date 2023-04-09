@@ -63,6 +63,7 @@ void bili_reset(void);
 int bili_init(void);
 int bili_uninit(void);
 void bili_stop_update(void);
+void bili_start_update(void);
 void update_relation(void);
 void update_detail(void);
 void bili_thread(void);

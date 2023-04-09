@@ -131,6 +131,11 @@ void _ui_anim_callback_set_image_angle(lv_anim_t * a, int32_t v)
     lv_img_set_angle((lv_obj_t *)a->user_data, v);
 }
 
+void _ui_anim_callback_set_arc(lv_anim_t *a, int32_t v)
+{
+    lv_arc_set_value((lv_obj_t *)a->user_data, v);
+}
+
 
 int32_t _ui_anim_callback_get_x(lv_anim_t * a)
 {
@@ -167,6 +172,7 @@ int32_t _ui_anim_callback_get_image_angle(lv_anim_t * a)
     return lv_img_get_angle((lv_obj_t *)a->user_data);
 }
 
+
 void _ui_arc_set_text_value(lv_obj_t * trg, lv_obj_t * src, char * prefix, char * postfix)
 {
     char buf[_UI_TEMPORARY_STRING_BUFFER_SIZE];
@@ -189,4 +195,67 @@ void _ui_checked_set_text_value(lv_obj_t * trg, lv_obj_t * src, char * txt_on, c
 void _ui_slider_set_value(void *a, int32_t v)
 {
     lv_slider_set_value((lv_obj_t *)a, v, LV_ANIM_OFF);
+}
+
+void ui_creat_panel(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, int height) {
+    *obj = lv_obj_create((lv_obj_t*)parent);
+    lv_obj_set_width(*obj, width);
+    lv_obj_set_height(*obj, height);
+    lv_obj_set_x(*obj, x);
+    lv_obj_set_y(*obj, y);
+    lv_obj_set_align(*obj, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(*obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |
+                       LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | 
+                       LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN);
+    lv_obj_set_style_radius(*obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(*obj, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(*obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(*obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
+void ui_creat_text_area(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, \
+                        const char *text, const char *placeholder, const lv_font_t *font) {
+    *obj = lv_textarea_create((lv_obj_t*)parent);
+    lv_obj_set_width(*obj, width);
+    lv_obj_set_height(*obj, LV_SIZE_CONTENT);
+    lv_obj_set_x(*obj, x);
+    lv_obj_set_y(*obj, y);
+    lv_obj_set_align(*obj, LV_ALIGN_CENTER);
+    lv_textarea_set_text(*obj, text);
+    lv_textarea_set_placeholder_text(*obj, placeholder);
+    lv_textarea_set_one_line(*obj, true);
+    lv_obj_clear_state(*obj, LV_STATE_ANY);
+    lv_obj_clear_flag(*obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |
+                       LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_text_align(*obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    if (font) lv_obj_set_style_text_font(*obj, font, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(*obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(*obj, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(*obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(*obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
+void ui_creat_label(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, \
+                    const char *text, const lv_font_t *font) {
+    *obj = lv_label_create((lv_obj_t *)parent);
+    lv_obj_set_width(*obj, width);
+    lv_obj_set_height(*obj, LV_SIZE_CONTENT);
+    lv_obj_set_x(*obj, x);
+    lv_obj_set_y(*obj, y);
+    lv_obj_set_align(*obj, LV_ALIGN_CENTER);
+    lv_label_set_text(*obj, text);
+    lv_obj_set_style_text_align(*obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(*obj, font, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
+void ui_creat_img(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int w, int h, const lv_img_dsc_t *img) {
+    *obj = lv_img_create((lv_obj_t*)parent);
+    lv_img_set_src(*obj, img);
+    lv_obj_set_width(*obj, w);
+    lv_obj_set_height(*obj, h);
+    lv_obj_set_x(*obj, x);
+    lv_obj_set_y(*obj, y);
+    lv_obj_set_align(*obj, LV_ALIGN_CENTER);
+    lv_obj_add_flag(*obj, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_clear_flag(*obj, LV_OBJ_FLAG_SCROLLABLE);
 }

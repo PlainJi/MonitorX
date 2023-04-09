@@ -12,11 +12,11 @@ extern "C" {
 
 #include "lvgl/lvgl.h"
 
-void StartCpuPointer_Animation(lv_obj_t * TargetObject, int delay);
-void StartGpuPointer_Animation(lv_obj_t * TargetObject, int delay);
-void StartCpuTemp_Animation(lv_obj_t * TargetObject, int delay);
-void StartGpuTemp_Animation(lv_obj_t * TargetObject, int delay);
-void StartLoading_Animation(lv_obj_t * TargetObject, int v1, int v2, int time);
+void ui_InitAnimationForPointer(lv_obj_t *TargetObject, int start, int stop);
+void ui_InitAnimationForArc(lv_obj_t *TargetObject, int start, int stop);
+void ui_AnimationForPointer(lv_obj_t * TargetObject, int new_angle, int time);
+void ui_AnimationForArc(lv_obj_t * TargetObject, int new_angle, int time);
+void ui_Loading_Animation(lv_obj_t * TargetObject, int v1, int v2, int time);
 void kb_event_cb(lv_event_t * e);
 void ui_event_Monitor(lv_event_t * e);
 extern lv_obj_t * ui_Monitor;
@@ -99,7 +99,6 @@ LV_FONT_DECLARE(ui_font_ShangShou40);
 
 void ui_init(void);
 void ui_Monitor_screen_init(void);
-void ui_Git_add_text(lv_obj_t *obj, int x, int y, const char *string);
 void ui_Git_screen_init(void);
 void ui_Bili_screen_init(void);
 

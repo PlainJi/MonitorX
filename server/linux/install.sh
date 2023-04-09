@@ -31,6 +31,7 @@ chmod 644 /etc/systemd/system/MonitorX.service
 systemctl daemon-reload
 systemctl enable MonitorX.service
 systemctl start MonitorX.service
+sleep 1
+systemctl status MonitorX.service
 
 echo 'Done!'
-echo 'check with "systemctl status MonitorX.service"'

@@ -145,20 +145,19 @@ int main(void)
     lv_example_freetype_1();
     //json_parser_test();
 #else
-    read_config();
+    config_init();
     ui_init();
-    task_creat("monitor", 90, 32*1024, (FUNC)monitor_thread, NULL);
-    task_creat("git", 90, 128*1024, (FUNC)git_thread, NULL);
-    task_creat("bili", 90, 128*1024, (FUNC)bili_thread, NULL);
-#endif
-    /*Handle LitlevGL tasks (tickless mode)*/
+    task_creat("monitor", 80, 32*1024, (FUNC)monitor_thread, NULL);
+    task_creat("git", 80, 128*1024, (FUNC)git_thread, NULL);
+    task_creat("bili", 80, 128*1024, (FUNC)bili_thread, NULL);
     while(1) {
         pthread_mutex_lock(&lvgl_mutex);
         lv_timer_handler();
         pthread_mutex_unlock(&lvgl_mutex);
         usleep(5000);
     }
-    free_config_resource();
+    config_uninit();
+#endif
 
     return 0;
 }

@@ -4,7 +4,7 @@ import os, time
 import inspect, logging
 import win32serviceutil, win32service, win32event
 from logging.handlers import TimedRotatingFileHandler
-from SystemMonitor import monitor_once
+from monitorlib import monitor_once
 
 class SystemMonitorService(win32serviceutil.ServiceFramework):
     _svc_name_ = "MonitorX Service"             # 服务名

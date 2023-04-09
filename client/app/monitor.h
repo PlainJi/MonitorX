@@ -1,13 +1,17 @@
 #pragma once
 
 typedef struct _monitor_t {
+    char cpu_model[16];
     double cpu_load;
     double ram_load;
+    char ram_capacity[8];
     double cpu_clock;
     double cpu_temp;
 
+    char gpu_model[16];
     double gpu_load;
     double gram_load;
+    char gram_capacity[8];
     double gpu_clock;
     double gpu_temp;
 

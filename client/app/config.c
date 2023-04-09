@@ -5,7 +5,7 @@ sys_config_t conf;
 dictionary *ini = NULL;
 FILE *config_file = NULL;
 
-int read_config(void) {
+int config_init(void) {
     int ret = 0;
     int tmp_int;
     const char *tmp_str;
@@ -82,7 +82,7 @@ int save_config(void) {
     return 0;
 }
 
-void free_config_resource(void) {
+void config_uninit(void) {
     if (ini) {
         dictionary_del(ini);
         ini = NULL;

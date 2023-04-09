@@ -23,5 +23,6 @@ void git_reset(void);
 int git_init(void);
 void git_uninit(void);
 void git_stop_update(void);
+void git_start_update(void);
 void update_contribution_wall(void);
 void git_thread(void);

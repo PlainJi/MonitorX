@@ -34,79 +34,187 @@ char buf[32] = {0};		// monitor temp string buffer
 git_t **ui_git_info;	// same as git_info**
 int ui_git_end_year = 0;
 
-void SetAnimation(lv_obj_t * TargetObject, int new_angle, int time)
-{
-	lv_anim_t PropertyAnimation_0;
-	lv_anim_init(&PropertyAnimation_0);
-	lv_anim_set_time(&PropertyAnimation_0, time);
-	lv_anim_set_user_data(&PropertyAnimation_0, TargetObject);
-	lv_anim_set_custom_exec_cb(&PropertyAnimation_0, _ui_anim_callback_set_image_angle);
-	int start = lv_img_get_angle(TargetObject);
-	if (start > 2700) start -= 65536;
-	lv_anim_set_values(&PropertyAnimation_0, start, new_angle);
-	lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_ease_in_out);
-	lv_anim_set_delay(&PropertyAnimation_0, 0);
-	lv_anim_set_playback_time(&PropertyAnimation_0, 0);
-	lv_anim_set_playback_delay(&PropertyAnimation_0, 0);
-	lv_anim_set_repeat_count(&PropertyAnimation_0, 0);
-	lv_anim_set_repeat_delay(&PropertyAnimation_0, 0);
-	lv_anim_set_early_apply(&PropertyAnimation_0, false);
-	lv_anim_start(&PropertyAnimation_0);
-}
-
 void ImageRotation(lv_obj_t *obj, int start, int end, float usage) {
 	int angle = (int)(usage / 100.0f * (end - start) + start);
 	lv_img_set_angle(obj, angle);
 }
+/////////////////////////////////////
+void CpuSetModel(char *model) {
+	static bool init_flag = false;
+	
+	if (!init_flag) {
+		lv_textarea_set_text(ui_CpuModel, model);
+		init_flag = true;
+	}
+}
 
 void CpuSetUsagePointer(float usage) {
+	static int last_angle = CPU_USAGE_POINTER_START;
 	int angle = GET_ANGLE_BY_PERCENT(CPU_USAGE_POINTER_START, CPU_USAGE_POINTER_END, usage);
-	SetAnimation(ui_CpuUsagePointer, angle, 950);
-}
 
-void CpuSetTempPointer(float usage) {
-	int angle = GET_ANGLE_BY_PERCENT(CPU_TEMP_POINTER_START, CPU_TEMP_POINTER_END, usage);
-	SetAnimation(ui_CpuTemp, angle, 950);
-}
-
-void GpuSetUsagePointer(float usage) {
-	int angle = GET_ANGLE_BY_PERCENT(GPU_USAGE_POINTER_START, GPU_USAGE_POINTER_END, usage);
-	SetAnimation(ui_GpuUsagePointer, angle, 950);
-}
-
-void GpuSetTempPointer(float usage) {
-	int angle = GET_ANGLE_BY_PERCENT(GPU_TEMP_POINTER_START, GPU_TEMP_POINTER_END, usage);
-	SetAnimation(ui_GpuTemp, angle, 950);
-}
-
-void MemSetUsage(float usage) {
-	lv_arc_set_value(ui_MemUsageArc, usage);
-}
-
-void GMemSetUsage(float usage) {
-	lv_arc_set_value(ui_GMemUsageArc, usage);
+	if (angle != last_angle) {
+		ui_AnimationForPointer(ui_CpuUsagePointer, angle, 950);
+		last_angle = angle;
+	}
 }
 
 void CpuSetUsagePercent(float usage) {
-	sprintf(buf, "%d%%", (int)usage);
-	lv_textarea_set_text(ui_CpuUsagePercent, buf);
+	static int last_usage = 0;
+	int cur_usage = (int)usage;
+
+	if (cur_usage != last_usage) {
+		sprintf(buf, "%d%%", cur_usage);
+		lv_textarea_set_text(ui_CpuUsagePercent, buf);
+		last_usage = cur_usage;
+	}
+}
+
+void CpuSetFrequency(float mhz) {
+	float temp = 0;
+	static int last_mhz = 0;
+	int cur_mhz = (int)mhz;
+
+	if (cur_mhz != last_mhz) {
+		if (mhz > 999.0f) {
+			temp = mhz / 1000.0f;
+			sprintf(buf, "%3.1fGHz", (double)temp);
+			lv_textarea_set_text(ui_CpuFrequency, buf);
+		} else {
+			sprintf(buf, "%dMHz", (int)mhz);
+			lv_textarea_set_text(ui_CpuFrequency, buf);
+		}
+		last_mhz = cur_mhz;
+	}
+}
+
+void CpuSetTempPointer(float usage) {
+	static int last_angle = CPU_TEMP_POINTER_START;
+	int angle = GET_ANGLE_BY_PERCENT(CPU_TEMP_POINTER_START, CPU_TEMP_POINTER_END, usage);
+
+	if (angle != last_angle) {
+		ui_AnimationForPointer(ui_CpuTemp, angle, 950);
+		last_angle = angle;
+	}
+}
+/////////////////////////////////////
+void GpuSetModel(char *model) {
+	static bool init_flag = false;
+
+	if (!init_flag) {
+		lv_textarea_set_text(ui_GpuModel, model);
+		init_flag = true;
+	}
+}
+
+void GpuSetUsagePointer(float usage) {
+	static int last_angle = GPU_USAGE_POINTER_START;
+	int angle = GET_ANGLE_BY_PERCENT(GPU_USAGE_POINTER_START, GPU_USAGE_POINTER_END, usage);
+
+	if (angle != last_angle) {
+		ui_AnimationForPointer(ui_GpuUsagePointer, angle, 950);
+		last_angle = angle;
+	}
 }
 
 void GpuSetUsagePercent(float usage) {
-	sprintf(buf, "%d%%", (int)usage);
-	lv_textarea_set_text(ui_GpuUsagePercent, buf);
+	static int last_usage = 0;
+	int cur_usage = (int)usage;
+
+	if (cur_usage != last_usage) {
+		sprintf(buf, "%d%%", cur_usage);
+		lv_textarea_set_text(ui_GpuUsagePercent, buf);
+		last_usage = cur_usage;
+	}
+}
+
+void GpuSetFrequency(float mhz) {
+	static int last_mhz = 0;
+	int cur_mhz = (int)mhz;
+	float temp = 0;
+
+	if (cur_mhz != last_mhz) {
+		if (mhz > 999.0f) {
+			temp = mhz / 1000.0f;
+			sprintf(buf, "%3.1fGHz", (double)temp);
+			lv_textarea_set_text(ui_GpuFrequency, buf);
+		} else {
+			sprintf(buf, "%dMHz", (int)mhz);
+			lv_textarea_set_text(ui_GpuFrequency, buf);
+		}
+		last_mhz = cur_mhz;
+	}
+}
+
+void GpuSetTempPointer(float usage) {
+	static int last_angle = GPU_TEMP_POINTER_START;
+	int angle = GET_ANGLE_BY_PERCENT(GPU_TEMP_POINTER_START, GPU_TEMP_POINTER_END, usage);
+
+	if (angle != last_angle) {
+		ui_AnimationForPointer(ui_GpuTemp, angle, 950);
+		last_angle = angle;
+	}
+}
+/////////////////////////////////////
+void MemSetUsage(float usage) {
+	static int last_usage = 0;
+	int cur_usage = (int)usage;
+
+	if (cur_usage != last_usage) {
+		ui_AnimationForArc(ui_MemUsageArc, cur_usage, 950);
+		last_usage = cur_usage;
+	}
 }
 
 void MemSetUsagePercent(float usage) {
-	sprintf(buf, "%d%%", (int)usage);
-	lv_textarea_set_text(ui_MemUsagePercent, buf);
+	static int last_usage = 0;
+	int cur_usage = (int)usage;
+
+	if (cur_usage != last_usage) {
+		sprintf(buf, "%d%%", cur_usage);
+		lv_textarea_set_text(ui_MemUsagePercent, buf);
+		last_usage = cur_usage;
+	}
+}
+
+void MemSetCapacity(const char *str) {
+	static bool init_flag = false;
+
+	if (!init_flag) {
+		lv_textarea_set_text(ui_MemCapacity, str);
+		init_flag = true;
+	}
+}
+
+void GMemSetUsage(float usage) {
+	static int last_usage = 0;
+	int cur_usage = (int)usage;
+
+	if (cur_usage != last_usage) {
+		ui_AnimationForArc(ui_GMemUsageArc, cur_usage, 950);
+		last_usage = cur_usage;
+	}
 }
 
 void GMemSetUsagePercent(float usage) {
-	sprintf(buf, "%d%%", (int)usage);
-	lv_textarea_set_text(ui_GMemUsagePercent, buf);
+	static int last_usage = 0;
+	int cur_usage = (int)usage;
+
+	if (cur_usage != last_usage) {
+		sprintf(buf, "%d%%", cur_usage);
+		lv_textarea_set_text(ui_GMemUsagePercent, buf);
+		last_usage = cur_usage;
+	}
 }
 
+void GMemSetCapacity(const char *str) {
+	static bool init_flag = false;
+
+	if (!init_flag) {
+		lv_textarea_set_text(ui_GMemCapacity, str);
+		init_flag = true;
+	}
+}
+/////////////////////////////////////
 void AutoUnit(int bytes, char *dest_buf) {
 	float temp = 0.0f;
 	if (bytes > 999 * 1024) {
@@ -119,61 +227,74 @@ void AutoUnit(int bytes, char *dest_buf) {
 }
 
 void NetSetUpload(int bytes) {
-	AutoUnit(bytes, buf);
-	lv_textarea_set_text(ui_Up, buf);
+	static int last_bytes = 0;
+
+	if (bytes != last_bytes) {
+		AutoUnit(bytes, buf);
+		lv_textarea_set_text(ui_Up, buf);
+		last_bytes = bytes;
+	}
 }
 
 void NetSetDownload(int bytes) {
-	AutoUnit(bytes, buf);
-	lv_textarea_set_text(ui_Down, buf);
+	static int last_bytes = 0;
+
+	if (bytes != last_bytes) {
+		AutoUnit(bytes, buf);
+		lv_textarea_set_text(ui_Down, buf);
+		last_bytes = bytes;
+	}
 }
 
 void IoSetRead(int bytes) {
-	AutoUnit(bytes, buf);
-	lv_textarea_set_text(ui_Read, buf);
+	static int last_bytes = 0;
+
+	if (bytes != last_bytes) {
+		AutoUnit(bytes, buf);
+		lv_textarea_set_text(ui_Read, buf);
+		last_bytes = bytes;
+	}
 }
 
 void IoSetWrite(int bytes) {
-	AutoUnit(bytes, buf);
-	lv_textarea_set_text(ui_Write, buf);
-}
+	static int last_bytes = 0;
 
-void CpuSetFrequency(float mhz) {
-	float temp = 0;
-	if (mhz > 999.0f) {
-		temp = mhz / 1000.0f;
-		sprintf(buf, "%3.1fGHz", (double)temp);
-		lv_textarea_set_text(ui_CpuFrequency, buf);
-	} else {
-		sprintf(buf, "%dMHz", (int)mhz);
-		lv_textarea_set_text(ui_CpuFrequency, buf);
+	if (bytes != last_bytes) {
+		AutoUnit(bytes, buf);
+		lv_textarea_set_text(ui_Write, buf);
+		last_bytes = bytes;
 	}
 }
 
-void GpuSetFrequency(float mhz) {
-	float temp = 0;
-	if (mhz > 999.0f) {
-		temp = mhz / 1000.0f;
-		sprintf(buf, "%3.1fGHz", (double)temp);
-		lv_textarea_set_text(ui_GpuFrequency, buf);
-	} else {
-		sprintf(buf, "%dMHz", (int)mhz);
-		lv_textarea_set_text(ui_GpuFrequency, buf);
-	}
-}
-
+/////////////////////////////////////
 void SetTime(char *str) {
-	lv_textarea_set_text(ui_Time, str);
+	static char time[16] = {0};
+
+	if (strncmp(time, str, sizeof(time))) {
+		lv_textarea_set_text(ui_Time, str);
+		strncpy(time, str, sizeof(time));
+	}
 }
 
 void SetWeek(char *str) {
-	lv_textarea_set_text(ui_Week, str);
+	static char week[8] = {0};
+
+	if (strncmp(week, str, sizeof(week))) {
+		lv_textarea_set_text(ui_Week, str);
+		strncpy(week, str, sizeof(week));
+	}
 }
 
 void SetDate(char *str) {
-	lv_textarea_set_text(ui_Date, str);
+	static char date[16] = {0};
+
+	if (strncmp(date, str, sizeof(date))) {
+		lv_textarea_set_text(ui_Date, str);
+		strncpy(date, str, sizeof(date));
+	}
 }
 
+/////////////////////////////////////
 void update_time_from_local(void) {
 	char temp[32] = {0};
 	static char *week[] = {"Sun.", "Mon.", "Tus.", "Wed.", "Thu.", "Fri.", "Sat."};
@@ -188,24 +309,30 @@ void update_time_from_local(void) {
 }
 
 void ui_monitor_init(void) {
-	StartGpuTemp_Animation(ui_GpuTemp, 0);
-    StartCpuTemp_Animation(ui_CpuTemp, 0);
-    StartGpuPointer_Animation(ui_GpuUsagePointer, 0);
-    StartCpuPointer_Animation(ui_CpuUsagePointer, 0);
+	ui_InitAnimationForPointer(ui_CpuUsagePointer, CPU_USAGE_POINTER_START, CPU_USAGE_POINTER_END);
+	ui_InitAnimationForPointer(ui_GpuUsagePointer, GPU_USAGE_POINTER_START, GPU_USAGE_POINTER_END);
+	ui_InitAnimationForPointer(ui_CpuTemp, CPU_TEMP_POINTER_START, CPU_TEMP_POINTER_END);
+	ui_InitAnimationForPointer(ui_GpuTemp, GPU_TEMP_POINTER_START, GPU_TEMP_POINTER_END);
+	ui_InitAnimationForArc(ui_MemUsageArc, 0, 100);
+	ui_InitAnimationForArc(ui_GMemUsageArc, 0, 100);
 }
 
 void ui_update_monitor(monitor_t *pMonitor) {
+	CpuSetModel(pMonitor->cpu_model);
 	CpuSetUsagePointer(pMonitor->cpu_load);
 	CpuSetUsagePercent(pMonitor->cpu_load);
 	MemSetUsage(pMonitor->ram_load);
 	MemSetUsagePercent(pMonitor->ram_load);
+	MemSetCapacity(pMonitor->ram_capacity);
 	CpuSetFrequency(pMonitor->cpu_clock);
 	CpuSetTempPointer(pMonitor->cpu_temp);
 
+	GpuSetModel(pMonitor->gpu_model);
 	GpuSetUsagePointer(pMonitor->gpu_load);
 	GpuSetUsagePercent(pMonitor->gpu_load);
 	GMemSetUsage(pMonitor->gram_load);
 	GMemSetUsagePercent(pMonitor->gram_load);
+	GMemSetCapacity(pMonitor->gram_capacity);
 	GpuSetFrequency(pMonitor->gpu_clock);
 	GpuSetTempPointer(pMonitor->gpu_temp);
 
@@ -298,7 +425,7 @@ void ui_update_git_status(char percent) {
 		if (percent != 100) {
 			lv_obj_clear_flag(ui_Git_Slider_Loading, LV_OBJ_FLAG_HIDDEN);
 		}
-		StartLoading_Animation(ui_Git_Slider_Loading, cur_percent, percent, 500);
+		ui_Loading_Animation(ui_Git_Slider_Loading, cur_percent, percent, 500);
 		if (percent == 100) {
 			lv_obj_add_flag(ui_Git_Slider_Loading, LV_OBJ_FLAG_HIDDEN);
 		}
@@ -379,8 +506,17 @@ int ui_git_check_username(const char *username) {
 
 //////////////////////////////////////////////////////////////////////////////
 
+void ui_bili_reset(void) {
+	lv_textarea_set_text(ui_TextFollower, " ");
+	lv_textarea_set_text(ui_TextBiliUserID, "ID:");
+	lv_textarea_set_text(ui_TextLike, " ");
+	lv_textarea_set_text(ui_TextCoin, " ");
+	lv_textarea_set_text(ui_TextFavorite, " ");
+}
+
 void ui_bili_init(void) {
 	char bili_buf[32] = {0};
+	ui_bili_reset();
 
 	snprintf(bili_buf, sizeof(bili_buf), "ID: %s", conf.bili_userid);
 	lv_textarea_set_text(ui_TextBiliUserID, bili_buf);
@@ -402,7 +538,7 @@ void ui_update_bili_status(char percent) {
 		if (percent != 100) {
 			lv_obj_clear_flag(ui_Bili_Slider_Loading, LV_OBJ_FLAG_HIDDEN);
 		}
-		StartLoading_Animation(ui_Bili_Slider_Loading, cur_percent, percent, 800);
+		ui_Loading_Animation(ui_Bili_Slider_Loading, cur_percent, percent, 800);
 		if (percent == 100) {
 			lv_obj_add_flag(ui_Bili_Slider_Loading, LV_OBJ_FLAG_HIDDEN);
 		}

@@ -23,7 +23,7 @@ def generate_output():
     # RAM
     hw_monitor['summary']['ram_load'] = round(hw_monitor['RAM']['Load']['Memory'] + 0.5, 0)
     ram_total =  hw_monitor['RAM']['Data']['Used Memory'] + hw_monitor['RAM']['Data']['Available Memory']
-    hw_monitor['summary']['ram_total'] = str(int(round(ram_total + 0.5, 0))) + 'GB'
+    hw_monitor['summary']['ram_capacity'] = str(int(round(ram_total + 0.5, 0))) + 'GB'
 
     # GPU
     hw_monitor['summary']['gpu_model'] = hw_monitor['GpuNvidia']['Name']
@@ -33,7 +33,7 @@ def generate_output():
     # GRAM
     hw_monitor['summary']['gram_load'] = round(hw_monitor['GpuNvidia']['Load']['GPU Memory'] + 0.5, 0)
     gram_total = round(hw_monitor['GpuNvidia']['SmallData']['GPU Memory Total']/1024.0, 0)
-    hw_monitor['summary']['gram_total'] = str(int(gram_total)) + 'GB'
+    hw_monitor['summary']['gram_capacity'] = str(int(gram_total)) + 'GB'
 
     # NET
     network = GetNetWork()

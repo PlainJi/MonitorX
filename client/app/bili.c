@@ -126,19 +126,26 @@ int bili_get_summary(void) {
     return 0;
 }
 
+// lvgl is not thread-safe by default.
+// But in event and timer it's valid.
+// Beshre this func is only called in kb_event_cb.
 void bili_reset(void) {
     bili_last_update_relation = 0;
     bili_last_update_stat = 0;
     memset(bili_video_list.author, 0, sizeof(bili_video_list.author));
+    ui_bili_reset();
 }
 
 int bili_init(void) {
-    bili_reset();
+    bili_last_update_relation = 0;
+    bili_last_update_stat = 0;
     memset(&bili_chunk, 0, sizeof(bili_chunk));
     memset(&bili_video_list, 0, sizeof(bili_video_list));
     memset(&bili_relation, 0, sizeof(bili_relation));
     memset(&bili_info_all, 0, sizeof(bili_info_all));
-    bili_header_chunk = curl_slist_append(bili_header_chunk, "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
+    bili_header_chunk = curl_slist_append(bili_header_chunk, \
+        "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 \
+        (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
     curl_global_init(CURL_GLOBAL_ALL);
     bili_curl = curl_easy_init();
     //curl_easy_setopt(bili_curl, CURLOPT_VERBOSE, 1);
@@ -162,6 +169,12 @@ void bili_stop_update(void) {
     bili_last_update_relation = time(NULL);
     bili_last_update_stat = time(NULL);
     bili_updating = false;
+}
+
+void bili_start_update(void) {
+    printf("bili start update!\n");
+    bili_last_update_relation = 0;
+    bili_last_update_stat = 0;
 }
 
 void update_relation(void) {

@@ -70,6 +70,8 @@ void _ui_anim_callback_set_image_zoom(lv_anim_t * a, int32_t v);
 
 void _ui_anim_callback_set_image_angle(lv_anim_t * a, int32_t v);
 
+void _ui_anim_callback_set_arc(lv_anim_t *a, int32_t v);
+
 int32_t _ui_anim_callback_get_x(lv_anim_t * a);
 
 int32_t _ui_anim_callback_get_y(lv_anim_t * a);
@@ -91,5 +93,11 @@ void _ui_slider_set_text_value(lv_obj_t * trg, lv_obj_t * src, char * prefix, ch
 void _ui_checked_set_text_value(lv_obj_t * trg, lv_obj_t * src, char * txt_on, char * txt_off);
 
 void _ui_slider_set_value(void *a, int32_t v);
+
+void ui_creat_panel(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, int height);
+void ui_creat_text_area(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, \
+                        const char *text, const char *placeholder, const lv_font_t *font);
+void ui_creat_label(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, const char *text, const lv_font_t *font);
+void ui_creat_img(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int w, int h, const lv_img_dsc_t *img);
 
 #endif

@@ -25,6 +25,11 @@ extern pthread_mutex_t lvgl_mutex;
 
 void monitor_thread(void)
 {
+    pthread_mutex_lock(&lvgl_mutex);
+    ui_monitor_init();
+    pthread_mutex_unlock(&lvgl_mutex);
+    sleep(3);
+
     struct sockaddr_in localaddr;
     int confd;
     ssize_t len;
@@ -49,11 +54,10 @@ void monitor_thread(void)
     //5.设置客户端加入多播组
     setsockopt(confd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&group,sizeof(group));
 
-    ui_monitor_init();
     while(1){
         memset(buf, 0, sizeof(buf));
         recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);
-        //printf("recv %ld: %s\n", (long int)len, buf);
+        //printf("recv: %s\n", buf);
         if (!parse_monitor_info(buf, &ui_monitor)) {
             pthread_mutex_lock(&lvgl_mutex);
             ui_update_monitor(&ui_monitor);
