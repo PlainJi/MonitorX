@@ -24,7 +24,7 @@ fi
 pip3 install -r requirements.txt
 mkdir /opt/MonitorX
 cp *.py /opt/MonitorX
-chmod +x /opt/MonitorX/SystemMonitor.py
+chmod +x /opt/MonitorX/MonitorX.py
 
 cp MonitorX.service /etc/systemd/system/
 chmod 644 /etc/systemd/system/MonitorX.service

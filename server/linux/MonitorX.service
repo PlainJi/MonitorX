@@ -8,7 +8,7 @@ Type=simple
 Restart=on-failure
 RestartSec=5s
 WorkingDirectory=/opt/MonitorX/
-ExecStart=python3 /opt/MonitorX/SystemMonitor.py
+ExecStart=python3 /opt/MonitorX/MonitorX.py
 
 [Install]
 WantedBy=multi-user.target
