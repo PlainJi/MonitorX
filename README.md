@@ -21,4 +21,4 @@
 ![pic](pics/diagram.png)
 
 ## 效果图
-![pic](pics/monitor.png)
+![pic](pics/monitor.gif)
