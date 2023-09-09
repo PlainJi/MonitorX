@@ -12,6 +12,7 @@
 #include "git.h"
 #include "bili.h"
 #include "config.h"
+#include "util.h"
 
 // #include "demos/lv_demos.h"
 // #include "examples/lv_examples.h"
@@ -128,11 +129,26 @@ static void init_fbdev(void)
 #endif
 
 pthread_mutex_t lvgl_mutex = PTHREAD_MUTEX_INITIALIZER;
+void wait_for_timesync();
+
+void wait_for_timesync() {
+    int year = 1970;
+    time_t t = 0;
+    while (year == 1970) {
+        printf("checking timesync...\n");
+        t = time(NULL);
+	    struct tm *s_tm = localtime(&t);
+	    year = s_tm->tm_year+1900;
+        sleep(1);
+    }
+    printf("%s\n", getasctime(&t));
+}
 
 int main(void)
 {
     time_t t;
     srand((unsigned)time(&t));
+    time_t last_refresh_time = 0;
     
     lv_init();
 
@@ -152,6 +168,7 @@ int main(void)
         usleep(5000);
     }
 #else
+    wait_for_timesync();
     config_init();
     ui_init();
     task_creat("monitor", 80, 32*1024, (FUNC)monitor_thread, NULL);
@@ -162,6 +179,11 @@ int main(void)
         lv_timer_handler();
         pthread_mutex_unlock(&lvgl_mutex);
         usleep(5000);
+
+        if (time(NULL) - last_refresh_time > 5) {
+            last_refresh_time = time(NULL);
+            sync();
+        }
     }
     config_uninit();
 #endif

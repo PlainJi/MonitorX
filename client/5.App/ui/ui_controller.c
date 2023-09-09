@@ -351,6 +351,7 @@ void ui_update_monitor(monitor_t *pMonitor) {
 
 static uint8_t ui_git_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CONTRIBUTION_PANEL_W, CONTRIBUTION_PANEL_H)];
 lv_obj_t *ui_git_canvas;
+lv_color_t color_bg_1, color_bd_1;
 lv_color_t color_bg0, color_bd0;
 lv_color_t color_bg1, color_bd1;
 lv_color_t color_bg2, color_bd2;
@@ -389,6 +390,8 @@ void ui_git_init(int end_year) {
 	color_bd1 = lv_color_hex(0x92E9AB);
 	color_bg0 = lv_color_hex(0xDFE1E4);  // grey
 	color_bd0 = lv_color_hex(0xEBEDF0);
+	color_bg_1 = lv_color_hex(0xFFFFFF);  // white
+	color_bd_1 = lv_color_hex(0xFFFFFF);
 	lv_draw_rect_dsc_init(&ui_git_dsc);
     ui_git_dsc.border_width = 1;
     ui_git_dsc.radius = 3;
@@ -477,9 +480,63 @@ void ui_update_contribution_panel(git_t *info) {
 	}
 }
 
+void ui_update_contribution_panel1(git_t *info) {
+	const int x_start = 5;
+	const int y_start = 5;
+	const int w_h = 11;
+	const int step = 3;
+
+
+	if (info == NULL) {
+		ui_git_dsc.bg_color = color_bg0;
+		ui_git_dsc.border_color = color_bd0;
+		for (int j=0; j<=52; j++) {
+			for (int k=0; k<7; k++) {
+				lv_canvas_draw_rect(ui_git_canvas, x_start + j*(w_h+step), y_start + k*(w_h+step), w_h, w_h, &ui_git_dsc);
+			}
+		}
+	} else {
+		for (int j=0; j<=52; j++) {
+			for (int k=0; k<7; k++) {
+				switch (info->contribution[j][k]) {
+					case -1:
+						ui_git_dsc.bg_color = color_bg_1;
+						ui_git_dsc.border_color = color_bd_1;
+						break;
+					case 0:
+						ui_git_dsc.bg_color = color_bg0;
+						ui_git_dsc.border_color = color_bd0;
+						break;
+					case 1:
+						ui_git_dsc.bg_color = color_bg1;
+						ui_git_dsc.border_color = color_bd1;
+						break;
+					case 2:
+						ui_git_dsc.bg_color = color_bg2;
+						ui_git_dsc.border_color = color_bd2;
+						break;
+					case 3:
+						ui_git_dsc.bg_color = color_bg3;
+						ui_git_dsc.border_color = color_bd3;
+						break;
+					case 4:
+						ui_git_dsc.bg_color = color_bg4;
+						ui_git_dsc.border_color = color_bd4;
+						break;
+					default:
+						ui_git_dsc.bg_color = color_bg_1;
+						ui_git_dsc.border_color = color_bd_1;
+						break;
+				}
+				lv_canvas_draw_rect(ui_git_canvas, x_start + j*(w_h+step), y_start + k*(w_h+step), w_h, w_h, &ui_git_dsc);
+			}
+		}
+	}
+}
+
 void ui_update_contribution_panel_by_year(int year) {
 	if (ui_git_info && year >= START_YEAR && year <= ui_git_end_year) {
-		ui_update_contribution_panel(ui_git_info[year-START_YEAR]);
+		ui_update_contribution_panel1(ui_git_info[year-START_YEAR]);
 	}
 }
 
@@ -488,7 +545,7 @@ void ui_update_git(git_t **info) {
 	char dd_buf[8];
 	lv_dropdown_get_selected_str(ui_year, dd_buf, sizeof(dd_buf));
 	int year = atoi(dd_buf);
-	ui_update_contribution_panel(ui_git_info[year-START_YEAR]);
+	ui_update_contribution_panel1(ui_git_info[year-START_YEAR]);
 }
 
 int ui_git_check_username(const char *username) {

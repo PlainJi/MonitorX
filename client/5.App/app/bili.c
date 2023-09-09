@@ -124,7 +124,7 @@ int bili_get_summary(void) {
         bili_info_all.share += tmp->share;
     }
     time_t t = time(NULL);
-    printf("[%s] [BILI] update bili info. username: %s follower: %d likes: %d coins: %d favorite: %d\n", \
+    printf("[%s] [BILI] get summary username: %s follower: %d likes: %d coins: %d favorite: %d\n", \
         getasctime(&t), bili_info_all.username, bili_info_all.follower, \
         bili_info_all.like, bili_info_all.coin, bili_info_all.favorite);
 
@@ -188,7 +188,6 @@ void update_relation(void) {
         pthread_mutex_lock(&lvgl_mutex);
         ui_update_bili_relation(&bili_relation);
         pthread_mutex_unlock(&lvgl_mutex);
-        bili_last_update_relation = time(NULL);
         printf("[%s] [BILI] update_relation: %d\n", getasctime(&bili_last_update_relation), bili_relation.follower);
     }
 }
@@ -209,6 +208,7 @@ void update_detail(void) {
             // update username
             pthread_mutex_lock(&lvgl_mutex);
             ui_update_bili_username(bili_video_list.author);
+            printf("[%s] [BILI] update username %s.\n", getasctime(&bili_last_update_stat), bili_video_list.author);
             pthread_mutex_unlock(&lvgl_mutex);
             // alloc buffer for each video info    
             bili_video_infos = realloc(bili_video_infos, bili_video_list.count * sizeof(bili_video_info_t));
@@ -231,6 +231,7 @@ void update_detail(void) {
                 bili_updating_percent = cur_video_cnt*100 / bili_video_list.count;
             } else {
                 bili_updating = false;
+                printf("[%s] [BILI] update_detail failed!!!!\n", getasctime(&bili_last_update_stat));
             }
         } else {
             // get summary and update
@@ -242,9 +243,8 @@ void update_detail(void) {
             // ensure ui percent is 100
             bili_updating_percent = 100;
             ui_update_bili_status_mutex(bili_updating_percent);
-            bili_last_update_stat = time(NULL);
             bili_updating = false;
-            printf("[%s] [BILI] update_detail.\n", getasctime(&bili_last_update_stat));
+            printf("[%s] [BILI] update_detail complete.\n", getasctime(&bili_last_update_stat));
         }
         usleep((rand()%1000+500) * 1000);
     }
@@ -262,9 +262,11 @@ void bili_thread(void) {
 
     do {
         if (time(NULL) - bili_last_update_relation > conf.bili_update_folw_itv_m*60) {
+            bili_last_update_relation = time(NULL);
             update_relation();
         }
         if (time(NULL) - bili_last_update_stat > conf.bili_update_stat_itv_h*3600) {
+            bili_last_update_stat = time(NULL);
             update_detail();
         }
         sleep(1);

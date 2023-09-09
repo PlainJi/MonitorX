@@ -345,6 +345,8 @@ int parse_bili_video_list(const char *str, bili_video_list_t *list_buf) {
 int parse_bili_video_detail(const char *str, bili_video_info_t *info) {
 	cJSON *root = NULL;
 	cJSON *data = NULL;
+	cJSON *view = NULL;
+	cJSON *stat = NULL;
 	int res = 0;
 	int status = 0;
 
@@ -357,14 +359,16 @@ int parse_bili_video_detail(const char *str, bili_video_info_t *info) {
 		}
 		
 		if (get_node(root, "data", &data)) {res=4; break;}
-			if (get_int_from_node(data, "aid", &info->aid)) {res=5;break;}
-			if (get_int_from_node(data, "view", &info->view)) {res=6;break;}
-			if (get_int_from_node(data, "danmaku", &info->danmu)) {res=7;break;}
-			if (get_int_from_node(data, "reply", &info->reply)) {res=8;break;}
-			if (get_int_from_node(data, "favorite", &info->favorite)) {res=9;break;}
-			if (get_int_from_node(data, "coin", &info->coin)) {res=10;break;}
-			if (get_int_from_node(data, "share", &info->share)) {res=11;break;}
-			if (get_int_from_node(data, "like", &info->like)) {res=12;break;}
+			if (get_node(data, "View", &view)) {res=5; break;}
+				if (get_node(view, "stat", &stat)) {res=6; break;}
+					if (get_int_from_node(stat, "aid", &info->aid)) {res=7;break;}
+					if (get_int_from_node(stat, "view", &info->view)) {res=8;break;}
+					if (get_int_from_node(stat, "danmaku", &info->danmu)) {res=9;break;}
+					if (get_int_from_node(stat, "reply", &info->reply)) {res=10;break;}
+					if (get_int_from_node(stat, "favorite", &info->favorite)) {res=11;break;}
+					if (get_int_from_node(stat, "coin", &info->coin)) {res=12;break;}
+					if (get_int_from_node(stat, "share", &info->share)) {res=13;break;}
+					if (get_int_from_node(stat, "like", &info->like)) {res=14;break;}
 	}while(0);
 	
 	cJSON_Delete(root);

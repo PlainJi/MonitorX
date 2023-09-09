@@ -6,7 +6,8 @@
 #define URL_BILI_RELATION   "https://api.bilibili.com/x/relation/stat?vmid="                // 389426697
 //#define URL_BILI_VIDEO_LIST "https://api.bilibili.com/x/space/arc/search?mid="            // 389426697&pn=1&ps=50
 #define URL_BILI_VIDEO_LIST "https://api.bilibili.com/x/space/wbi/arc/search?mid="          // 389426697&pn=1&ps=50
-#define URL_BILI_VIDEO_INFO "https://api.bilibili.com/x/web-interface/archive/stat?aid="    // 590023490
+//#define URL_BILI_VIDEO_INFO "https://api.bilibili.com/x/web-interface/archive/stat?aid="    // 590023490
+#define URL_BILI_VIDEO_INFO "https://api.bilibili.com/x/web-interface/wbi/view/detail?aid="     
 
 typedef struct _bili_t {
     char userid[16];	// 用户ID
