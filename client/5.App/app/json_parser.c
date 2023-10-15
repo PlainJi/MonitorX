@@ -150,6 +150,20 @@ int get_string_from_node(cJSON *node, char *key, char *buf, int len) {
 	return 0;
 }
 
+char* get_string_pointer_from_node(cJSON *node, char *key) {
+	if (!node) {
+		printf("not parsed!\n");
+		return NULL;
+	}
+	const cJSON *name = cJSON_GetObjectItemCaseSensitive(node, key);
+	if (!cJSON_IsString(name))
+	{
+		return NULL;
+	}
+
+	return name->valuestring;
+}
+
 int parse_monitor_info(const char *str, monitor_t *ui_monitor) {
 	int res = 0;
 	cJSON *root = NULL;
@@ -252,7 +266,7 @@ int parse_bili_relation(const char *str, bili_relation_t *ui_bili) {
 		if (get_root(str, &root)) { res = 1; break; }
 		if (get_int_from_node(root, "code", &status)) {res=2; break;}
 		if (status != 0) {
-			printf("bili relation status: %d\n", status);
+			printf("bili relation status: %d, %s\n", status, get_string_pointer_from_node(root, "message"));
 			res=3; break;
 		}
 
@@ -290,7 +304,7 @@ int parse_bili_video_list(const char *str, bili_video_list_t *list_buf) {
 		if (get_root(str, &root)) { res = 1; break; }
 			if (get_int_from_node(root, "code", &status)) { res=2; break; }
 			if (status != 0) {
-				printf("bili video list status: %d\n", status);
+				printf("bili video list status: %d, %s\n", status, get_string_pointer_from_node(root, "message"));
 				res=3; break;
 			}
 
@@ -354,7 +368,7 @@ int parse_bili_video_detail(const char *str, bili_video_info_t *info) {
 		if (get_root(str, &root)) {res = 1;break;}
 		if (get_int_from_node(root, "code", &status)) {res=2;break;}
 		if (status != 0) {
-			printf("bili video detail status: %d\n", status);
+			printf("bili video detail status: %d, %s\n", status, get_string_pointer_from_node(root, "message"));
 			res=3; break;
 		}
 		

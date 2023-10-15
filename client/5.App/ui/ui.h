@@ -71,6 +71,15 @@ extern lv_obj_t * ui_TextFavorite;
 extern lv_obj_t * ui_Bili_ImgButtonLogo;
 extern lv_obj_t * ui_Bili_Slider_Loading;
 
+extern void ui_event_Tomato(lv_event_t * e);
+extern lv_obj_t * ui_Tomato;
+extern lv_obj_t * ui_meter;
+extern lv_meter_scale_t * ui_scale;
+extern lv_meter_scale_t * ui_scale_num;
+extern lv_meter_indicator_t * ui_indic_pointer;
+extern lv_meter_indicator_t * ui_indic_pie;
+extern lv_obj_t * ui_ArcTomato;
+
 
 LV_IMG_DECLARE(ui_img_bg_png);    // assets\bg.png
 LV_IMG_DECLARE(ui_img_big_pointer_png);    // assets\big_pointer.png
@@ -87,6 +96,9 @@ LV_IMG_DECLARE(ui_img_like_png);
 LV_IMG_DECLARE(ui_img_coin_png);
 LV_IMG_DECLARE(ui_img_favorite_png);
 LV_IMG_DECLARE(ui_img_follower_png);
+LV_IMG_DECLARE(ui_img_tomato_png_50);
+LV_IMG_DECLARE(ui_img_tomato_png_80);
+LV_IMG_DECLARE(ui_img_tomato_png_100);
 
 LV_FONT_DECLARE(ui_font_ShangShou14);
 LV_FONT_DECLARE(ui_font_ShangShou20);
@@ -101,6 +113,7 @@ void ui_init(void);
 void ui_Monitor_screen_init(void);
 void ui_Git_screen_init(void);
 void ui_Bili_screen_init(void);
+void ui_Tomato_screen_init(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

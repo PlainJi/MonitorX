@@ -175,7 +175,7 @@ int git_curl_req(const char *username, int year, git_t *info) {
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-        printf("perform curl error:%d.\n", res);
+        printf("[GIT] perform curl error:%d.\n", res);
         return 1;
     }
 

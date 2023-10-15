@@ -59,4 +59,9 @@ void ui_update_bili_username(char *username);
 void ui_update_bili(bili_t *info);
 int ui_bili_check_userid(const char *userid);
 
+void ui_tomato_init(void);
+void ui_tomato_set_time(int minutes);
+void ui_update_tomato_time(int time);
+
+
 #endif

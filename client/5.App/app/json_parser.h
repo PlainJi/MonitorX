@@ -17,6 +17,7 @@ int get_node(cJSON *father_node, char *key, cJSON **node);
 int get_double_from_node(cJSON *node, char *key, double *value);
 int get_int_from_node(cJSON *node, char *key, int *value);
 int get_string_from_node(cJSON *node, char *key, char *buf, int len);
+char* get_string_pointer_from_node(cJSON *node, char *key);
 
 int parse_monitor_info(const char *str, struct _monitor_t *ui_monitor);
 
