@@ -21,6 +21,10 @@ extern time_t bili_last_update_stat;
 // screen monitor
 lv_obj_t * ui_Monitor;
 lv_obj_t * ui_PanelMonitor;
+lv_obj_t * ui_PanelDisconnect;
+lv_obj_t * ui_ArcDisconnect;
+lv_obj_t * ui_TextDisconnect;
+lv_anim_t * ui_AnimDisconnect;
 lv_obj_t * ui_PanelMonitorCpu;
 lv_obj_t * ui_CpuModel;
 lv_obj_t * ui_MemCapacity;
@@ -211,8 +215,8 @@ void ui_Loading_Animation(lv_obj_t * TargetObject, int v1, int v2, int time)
 {
     lv_anim_t PropertyAnimation_0;
     lv_anim_init(&PropertyAnimation_0);
-    lv_anim_set_exec_cb(&PropertyAnimation_0, (lv_anim_exec_xcb_t)_ui_slider_set_value);
-    lv_anim_set_var(&PropertyAnimation_0, TargetObject);
+    lv_anim_set_user_data(&PropertyAnimation_0, TargetObject);
+    lv_anim_set_custom_exec_cb(&PropertyAnimation_0, _ui_slider_set_value);
     lv_anim_set_time(&PropertyAnimation_0, time);
     lv_anim_set_values(&PropertyAnimation_0, v1, v2);
     lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_ease_out);
@@ -224,6 +228,24 @@ void ui_Loading_Animation(lv_obj_t * TargetObject, int v1, int v2, int time)
     lv_anim_set_early_apply(&PropertyAnimation_0, false);
     lv_anim_start(&PropertyAnimation_0);
 }
+
+void ui_AnimationForDisconnectStart(void) {
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_user_data(&a, ui_ArcDisconnect);
+    lv_anim_set_custom_exec_cb(&a, _ui_anim_callback_set_arc);
+    lv_anim_set_time(&a, 1000);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_repeat_delay(&a, 500);
+    lv_anim_set_values(&a, 0, 100);
+    ui_AnimDisconnect = lv_anim_start(&a);
+}
+
+void ui_AnimationForDisconnectStop(void) {
+    lv_anim_del(ui_AnimDisconnect, NULL);
+}
+
+///////////////////// Event ////////////////////
 
 void kb_event_cb(lv_event_t * e)
 {
@@ -278,7 +300,6 @@ void kb_event_cb(lv_event_t * e)
     }
 }
 
-///////////////////// Event ////////////////////
 void ui_event_Monitor(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
@@ -339,10 +360,30 @@ void ui_Monitor_screen_init(void)
     ui_Monitor = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_Monitor, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(ui_Monitor, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Monitor, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    // display disconnection by icon
+    // ui_Disconnect = lv_img_create(ui_Monitor);
+    // lv_img_set_src(ui_Disconnect, &ui_img_disconnect_png_48);
+    // lv_obj_set_align(ui_Disconnect, LV_ALIGN_CENTER);
+
+    // display disconnection by spinning arc
+    // Panel Disconnect
+    ui_creat_panel(ui_Monitor, &ui_PanelDisconnect, 0, 0, 800, 480);
+    ui_creat_text_area(ui_PanelDisconnect, &ui_TextDisconnect, 0, 100, LV_SIZE_CONTENT, "Disconnect", "", &ui_font_ShangShou20);
+    lv_obj_set_style_text_letter_space(ui_TextDisconnect, 2, 0);
+    ui_ArcDisconnect = lv_arc_create(ui_PanelDisconnect);
+    lv_obj_set_width(ui_ArcDisconnect, 100);
+    lv_obj_set_height(ui_ArcDisconnect, 100);
+    lv_arc_set_rotation(ui_ArcDisconnect, 270);
+    lv_arc_set_bg_angles(ui_ArcDisconnect, 0, 360);
+    lv_obj_remove_style(ui_ArcDisconnect, NULL, LV_PART_KNOB);
+    lv_obj_clear_flag(ui_ArcDisconnect, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(ui_ArcDisconnect);
+
+    // Panel Monitor
     ui_creat_panel(ui_Monitor, &ui_PanelMonitor, 0, -20, 800, 480);
     lv_obj_set_style_bg_img_src(ui_PanelMonitor, &ui_img_bg_png, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_opa(ui_PanelMonitor, LV_OPA_COVER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ///////////////////////////////////////////////
     ui_creat_panel(ui_PanelMonitor, &ui_PanelMonitorCpu, -199, 48, 391, 476);
@@ -565,7 +606,7 @@ void ui_Bili_screen_init(void)
 
     ui_creat_text_area(ui_Bili, &ui_TextBiliUserName, -240, -72, 250, " ", "Input UserID", NULL);
     lv_obj_add_flag(ui_TextBiliUserName, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_CLICK_FOCUSABLE);
-    lv_obj_set_style_text_letter_space(ui_TextBiliUserName, 2, 0);
+    lv_obj_set_style_text_letter_space(ui_TextBiliUserName, 1, 0);
     lv_obj_add_style(ui_TextBiliUserName, &style_my_font, 0);
 
     ui_creat_img(ui_Bili, &ui_ImageFollower, 240, -111, LV_SIZE_CONTENT, LV_SIZE_CONTENT, &ui_img_follower_png);
@@ -641,9 +682,9 @@ void ui_Tomato_screen_init(void)
     // creat meter obj & init style
     ui_meter = lv_meter_create(ui_Tomato);
     lv_obj_center(ui_meter);
-    lv_obj_set_size(ui_meter, 300, 300);
+    lv_obj_set_size(ui_meter, 400, 400);
     // set meter background style
-    lv_obj_set_style_radius(ui_meter, 150, LV_PART_MAIN);
+    lv_obj_set_style_radius(ui_meter, 200, LV_PART_MAIN);
     lv_obj_set_style_bg_opa(ui_meter, LV_OPA_COVER, LV_PART_MAIN);
     lv_obj_set_style_bg_color(ui_meter, lv_color_hex(0x303545), LV_PART_MAIN);
     lv_obj_set_style_pad_all(ui_meter, 10, LV_PART_MAIN);
@@ -671,15 +712,13 @@ void ui_Tomato_screen_init(void)
     lv_meter_set_indicator_value(ui_meter, ui_indic_pointer, 0);
     // Add a red arc to the start
     ui_indic_pie = lv_meter_add_arc(ui_meter, ui_scale, 130, lv_color_hex(0xff6347), 0);
-    //ui_indic_pie = lv_meter_add_arc(ui_meter, ui_scale, 130, lv_palette_main(LV_PALETTE_ORANGE), 0);
     lv_meter_set_indicator_start_value(ui_meter, ui_indic_pie, 0);
     lv_meter_set_indicator_end_value(ui_meter, ui_indic_pie, 0);
 
-    
     // creat an arc to set time
     ui_ArcTomato = lv_arc_create(ui_Tomato);
-    lv_obj_set_width(ui_ArcTomato, 280);
-    lv_obj_set_height(ui_ArcTomato, 280);
+    lv_obj_set_width(ui_ArcTomato, 370);
+    lv_obj_set_height(ui_ArcTomato, 370);
     lv_obj_set_align(ui_ArcTomato, LV_ALIGN_CENTER);
     lv_arc_set_range(ui_ArcTomato, 1, 11);
     lv_arc_set_value(ui_ArcTomato, 1);
@@ -688,7 +727,7 @@ void ui_Tomato_screen_init(void)
     lv_obj_set_style_arc_width(ui_ArcTomato, 20, LV_PART_MAIN);
     lv_obj_set_style_arc_opa(ui_ArcTomato, LV_OPA_TRANSP, LV_PART_MAIN);
     // set arc indicator style
-    lv_obj_set_style_arc_width(ui_ArcTomato, 50, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(ui_ArcTomato, 70, LV_PART_INDICATOR);
     lv_obj_set_style_arc_opa(ui_ArcTomato, LV_OPA_TRANSP, LV_PART_INDICATOR);
     // remove arc knob style
     lv_obj_remove_style(ui_ArcTomato, NULL, LV_PART_KNOB);

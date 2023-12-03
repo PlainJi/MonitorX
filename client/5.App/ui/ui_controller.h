@@ -41,6 +41,8 @@ void SetDate(char *buf);
 void update_time_from_local(void);
 void ui_monitor_init(void);
 void ui_update_monitor(monitor_t *pMonitor);
+void ui_monitor_disconnected(void);
+void ui_monitor_reconnected(void);
 
 void ui_bili_reset(void);
 void ui_git_init(int end_year);

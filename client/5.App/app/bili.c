@@ -37,7 +37,7 @@ int bili_curl_req(char *url) {
     curl_easy_setopt(bili_curl, CURLOPT_WRITEDATA, (void*)&bili_chunk);
     bili_res = curl_easy_perform(bili_curl);
     if (bili_res != CURLE_OK) {
-        printf("perform curl error:%d.\n", bili_res);
+        printf("[BILI] perform curl error:%d.\n", bili_res);
         return 1;
     }
 
@@ -149,8 +149,7 @@ int bili_init(void) {
     memset(&bili_relation, 0, sizeof(bili_relation));
     memset(&bili_info_all, 0, sizeof(bili_info_all));
     bili_header_chunk = curl_slist_append(bili_header_chunk, \
-        "user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \
-        AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36");
+        "user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
     curl_global_init(CURL_GLOBAL_ALL);
     bili_curl = curl_easy_init();
     //curl_easy_setopt(bili_curl, CURLOPT_VERBOSE, 1);
@@ -199,7 +198,6 @@ void update_detail(void) {
 
     if (bili_req_video_list()) {
         // req video list failed
-        if (bili_chunk.memory) free(bili_chunk.memory);
         if (bili_video_list.video_list_buf) free(bili_video_list.video_list_buf);
         memset(&bili_video_list, 0, sizeof(bili_video_list));
     } else {

@@ -16,7 +16,7 @@ bool git_updating = true;
 char git_updating_percent = 0;
 char url_buf[128];
 CURLcode res;
-CURL *curl = NULL;
+CURL *git_curl = NULL;
 struct MemoryStruct chunk;
 extern pthread_mutex_t lvgl_mutex;
 
@@ -33,7 +33,7 @@ const char* str_skip_lines(const char *str, int lines) {
 
 const char* str_get_line(const char *str, char *buf, int length) {
     int cnt = 0;
-    length -= 1;
+    //length -= 1;
     while((*str) && (*str != 0x0A) && (cnt < length)) {
         *buf++ = *str++;
         cnt++;
@@ -52,26 +52,18 @@ const char* str_get_line(const char *str, char *buf, int length) {
     }
 }
 
-int get_level_from_line(const char* buf, char *level, int *count) {
+int get_level_from_line(const char *buf, char *level, int *count) {
     *level = -1;
-    *count = 0;
-
     //              <td></td>
-    if (buf[17] == '>') {
+    if (buf[3] == '>') {
         *level = -1;
         *count = 0;
         return 0;
-    } else if (buf[17] == ' ') {
-        // find datalevel
-        char *temp1 = strstr(buf, "level=\"");
-        char *temp2 = strstr(temp1, "only\">");
-        if (temp1 && temp2) {
-            *level = (char)atoi(temp1+7);
-            if (*(temp2+6) == 'N') {
-                *count = 0;
-            } else {
-                *count = atoi(temp2+6);
-            }
+    } else if (buf[3] == ' ') {
+        // find data-level
+        char *temp1 = strstr(buf, "data-level=\"");
+        if (temp1) {
+            *level = (char)atoi(temp1+12);
             return 0;
         } else {
             printf("keyword not found!\n");
@@ -84,51 +76,45 @@ int get_level_from_line(const char* buf, char *level, int *count) {
 
 int git_parse_html(const char *str, git_t *ui_git) {
     char *cur_pos = NULL;
-    char line_buf[256];
+    char line_buf[512];
     char *buf_temp = NULL;
     char level = 0;
     int count = 0;
     // go step unused lines
-    cur_pos = (char*)str_skip_lines((const char*)str, 97);
+    cur_pos = (char*)strstr((const char*)str, "<tr");
     if (!cur_pos) {
         return 1;
     }
 
     // from Sunday to Saturday
     for (int i=0; i<7; i++) {
+        cur_pos = (char*)strstr((const char*)cur_pos+3, "<tr");
+        if (!cur_pos) {
+            return 2;
+        }
+
         // skip unused lines
         // <tr style="height: 10px">
         // <td class="ContributionCalendar-label" style="position: relative">
         cur_pos = (char*)str_skip_lines((const char*)cur_pos, 2);
         if (!cur_pos) {
-            return 2;
+            return 3;
         }
-
         // <span class="sr-only">Sunday</span>
         cur_pos = (char*)str_get_line((const char*)cur_pos, line_buf, sizeof(line_buf));
         if (!cur_pos) {
-            return 3;
+            return 4;
         }
+        // print weekday
         buf_temp = line_buf;
         while(*buf_temp && (*buf_temp++ != '>'));
         //printf("%s\n", buf_temp);
 
-        // skip unused lines
-        do {
-            cur_pos = (char*)str_get_line((const char*)cur_pos, line_buf, sizeof(line_buf));
+        for(int j=0; j<53; j++) {
+            cur_pos = (char*)strstr((const char*)cur_pos, "<td");
             if (!cur_pos) {
-                return 4;
+                return 5;
             }
-        } while (!strstr(line_buf, "<td"));
-
-        if(get_level_from_line(line_buf, &level, &count)) {
-            printf("%s\n", "get level failed!\n");
-            return 5;
-        }
-        ui_git->contribution[0][i] = level;
-        // printf("%d ", level);
-
-        for(int j=0; j<52; j++) {
             cur_pos = (char*)str_get_line((const char*)cur_pos, line_buf, sizeof(line_buf));
             if (!cur_pos) {
                 return 6;
@@ -137,21 +123,12 @@ int git_parse_html(const char *str, git_t *ui_git) {
                 printf("%s\n", "get level failed!\n");
                 return 7;
             }
-            ui_git->contribution[j+1][i] = level;
+            ui_git->contribution[j][i] = level;
             //printf("%d ", level);
         }
         //printf("\n");
-
-        // </tr>
-        cur_pos = (char*)str_get_line((const char*)cur_pos, line_buf, sizeof(line_buf));
     }
     
-    
-
-    // now we should have got the first valid line
-    
-
-
     return 0;
 }
 
@@ -165,17 +142,17 @@ int git_curl_req(const char *username, int year, git_t *info) {
         snprintf(url_buf, sizeof(url_buf), "%s%s%s%d%s%d%s", \
             URL_GIT_PREFIX, conf.git_username, URL_GIT_SUFFIX1, year, URL_GIT_SUFFIX2, year, URL_GIT_SUFFIX3);
     }
-    //printf("curl %s\n", url_buf);
+    printf("git_curl %s\n", url_buf);
     chunk.size = 0;
-    curl_easy_setopt(curl, CURLOPT_URL, url_buf);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "gzip");
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&chunk);
-    res = curl_easy_perform(curl);
+    curl_easy_setopt(git_curl, CURLOPT_URL, url_buf);
+    curl_easy_setopt(git_curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(git_curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    curl_easy_setopt(git_curl, CURLOPT_ACCEPT_ENCODING, "gzip");
+    curl_easy_setopt(git_curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+    curl_easy_setopt(git_curl, CURLOPT_WRITEDATA, (void*)&chunk);
+    res = curl_easy_perform(git_curl);
     if (res != CURLE_OK) {
-        printf("[GIT] perform curl error:%d.\n", res);
+        printf("[GIT] perform git_curl error:%d.\n", res);
         return 1;
     }
 
@@ -232,8 +209,8 @@ int git_init(void) {
 
     memset(&chunk, 0, sizeof(chunk));
     curl_global_init(CURL_GLOBAL_ALL);
-    curl = curl_easy_init();
-    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
+    git_curl = curl_easy_init();
+    //curl_easy_setopt(git_curl, CURLOPT_VERBOSE, 1);
     return 0;
 }
 
@@ -243,7 +220,7 @@ void git_uninit(void) {
     }
     if (git_info) free(git_info);
     if(chunk.memory) free(chunk.memory);
-	if(curl) curl_easy_cleanup(curl);
+	if(git_curl) curl_easy_cleanup(git_curl);
     curl_global_cleanup();
 }
 

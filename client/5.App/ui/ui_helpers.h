@@ -92,7 +92,7 @@ void _ui_slider_set_text_value(lv_obj_t * trg, lv_obj_t * src, char * prefix, ch
 
 void _ui_checked_set_text_value(lv_obj_t * trg, lv_obj_t * src, char * txt_on, char * txt_off);
 
-void _ui_slider_set_value(void *a, int32_t v);
+void _ui_slider_set_value(lv_anim_t *a, int32_t v);
 
 void ui_creat_panel(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, int height);
 void ui_creat_text_area(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, \

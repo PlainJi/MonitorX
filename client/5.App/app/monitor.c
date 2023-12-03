@@ -28,13 +28,15 @@ void monitor_thread(void)
     pthread_mutex_lock(&lvgl_mutex);
     ui_monitor_init();
     pthread_mutex_unlock(&lvgl_mutex);
-    sleep(3);
+    sleep(3);       // wait for animation
 
+    bool connected = true;
+    bool connect_status = true;
     struct sockaddr_in localaddr;
     int confd;
     ssize_t len;
     char buf[MAXLINE];
-    struct ip_mreqn group;//设置组播
+    struct ip_mreqn group;
 
     //1.创建一个socket
     confd=socket(AF_INET,SOCK_DGRAM,0);
@@ -43,7 +45,7 @@ void monitor_thread(void)
     localaddr.sin_family=AF_INET;
     //
     inet_pton(AF_INET,"0.0.0.0",&localaddr.sin_addr.s_addr);
-    localaddr.sin_port =htons(CLIENT_PORT);
+    localaddr.sin_port = htons(CLIENT_PORT);
     bind(confd,(struct sockaddr *)&localaddr,sizeof(localaddr));
 
     //3.设置组地址
@@ -53,14 +55,33 @@ void monitor_thread(void)
     group.imr_ifindex=if_nametoindex("wlan0");//将网卡名转换成序号 等价 ip ad
     //5.设置客户端加入多播组
     setsockopt(confd,IPPROTO_IP,IP_ADD_MEMBERSHIP,&group,sizeof(group));
+    //6.设置接收超时时间
+    struct timeval tv;
+	tv.tv_sec = 3;
+	tv.tv_usec =  0;
+	setsockopt(confd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 
     while(1){
         memset(buf, 0, sizeof(buf));
-        recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);
-        //printf("recv: %s\n", buf);
-        if (!parse_monitor_info(buf, &ui_monitor)) {
+        int ret = recvfrom(confd, buf, sizeof(buf), 0, NULL, 0);
+        if (ret <= 0) {
+            printf("[MONITOR] recv timeout\n");
+            connected = false;
+        } else {
+            connected = true;
+            //printf("[MONITOR] recv: %s\n", buf);
+            if (!parse_monitor_info(buf, &ui_monitor)) {
+                pthread_mutex_lock(&lvgl_mutex);
+                ui_update_monitor(&ui_monitor);
+                pthread_mutex_unlock(&lvgl_mutex);
+            }
+        }
+
+        if (connect_status != connected) {
+            connect_status = connected;
             pthread_mutex_lock(&lvgl_mutex);
-            ui_update_monitor(&ui_monitor);
+            if (connected) ui_monitor_reconnected();
+            else ui_monitor_disconnected();
             pthread_mutex_unlock(&lvgl_mutex);
         }
     }

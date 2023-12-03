@@ -136,7 +136,6 @@ void _ui_anim_callback_set_arc(lv_anim_t *a, int32_t v)
     lv_arc_set_value((lv_obj_t *)a->user_data, v);
 }
 
-
 int32_t _ui_anim_callback_get_x(lv_anim_t * a)
 {
     return lv_obj_get_x_aligned((lv_obj_t *)a->user_data);
@@ -192,9 +191,9 @@ void _ui_checked_set_text_value(lv_obj_t * trg, lv_obj_t * src, char * txt_on, c
     else lv_label_set_text(trg, txt_off);
 }
 
-void _ui_slider_set_value(void *a, int32_t v)
+void _ui_slider_set_value(lv_anim_t *a, int32_t v)
 {
-    lv_slider_set_value((lv_obj_t *)a, v, LV_ANIM_OFF);
+    lv_slider_set_value((lv_obj_t *)a->user_data, v, LV_ANIM_OFF);
 }
 
 void ui_creat_panel(const lv_obj_t *parent, lv_obj_t **obj, int x, int y, int width, int height) {

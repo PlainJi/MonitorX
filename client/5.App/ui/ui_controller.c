@@ -348,6 +348,19 @@ void ui_update_monitor(monitor_t *pMonitor) {
 	SetWeek(pMonitor->week);
 }
 
+void ui_monitor_disconnected(void) {
+	printf("ui_monitor_disconnected\n");
+	lv_obj_set_style_opa(ui_PanelMonitor, LV_OPA_10, LV_PART_MAIN | LV_STATE_DEFAULT);
+	ui_AnimationForDisconnectStart();
+	lv_obj_set_style_opa(ui_PanelDisconnect, LV_OPA_COVER, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
+void ui_monitor_reconnected(void) {
+	lv_obj_set_style_opa(ui_PanelDisconnect, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
+	ui_AnimationForDisconnectStop();
+	lv_obj_set_style_opa(ui_PanelMonitor, LV_OPA_COVER, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 static uint8_t ui_git_cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CONTRIBUTION_PANEL_W, CONTRIBUTION_PANEL_H)];

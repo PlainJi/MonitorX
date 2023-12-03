@@ -17,10 +17,13 @@ void ui_InitAnimationForArc(lv_obj_t *TargetObject, int start, int stop);
 void ui_AnimationForPointer(lv_obj_t * TargetObject, int new_angle, int time);
 void ui_AnimationForArc(lv_obj_t * TargetObject, int new_angle, int time);
 void ui_Loading_Animation(lv_obj_t * TargetObject, int v1, int v2, int time);
+void ui_AnimationForDisconnectStart(void);
+void ui_AnimationForDisconnectStop(void);
 void kb_event_cb(lv_event_t * e);
 void ui_event_Monitor(lv_event_t * e);
 extern lv_obj_t * ui_Monitor;
 extern lv_obj_t * ui_PanelMonitor;
+extern lv_obj_t * ui_PanelDisconnect;
 extern lv_obj_t * ui_PanelMonitorCpu;
 extern lv_obj_t * ui_CpuModel;
 extern lv_obj_t * ui_MemCapacity;
@@ -82,6 +85,7 @@ extern lv_obj_t * ui_ArcTomato;
 
 
 LV_IMG_DECLARE(ui_img_bg_png);    // assets\bg.png
+LV_IMG_DECLARE(ui_img_disconnect_png_48);
 LV_IMG_DECLARE(ui_img_big_pointer_png);    // assets\big_pointer.png
 LV_IMG_DECLARE(ui_img_mem_usage1_png);    // assets\mem_usage1.png
 LV_IMG_DECLARE(ui_img_mem_usage2_png);    // assets\mem_usage2.png
