@@ -161,9 +161,11 @@ int main(void)
 
 #if LV_BUILD_EXAMPLES
     //lv_demo_widgets();
-    lv_demo_benchmark();
+    //lv_demo_benchmark();
     //lv_example_freetype_1();
     //json_parser_test();
+    lv_example_btn_1();
+    lv_example_arc_2();
     while(1) {
         lv_timer_handler();
         usleep(5000);
@@ -203,15 +205,14 @@ uint32_t custom_tick_get(void)
     if(start_ms == 0) {
         struct timeval tv_start;
         gettimeofday(&tv_start, NULL);
-        start_ms = (tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
+        start_ms = ((uint64_t)tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
     }
 
+    uint64_t now_ms;
     struct timeval tv_now;
     gettimeofday(&tv_now, NULL);
-    uint64_t now_ms;
-    now_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
+    now_ms = ((uint64_t)tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
 
-    uint32_t time_ms = now_ms - start_ms;
-    return time_ms;
+    return (uint32_t)(now_ms - start_ms);
 }
 
