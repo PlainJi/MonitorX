@@ -21,6 +21,7 @@
 #if USE_SDL
 #include <SDL2/SDL.h>
 #include "lv_drivers/sdl/sdl_common.h"
+#define DISP_BUF_SIZE (HOR_RES*VER_RES)
 
 static void init_simulator(void)
 {
@@ -31,15 +32,15 @@ static void init_simulator(void)
   //SDL_CreateThread(tick_thread, "tick", NULL);
 
   // Create a display buffer
-  static lv_disp_draw_buf_t disp_buf1;
-  static lv_color_t buf1_1[SDL_HOR_RES * 100];
-  static lv_color_t buf1_2[SDL_HOR_RES * 100];
-  lv_disp_draw_buf_init(&disp_buf1, buf1_1, buf1_2, SDL_HOR_RES * 100);
+  static lv_disp_draw_buf_t disp_buf;
+  static lv_color_t buf1[DISP_BUF_SIZE];
+  static lv_color_t buf2[DISP_BUF_SIZE];
+  lv_disp_draw_buf_init(&disp_buf, buf1, buf2, DISP_BUF_SIZE);
 
   // Create a display
   static lv_disp_drv_t disp_drv;
   lv_disp_drv_init(&disp_drv);
-  disp_drv.draw_buf = &disp_buf1;
+  disp_drv.draw_buf = &disp_buf;
   disp_drv.flush_cb = sdl_display_flush;
   disp_drv.hor_res = SDL_HOR_RES;
   disp_drv.ver_res = SDL_VER_RES;
@@ -94,11 +95,12 @@ static void init_fbdev(void)
     // Linux frame buffer device init
     fbdev_init();
     // A small buffer for LittlevGL to draw the screen's content
-    static lv_color_t buf[DISP_BUF_SIZE];
+    static lv_color_t buf1[DISP_BUF_SIZE];
+    static lv_color_t buf2[DISP_BUF_SIZE];
 
     // Initialize a descriptor for the buffer
     static lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, buf, NULL, DISP_BUF_SIZE);
+    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, DISP_BUF_SIZE);
 
     // Initialize and register a display driver
     static lv_disp_drv_t disp_drv;
@@ -161,11 +163,13 @@ int main(void)
 
 #if LV_BUILD_EXAMPLES
     //lv_demo_widgets();
-    //lv_demo_benchmark();
+    lv_demo_benchmark();
     //lv_example_freetype_1();
     //json_parser_test();
-    lv_example_btn_1();
-    lv_example_arc_2();
+    //lv_example_btn_1();
+    //lv_example_arc_2();
+    //lv_example_roller_2();
+    //lv_example_ffmpeg_2();
     while(1) {
         lv_timer_handler();
         usleep(5000);
@@ -176,7 +180,7 @@ int main(void)
     ui_init();
     task_creat("monitor", 80, 32*1024, (FUNC)monitor_thread, NULL);
     task_creat("git", 80, 128*1024, (FUNC)git_thread, NULL);
-    //task_creat("bili", 80, 128*1024, (FUNC)bili_thread, NULL);
+    task_creat("bili", 80, 128*1024, (FUNC)bili_thread, NULL);
     task_creat("tomato", 80, 32*1024, (FUNC)tomato_thread, NULL);
 
     while(1) {

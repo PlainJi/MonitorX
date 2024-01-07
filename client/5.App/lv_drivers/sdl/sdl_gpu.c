@@ -244,7 +244,7 @@ static void monitor_sdl_clean_up(void)
 static void window_create(monitor_t * m)
 {
 //    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
-    m->window = SDL_CreateWindow("TFT Simulator",
+    m->window = SDL_CreateWindow("LVGL Simulator",
                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                               SDL_HOR_RES * SDL_ZOOM, SDL_VER_RES * SDL_ZOOM, SDL_WINDOW_RESIZABLE);
 

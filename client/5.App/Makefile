@@ -51,6 +51,7 @@ DEFINES				+= -DUSE_EVDEV=1 -DLV_BUILD_TEST=0 -DLV_BUILD_EXAMPLES=0
 INC_PATH 			+= -I./ -I./lvgl/ -I./ui/ -I./app/ -I./thirdparty/cJSON/ \
 						-I./thirdparty/iniparser/src/ -I./thirdparty/thread/
 LD_LIBS	 			+= -lcurl -lssl -lcrypto -lz -pthread -lfreetype
+# LD_LIBS				+= -lavcodec -lavformat -lavutil -lswscale
 BIN 				:= $(BIN_DIR)/$(PROJECT).$(target)
 COMPILE				= $(CC) $(CFLAGS) $(INC_PATH) $(DEFINES)
 # Automatically include all source files

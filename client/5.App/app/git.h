@@ -3,7 +3,7 @@
 #include "stdbool.h"
 #include "curldef.h"
 
-//#define URL_GIT           "https://skyline.github.com"
+#define URL_GIT             "https://skyline.github.com"
 #define URL_GIT_PREFIX      "https://github.com/users/"
 #define URL_GIT_SUFFIX1     "/contributions?from="
 #define URL_GIT_SUFFIX2     "-01-01&to="

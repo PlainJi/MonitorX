@@ -134,13 +134,13 @@ int git_parse_html(const char *str, git_t *ui_git) {
 
 int git_curl_req(const char *username, int year, git_t *info) {
     if (username) {
-        //snprintf(url_buf, sizeof(url_buf), "%s/%s/%d.json", URL_GIT, username, year);
-        snprintf(url_buf, sizeof(url_buf), "%s%s%s%d%s%d%s", \
-            URL_GIT_PREFIX, username, URL_GIT_SUFFIX1, year, URL_GIT_SUFFIX2, year, URL_GIT_SUFFIX3);
+        snprintf(url_buf, sizeof(url_buf), "%s/%s/%d.json", URL_GIT, username, year);
+        //snprintf(url_buf, sizeof(url_buf), "%s%s%s%d%s%d%s", \
+        //    URL_GIT_PREFIX, username, URL_GIT_SUFFIX1, year, URL_GIT_SUFFIX2, year, URL_GIT_SUFFIX3);
     } else {
-        //snprintf(url_buf, sizeof(url_buf), "%s/%s/%d.json", URL_GIT, conf.git_username, year);
-        snprintf(url_buf, sizeof(url_buf), "%s%s%s%d%s%d%s", \
-            URL_GIT_PREFIX, conf.git_username, URL_GIT_SUFFIX1, year, URL_GIT_SUFFIX2, year, URL_GIT_SUFFIX3);
+        snprintf(url_buf, sizeof(url_buf), "%s/%s/%d.json", URL_GIT, conf.git_username, year);
+        //snprintf(url_buf, sizeof(url_buf), "%s%s%s%d%s%d%s", \
+        //    URL_GIT_PREFIX, conf.git_username, URL_GIT_SUFFIX1, year, URL_GIT_SUFFIX2, year, URL_GIT_SUFFIX3);
     }
     printf("git_curl %s\n", url_buf);
     chunk.size = 0;
@@ -157,8 +157,8 @@ int git_curl_req(const char *username, int year, git_t *info) {
     }
 
     //printf("%lu %s\n", (long unsigned int)chunk.size, chunk.memory);
-    //int parse_res = parse_git_info(chunk.memory, info);
-    int parse_res = git_parse_html(chunk.memory, info);
+    int parse_res = parse_git_info(chunk.memory, info);
+    //int parse_res = git_parse_html(chunk.memory, info);
     if (parse_res) {
         printf("git_parse_html res=%d\n", parse_res);
         return 2;
