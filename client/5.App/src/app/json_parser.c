@@ -281,6 +281,47 @@ int parse_bili_relation(const char *str, bili_relation_t *ui_bili) {
 	return res;
 }
 
+int parse_bili_card(const char *str, bili_t *ui_bili) {
+	cJSON *root = NULL;
+	cJSON *code = NULL;
+	cJSON *data = NULL;
+	cJSON *card = NULL;
+	cJSON *official = NULL;
+
+
+	int res = 0;
+	int status = 0;
+
+	do {
+		if (get_root(str, &root)) { res = 1; break; }
+		if (get_int_from_node(root, "code", &status)) {res=2; break;}
+		if (status != 0) {
+			printf("bili card status: %d, %s\n", status, get_string_pointer_from_node(root, "message"));
+			res=3; break;
+		}
+
+		if (get_node(root, "data", &data)) {res=4; break;}
+		if (get_int_from_node(data, "archive_count", &ui_bili->video)) {res=5; break;}
+		if (get_int_from_node(data, "article_count", &ui_bili->article)) {res=6; break;}
+		if (get_int_from_node(data, "follower", &ui_bili->follower)) {res=7; break;}
+		if (get_int_from_node(data, "like_num", &ui_bili->like)) {res=8; break;}
+
+		if (get_node(data, "card", &card)) {res=9; break;}
+		if (get_string_from_node(card, "mid", ui_bili->userid, sizeof(ui_bili->userid))) { res=10; break; }
+		if (get_string_from_node(card, "name", ui_bili->username, sizeof(ui_bili->username))) { res=11; break; }
+		if (get_string_from_node(card, "face", ui_bili->face_url, sizeof(ui_bili->face_url))) { res=12; break; }
+		//if (get_int_from_node(card, "fans", &ui_bili->follower)) {res=13; break;}
+		if (get_int_from_node(card, "friend", &ui_bili->following)) {res=14; break;}
+		if (get_string_from_node(card, "sign", ui_bili->sign, sizeof(ui_bili->sign))) { res=15; break; }
+		
+		if (get_node(card, "Official", &official)) {res=16; break;}
+		if (get_string_from_node(official, "title", ui_bili->title, sizeof(ui_bili->title))) { res=17; break; }
+	}while(0);
+	
+	cJSON_Delete(root);
+	return res;
+}
+
 int parse_bili_video_list(const char *str, bili_video_list_t *list_buf) {
 	cJSON *root = NULL;
 		// code

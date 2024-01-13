@@ -59,6 +59,7 @@ void ui_update_bili_status_mutex(char percent);
 void ui_update_bili_relation(bili_relation_t *relation);
 void ui_update_bili_username(char *username);
 void ui_update_bili(bili_t *info);
+void ui_update_bili_card(bili_t *info_all);
 int ui_bili_check_userid(const char *userid);
 
 void ui_tomato_init(void);

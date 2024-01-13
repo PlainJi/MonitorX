@@ -578,10 +578,11 @@ int ui_git_check_username(const char *username) {
 //////////////////////////////////////////////////////////////////////////////
 
 void ui_bili_reset(void) {
-	lv_textarea_set_text(ui_TextBiliUserID, "ID:");
-	lv_textarea_set_text(ui_TextLike, " ");
-	lv_textarea_set_text(ui_TextVideo, " ");
-	lv_textarea_set_text(ui_TextFollower, " ");
+	lv_textarea_set_text(ui_TextBiliUserID, "ID");
+	lv_label_set_text(ui_TextBiliTitle, "Title");
+	lv_textarea_set_text(ui_TextLike, "0");
+	lv_textarea_set_text(ui_TextVideo, "0");
+	lv_textarea_set_text(ui_TextFollower, "0");
 }
 
 void ui_bili_init(void) {
@@ -638,11 +639,33 @@ void ui_update_bili(bili_t *info_all) {
 	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->like);
 	lv_textarea_set_text(ui_TextLike, bili_buf);
 
-	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->videos);
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->video);
 	lv_textarea_set_text(ui_TextVideo, bili_buf);
 
 	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->follower);
 	lv_textarea_set_text(ui_TextFollower, bili_buf);
+}
+
+void ui_update_bili_card(bili_t *info_all) {
+	char bili_buf[32] = {0};
+
+	snprintf(bili_buf, sizeof(bili_buf), "ID: %s", info_all->userid);
+	lv_textarea_set_text(ui_TextBiliUserID, bili_buf);
+	lv_label_set_text(ui_TextBiliTitle, info_all->title);
+
+	lv_textarea_set_text(ui_TextBiliUserName, info_all->username);
+	printf("%s\n", info_all->face_url);
+
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->like);
+	lv_textarea_set_text(ui_TextLike, bili_buf);
+
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->video);
+	lv_textarea_set_text(ui_TextVideo, bili_buf);
+
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->follower);
+	lv_textarea_set_text(ui_TextFollower, bili_buf);
+
+	lv_label_set_text(ui_TextSign, info_all->sign);
 }
 
 int ui_bili_check_userid(const char *userid) {

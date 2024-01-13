@@ -26,6 +26,7 @@ int parse_git_info(const char *str, struct _git_t *ui_git);
 int parse_bili_relation(const char *str, struct _bili_relation_t *ui_bili);
 int parse_bili_video_list(const char *str, struct _bili_video_list_t *list_buf);
 int parse_bili_video_detail(const char *str, struct _bili_video_info_t *info);
+int parse_bili_card(const char *str, bili_t *ui_bili);
 void json_parser_test(void);
 
 #endif

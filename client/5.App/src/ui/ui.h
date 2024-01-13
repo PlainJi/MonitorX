@@ -66,6 +66,7 @@ void ui_event_Bili(lv_event_t * e);
 extern lv_obj_t * ui_Bili;
 extern lv_obj_t * ui_TextBiliUserName;
 extern lv_obj_t * ui_TextBiliUserID;
+extern lv_obj_t * ui_TextBiliTitle;
 extern lv_obj_t * ui_ImageFace;
 extern lv_obj_t * ui_ImageLike;
 extern lv_obj_t * ui_ImageVideo;
@@ -77,6 +78,7 @@ extern lv_obj_t * ui_TextVideo;
 extern lv_obj_t * ui_TextFollower;
 //extern lv_obj_t * ui_TextCoin;
 //extern lv_obj_t * ui_TextFavorite;
+extern lv_obj_t * ui_TextSign;
 extern lv_obj_t * ui_Bili_ImgButtonLogo;
 extern lv_obj_t * ui_Bili_Slider_Loading;
 

@@ -60,6 +60,21 @@ int bili_req_relation(const char *userid, bili_relation_t *info) {
     return res;
 }
 
+int bili_req_card(const char *userid, bili_t *info) {
+    int res = 0;
+    snprintf(bili_url_buf, sizeof(bili_url_buf), "%s%s", URL_BILI_CARD, userid);
+    do {
+        if (bili_curl_req(bili_url_buf)) { res = 1; break; }
+        if (parse_bili_card(bili_chunk.memory, info)) {res = 2; break; }
+    }while(0);
+
+    if(res) {
+        printf("bili_req_card faile, res = %d\n", res);
+    }
+
+    return res;
+}
+
 int bili_check_userid(const char *userid) {
     bili_relation_t tmp;
     printf("[BILI CHECK]\n");
@@ -112,7 +127,7 @@ int bili_get_summary(void) {
     strncpy(bili_info_all.username, bili_video_list.author, sizeof(bili_info_all.username));
     bili_info_all.following = bili_relation.following;
     bili_info_all.follower = bili_relation.follower;
-    bili_info_all.videos = bili_video_list.count;
+    bili_info_all.video = bili_video_list.count;
     for (int i=0; i<bili_video_list.count; i++) {
         bili_video_info_t *tmp = (bili_video_info_t*)(bili_video_infos + sizeof(bili_video_info_t)*i);
         bili_info_all.view += tmp->view;
@@ -248,6 +263,28 @@ void update_detail(void) {
     }
 }
 
+void update_card(void) {
+    int ret = 0;
+
+    ui_update_bili_status_mutex(0);
+    memset(&bili_info_all, 0, sizeof(bili_info_all));
+    if (bili_req_card(conf.bili_userid, &bili_info_all)) {
+        // failed
+        ui_update_bili_status_mutex(100);
+    } else {
+        // update
+        pthread_mutex_lock(&lvgl_mutex);
+        ui_update_bili_card(&bili_info_all);
+        // printf("%s %s\n", bili_info_all.userid, bili_info_all.username);
+        // printf("%s %s\n", bili_info_all.sign, bili_info_all.title);
+        // printf("%d %d\n", bili_info_all.following, bili_info_all.follower);
+        // printf("%d %d\n", bili_info_all.video, bili_info_all.like);
+        printf("[%s] [BILI] update info of %s.\n", getasctime(&bili_last_update_relation), bili_info_all.username);
+        pthread_mutex_unlock(&lvgl_mutex);
+        ui_update_bili_status_mutex(100);
+    }
+}
+
 void bili_thread(void) {
     while(bili_init()) {
         bili_uninit();        
@@ -261,11 +298,7 @@ void bili_thread(void) {
     do {
         if (time(NULL) - bili_last_update_relation > conf.bili_update_folw_itv_m*60) {
             bili_last_update_relation = time(NULL);
-            update_relation();
-        }
-        if (time(NULL) - bili_last_update_stat > conf.bili_update_stat_itv_h*3600) {
-            bili_last_update_stat = time(NULL);
-            update_detail();
+            update_card();
         }
         sleep(1);        
     }while(1);
