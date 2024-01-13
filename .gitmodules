@@ -1,0 +1,11 @@
+[submodule "client/5.App/src/hal/lv_drivers/lv_drivers"]
+	path = client/5.App/src/hal/lv_drivers/lv_drivers
+	url = git@github.com:lvgl/lv_drivers.git
+	branch = release/v8.3
+[submodule "client/5.App/src/thirdparty/lvgl"]
+	path = client/5.App/src/thirdparty/lvgl
+	url = git@github.com:plainji/lvgl.git
+	branch = release/v8.3
+[submodule "client/5.App/src/thirdparty/iniparser"]
+	path = client/5.App/src/thirdparty/iniparser
+	url = git@github.com:ndevilla/iniparser.git
