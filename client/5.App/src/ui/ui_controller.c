@@ -578,11 +578,10 @@ int ui_git_check_username(const char *username) {
 //////////////////////////////////////////////////////////////////////////////
 
 void ui_bili_reset(void) {
-	lv_textarea_set_text(ui_TextFollower, " ");
 	lv_textarea_set_text(ui_TextBiliUserID, "ID:");
 	lv_textarea_set_text(ui_TextLike, " ");
-	lv_textarea_set_text(ui_TextCoin, " ");
-	lv_textarea_set_text(ui_TextFavorite, " ");
+	lv_textarea_set_text(ui_TextVideo, " ");
+	lv_textarea_set_text(ui_TextFollower, " ");
 }
 
 void ui_bili_init(void) {
@@ -639,11 +638,11 @@ void ui_update_bili(bili_t *info_all) {
 	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->like);
 	lv_textarea_set_text(ui_TextLike, bili_buf);
 
-	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->coin);
-	lv_textarea_set_text(ui_TextCoin, bili_buf);
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->videos);
+	lv_textarea_set_text(ui_TextVideo, bili_buf);
 
-	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->favorite);
-	lv_textarea_set_text(ui_TextFavorite, bili_buf);
+	snprintf(bili_buf, sizeof(bili_buf), "%d", info_all->follower);
+	lv_textarea_set_text(ui_TextFollower, bili_buf);
 }
 
 int ui_bili_check_userid(const char *userid) {
