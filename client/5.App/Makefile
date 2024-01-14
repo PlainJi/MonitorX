@@ -30,10 +30,11 @@ SRC_EXT      		:= c
 OBJ_EXT				:= o
 MAKEFLAGS 			:= -j $(shell nproc)
 
+BIN					:= $(PROJECT).$(platform)
 SRC_DIR				:= .
 WORKING_DIR			:= ./build
 BUILD_DIR			:= $(WORKING_DIR)/obj
-BIN_DIR				:= $(SRC_DIR)
+OUTPUT_DIR			:= ./output/$(BIN)
 
 CC					= $(TOOL_PREFIX)gcc
 STRIP				= $(TOOL_PREFIX)strip
@@ -53,8 +54,7 @@ INC_PATH 			+= -I./src/ -I./src/hal/lv_drivers/ -I./src/thirdparty/ -I./src/thir
 						-I./src/thirdparty/thread/
 LD_LIBS	 			+= -lcurl -lssl -lcrypto -lz -pthread -lfreetype
 # LD_LIBS				+= -lavcodec -lavformat -lavutil -lswscale
-BIN					:= $(PROJECT).$(platform)
-TARGET 				:= $(BIN_DIR)/$(BIN)
+TARGET 				:= $(OUTPUT_DIR)/$(BIN)
 COMPILE				= $(CC) $(CFLAGS) $(INC_PATH) $(DEFINES)
 # Automatically include all source files
 SRCS 				:= $(shell find $(SRC_DIR) -type f -name '*.c' \
@@ -70,7 +70,7 @@ $(BUILD_DIR)/%.$(OBJ_EXT): $(SRC_DIR)/%.$(SRC_EXT)
 	@$(COMPILE) -c -o "$@" "$<"
 
 default: $(OBJECTS)
-	@mkdir -p $(BIN_DIR)
+	@mkdir -p $(OUTPUT_DIR)
 	@echo 'CFLAGS $(CFLAGS)'
 	@echo 'LD_PATH $(LD_PATH)'
 	@echo 'LD_LIBS $(LD_LIBS)'
@@ -78,11 +78,10 @@ default: $(OBJECTS)
 	@$(CC) -o $(TARGET) $(OBJECTS) $(CFLAGS) $(LD_PATH) ${LD_LIBS}
 #	@echo 'STRIP $(BIN)'
 #	@$(STRIP) $(BIN)
-	@mkdir -p output/$(BIN)/lib/$(platform)
-	@cp -rf lib/$(platform)/lib/ output/$(BIN)/lib/$(platform)/	
-	@cp -rf res/ output/$(BIN)/
-	@cp $(BIN) output/$(BIN)/
-	@cp config.ini output/$(BIN)/
+	@mkdir -p $(OUTPUT_DIR)/lib/$(platform)
+	@cp -rf lib/$(platform)/lib/ $(OUTPUT_DIR)/lib/$(platform)/	
+	@cp -rf res/ $(OUTPUT_DIR)
+	@cp config.ini $(OUTPUT_DIR)
 	@cd output/;tar -czf $(BIN).tar.gz $(BIN)
 
 clean:

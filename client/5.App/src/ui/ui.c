@@ -32,15 +32,13 @@ DEFINE_IMG(git_pressed);
 DEFINE_IMG(bili_released_loading);
 DEFINE_IMG(bili_released);
 DEFINE_IMG(bili_pressed);
-DEFINE_IMG(unknown_face);
+DEFINE_IMG(face_unknown);
 DEFINE_IMG(like);
 //DEFINE_IMG(coin);
 DEFINE_IMG(video);
-DEFINE_IMG(video_72);
 //DEFINE_IMG(favorite);
 DEFINE_IMG(follower);
 DEFINE_IMG(tomato_clock);
-DEFINE_IMG(tomato_100);
 
 // screen monitor
 lv_obj_t * ui_Monitor;
@@ -664,13 +662,13 @@ void ui_Bili_screen_init(void)
     lv_obj_set_style_bg_opa(ui_ImageFaceContent, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     ui_ImageFace = lv_img_create(ui_ImageFaceContent);
     lv_obj_set_align(ui_ImageFace, LV_ALIGN_CENTER);
-    lv_img_set_src(ui_ImageFace, IMG(unknown_face));
+    lv_img_set_src(ui_ImageFace, IMG(face_unknown));
     lv_img_set_zoom(ui_ImageFace, (uint16_t)(60*256/(((lv_img_t*)ui_ImageFace)->w)));
     lv_obj_set_style_radius(ui_ImageFace, 20, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui_ImageFace, true, LV_PART_MAIN);
 
     ui_creat_img(ui_Bili, &ui_ImageLike, -240,      40, 48, 48, IMG(like));
-    ui_creat_img(ui_Bili, &ui_ImageVideo, 0,        40, 72, 72, IMG(video));
+    ui_creat_img(ui_Bili, &ui_ImageVideo, 0,        40, 48, 48, IMG(video));
     ui_creat_img(ui_Bili, &ui_ImageFollower, 240,   40, 46, 48, IMG(follower));
 
     ui_creat_text_area(ui_Bili, &ui_TextLike, -240,     110, 220, "0", "", &ui_font_ShangShou32);
@@ -776,7 +774,7 @@ void ui_Tomato_screen_init(void)
     lv_meter_set_scale_range(ui_meter, ui_scale_num, 0, 55, 330, 270);
     // Add the hands from images
     // ui_indic_pointer = lv_meter_add_needle_line(ui_meter, ui_scale, 15, lv_palette_main(LV_PALETTE_GREY), -60);
-    ui_indic_pointer = lv_meter_add_needle_img(ui_meter, ui_scale, IMG(tomato_100), 50, 50);
+    ui_indic_pointer = lv_meter_add_needle_img(ui_meter, ui_scale, IMG(tomato_clock), 50, 50);
     lv_meter_set_indicator_value(ui_meter, ui_indic_pointer, 0);
     // Add a red arc to the start
     ui_indic_pie = lv_meter_add_arc(ui_meter, ui_scale, 130, lv_color_hex(0xff6347), 0);

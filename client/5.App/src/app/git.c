@@ -142,7 +142,7 @@ int git_curl_req(const char *username, int year, git_t *info) {
         //snprintf(url_buf, sizeof(url_buf), "%s%s%s%d%s%d%s", \
         //    URL_GIT_PREFIX, conf.git_username, URL_GIT_SUFFIX1, year, URL_GIT_SUFFIX2, year, URL_GIT_SUFFIX3);
     }
-    printf("git_curl %s\n", url_buf);
+    //printf("git_curl %s\n", url_buf);
     chunk.size = 0;
     curl_easy_setopt(git_curl, CURLOPT_URL, url_buf);
     curl_easy_setopt(git_curl, CURLOPT_SSL_VERIFYPEER, 0L);
