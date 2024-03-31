@@ -1,7 +1,7 @@
 #ifndef __UI_CONTROLLER_H__
 #define __UI_CONTROLLER_H__
 
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 #include "ui.h"
 #include "json_parser.h"
 

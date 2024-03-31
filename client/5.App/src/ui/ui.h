@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-#include "thirdparty/lvgl/lvgl.h"
+#include "lvgl/lvgl.h"
 
 #define DEFINE_IMG(name)    const char *ui_img_##name##_png = "A:image/"#name".png"
 #define IMG(name)           ui_img_##name##_png

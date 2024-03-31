@@ -1,3 +1,7 @@
 [submodule "client/5.App/src/thirdparty/iniparser"]
 	path = client/5.App/src/thirdparty/iniparser
 	url = git@github.com:ndevilla/iniparser.git
+[submodule "client/5.App/src/thirdparty/lvgl"]
+	path = client/5.App/src/thirdparty/lvgl
+	url = https://github.com/lvgl/lvgl
+	branch = master
