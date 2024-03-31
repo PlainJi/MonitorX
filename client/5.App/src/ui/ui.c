@@ -628,21 +628,21 @@ void ui_Bili_screen_init(void)
     lv_obj_set_style_bg_color(ui_Bili, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_Bili, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_creat_text_area(ui_Bili, &ui_TextBiliUserID, -295, -217, 200, "ID:", "User ID", &ui_font_ShangShou14);
+    ui_creat_text_area(ui_Bili, &ui_TextBiliUserID, -295, -217, 200, "ID:", "User ID", NULL);
     lv_obj_set_style_text_align(ui_TextBiliUserID, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui_TextBiliUserID, lv_color_hex(0x3B3B3B), LV_PART_MAIN | LV_STATE_DEFAULT);
-
+    lv_obj_set_style_text_color(ui_TextBiliUserID, lv_color_hex(0x5B5B5B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_style(ui_TextBiliUserID, &style_font_fzht_14, 0);
     
     ui_TextBiliTitle = lv_label_create(ui_Bili);
-    lv_obj_set_align(ui_TextBiliTitle, LV_ALIGN_CENTER);
+    lv_obj_set_align(ui_TextBiliTitle, LV_ALIGN_TOP_RIGHT);
     lv_obj_set_width(ui_TextBiliTitle, 300);
     lv_obj_set_height(ui_TextBiliTitle, LV_SIZE_CONTENT);
-    lv_obj_set_x(ui_TextBiliTitle, 230);
-    lv_obj_set_y(ui_TextBiliTitle, -217);
+    lv_obj_set_x(ui_TextBiliTitle, 20);
+    lv_obj_set_y(ui_TextBiliTitle, 20);
     lv_label_set_long_mode(ui_TextBiliTitle, LV_LABEL_LONG_SCROLL_CIRCULAR);
     lv_label_set_text(ui_TextBiliTitle, "");    // 2023百大UP主、2023年度最高人气奖UP主、2022年度多元创新奖UP主
     lv_obj_set_style_text_align(ui_TextBiliTitle, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui_TextBiliTitle, lv_color_hex(0x3B3B3B), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_TextBiliTitle, lv_color_hex(0x5B5B5B), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_style(ui_TextBiliTitle, &style_font_fzht_14, 0);
 
     ui_creat_text_area(ui_Bili, &ui_TextBiliUserName, -240, -72, 250, "", "Input UserID", NULL);
