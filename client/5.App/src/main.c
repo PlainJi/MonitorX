@@ -167,8 +167,9 @@ int main(void)
     //lv_example_arc_2();
     //lv_example_roller_2();
     //lv_example_ffmpeg_2();
-    lv_example_sjpg_1();
+    //lv_example_sjpg_1();
     //lv_example_png_1();
+    lv_example_label_1();
     while(1) {
         lv_timer_handler();
         usleep(5000);
