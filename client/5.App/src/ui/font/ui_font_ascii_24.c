@@ -1,16 +1,10 @@
-/*******************************************************************************
- * Size: 24 px
- * Bpp: 1
- * Opts: --bpp 1 --size 24 --font E:\1.Project\DesktopBox\lvgl_proj\assets\ShangShouBiaoBangTi-2.ttf -o E:\1.Project\DesktopBox\lvgl_proj\assets\ui_font_ShangShou24.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
- ******************************************************************************/
+#include "lvgl/lvgl.h"
 
-#include "ui.h"
-
-#ifndef UI_FONT_SHANGSHOU24
-#define UI_FONT_SHANGSHOU24 1
+#ifndef UI_FONT_ASCII_24
+#define UI_FONT_ASCII_24 1
 #endif
 
-#if UI_FONT_SHANGSHOU24
+#if UI_FONT_ASCII_24
 
 /*-----------------
  *    BITMAPS
@@ -612,9 +606,9 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
 
 /*Initialize a public general font descriptor*/
 #if LV_VERSION_CHECK(8, 0, 0)
-const lv_font_t ui_font_ShangShou24 = {
+const lv_font_t ui_font_ascii_24 = {
 #else
-lv_font_t ui_font_ShangShou24 = {
+lv_font_t ui_font_ascii_24 = {
 #endif
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
@@ -632,5 +626,5 @@ lv_font_t ui_font_ShangShou24 = {
 
 
 
-#endif /*#if UI_FONT_SHANGSHOU24*/
+#endif /*#if UI_FONT_ASCII_24*/
 

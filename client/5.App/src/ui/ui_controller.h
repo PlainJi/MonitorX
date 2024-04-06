@@ -1,3 +1,5 @@
+#if 0
+
 #ifndef __UI_CONTROLLER_H__
 #define __UI_CONTROLLER_H__
 
@@ -66,5 +68,7 @@ void ui_tomato_init(void);
 void ui_tomato_set_time(int minutes);
 void ui_update_tomato_time(int time);
 
+
+#endif
 
 #endif

@@ -1,3 +1,4 @@
+#if 0
 #include "ui_controller.h"
 #include "json_parser.h"
 #include "ui.h"
@@ -389,7 +390,7 @@ void ui_git_init(int end_year) {
 		}
 		lv_dropdown_set_options(ui_year, year_buf);
 		lv_obj_t * dd_list = lv_dropdown_get_list(ui_year);
-		lv_obj_set_style_text_font(dd_list, &ui_font_ShangShou24, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_text_font(dd_list, &ui_font_ascii_24, LV_PART_MAIN | LV_STATE_DEFAULT);
 		free(year_buf);
 	}
 
@@ -701,3 +702,4 @@ void ui_update_tomato_time(int time_min) {
 }
 
 
+#endif

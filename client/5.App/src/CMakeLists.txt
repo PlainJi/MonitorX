@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-ADD_DEFINITIONS(-DLV_BUILD_EXAMPLES=1)
-
 # compile cJSON
 FILE(GLOB_RECURSE CJSON_SRC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cJSON/*.c)
 ADD_LIBRARY(cjson ${CJSON_SRC})
@@ -14,19 +12,31 @@ ADD_LIBRARY(ini_parser ${INI_PARSER_SRC})
 FILE(GLOB_RECURSE THREAD_WARPPER_SRC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/thread/*.c)
 ADD_LIBRARY(thread_warpper ${THREAD_WARPPER_SRC})
 
+# compile ui
+SET(UI_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ui")
+FILE(GLOB UI_SRC ${UI_INCLUDE_PATH}/*.c ${UI_INCLUDE_PATH}/font/*.c ${UI_INCLUDE_PATH}/page/ui_page_monitor.c ${UI_INCLUDE_PATH}/page/ui_page_git.c )
+ADD_LIBRARY(ui ${UI_SRC})
+TARGET_INCLUDE_DIRECTORIES(ui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
+TARGET_LINK_LIBRARIES(ui lvgl)
+
+
 IF((${CMAKE_C_COMPILER} STREQUAL "/usr/bin/cc") AND ((${CMAKE_CXX_COMPILER} STREQUAL "/usr/bin/c++")))
     MESSAGE(STATUS "-----------\n-----X86------\n--------------")
     # compile lvgl
-    ADD_DEFINITIONS(-DX86 -DLV_USE_SDL=1 -DLV_CONF_PATH=${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/lv_conf.h)
+    SET(LVGL_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
+    ADD_DEFINITIONS(-DLV_BUILD_EXAMPLES=0 -DDEBUG)
+    ADD_DEFINITIONS(-DX86 -DLV_USE_SDL=1 -DLV_CONF_PATH=${LVGL_INCLUDE_PATH}/lv_conf.h)
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(JPEG REQUIRED)
     add_subdirectory(thirdparty/lvgl)
     TARGET_INCLUDE_DIRECTORIES(lvgl PRIVATE ${SDL2_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS})
-    MESSAGE(STATUS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
 
     add_executable(MonitorX main.c)
-    TARGET_INCLUDE_DIRECTORIES(MonitorX PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
-    target_link_libraries(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg m pthread ${SDL2_LIBRARIES} ${JPEG_LIBRARIES})
+    TARGET_INCLUDE_DIRECTORIES(MonitorX PRIVATE ${LVGL_INCLUDE_PATH} ${UI_INCLUDE_PATH})
+    target_link_libraries(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg 
+                            ui 
+                            m pthread
+                            ${SDL2_LIBRARIES} ${JPEG_LIBRARIES})
 ELSE()
     MESSAGE(STATUS "-----------\n-----ARM------\n--------------")
     ADD_DEFINITIONS(-DARM -DLV_USE_LINUX_FBDEV=1 -DLV_USE_EVDEV=1)
