@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
 # compile cJSON
 FILE(GLOB_RECURSE CJSON_SRC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cJSON/*.c)
@@ -34,12 +34,12 @@ IF((${CMAKE_C_COMPILER} STREQUAL "/usr/bin/cc") AND ((${CMAKE_CXX_COMPILER} STRE
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(Freetype REQUIRED)
     FIND_PACKAGE(JPEG REQUIRED)
-    add_subdirectory(thirdparty/lvgl)
+    ADD_SUBDIRECTORY(thirdparty/lvgl)
     TARGET_INCLUDE_DIRECTORIES(lvgl PRIVATE ${SDL2_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 
-    add_executable(MonitorX main.c)
+    ADD_EXECUTABLE(MonitorX main.c)
     TARGET_INCLUDE_DIRECTORIES(MonitorX PRIVATE ${LVGL_INCLUDE_PATH} ${UI_INCLUDE_PATH})
-    target_link_libraries(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg 
+    TARGET_LINK_LIBRARIES(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg 
                             ui 
                             m pthread
                             ${SDL2_LIBRARIES} ${JPEG_LIBRARIES} ${FREETYPE_LIBRARIES})
@@ -50,12 +50,12 @@ ELSE()
     SET(THIRD_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/lib/armhf/include")
     SET(THIRD_LIBRARY_PATH "${PROJECT_SOURCE_DIR}/lib/armhf/lib")
 
-    add_subdirectory(thirdparty/lvgl)
+    ADD_SUBDIRECTORY(thirdparty/lvgl)
     TARGET_INCLUDE_DIRECTORIES(lvgl PRIVATE ${PROJECT_SOURCE_DIR} ${THIRD_INCLUDE_PATH})
     LINK_DIRECTORIES(${THIRD_LIBRARY_PATH})
 
-    add_executable(MonitorX main.c)
-    target_link_libraries(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg m pthread jpeg)
+    ADD_EXECUTABLE(MonitorX main.c)
+    TARGET_LINK_LIBRARIES(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg m pthread jpeg)
 ENDIF()
 
-add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/MonitorX DEPENDS MonitorX)
+ADD_CUSTOM_TARGET (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/MonitorX DEPENDS MonitorX)
