@@ -21,10 +21,12 @@ void ui_obj_set_style_basic(lv_obj_t *obj, \
 }
 
 void ui_obj_set_style_radius(lv_obj_t *obj, lv_style_selector_t selector, int32_t radius) {
-    if (radius < 0) 
+    if (radius < 0) {
         lv_obj_set_style_clip_corner(obj, true, selector);
-    else 
+        lv_obj_set_style_radius(obj, -radius, selector);
+    } else {
         lv_obj_set_style_radius(obj, radius, selector);
+    }
 }
 
 void ui_obj_set_style_bg(lv_obj_t *obj, lv_style_selector_t selector, \
@@ -120,7 +122,7 @@ void lv_textarea_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) {
 
 /////////////////////////////////////////////////////////////
 
-void ui_creat_panel(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, lv_align_t align) {
+void ui_create_panel(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, lv_align_t align) {
     *obj = lv_obj_create(parent);
     
     ui_obj_remove_state_flag(*obj);
@@ -173,6 +175,16 @@ void ui_create_image_arc(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y,
     ui_obj_set_style_arc(*obj, LV_PART_INDICATOR, 50, lv_color_black(), LV_OPA_COVER, false, img_indicator);
 
     lv_arc_set_value(*obj, 0);
+}
+
+void ui_create_image(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, \
+                        int32_t radius, bool clip_corner, lv_image_align_t align, const void *image) {
+    *obj = lv_image_create(parent);
+    ui_obj_set_style_basic(*obj, x, y, width, height, LV_ALIGN_CENTER);
+    lv_obj_set_style_radius(*obj, radius, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(*obj, clip_corner, LV_PART_MAIN);
+    lv_image_set_src(*obj, image);
+    lv_image_set_inner_align(*obj, align);
 }
 
 ///////////////////// ANIMATIONS ////////////////////

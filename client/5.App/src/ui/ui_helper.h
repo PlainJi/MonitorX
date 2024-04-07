@@ -7,7 +7,7 @@
                             LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE |        \
                             LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN)
 
-#define DEFINE_IMG(name)    const char *ui_img_##name##_png = "A:../res/image/"#name".png"
+#define DEFINE_IMG(name)    const char *ui_img_##name##_png = "A:./res/image/"#name".png"
 #define IMG(name)           ui_img_##name##_png
 
 LV_FONT_DECLARE(ui_font_ascii_14);
@@ -64,7 +64,7 @@ void lv_textarea_set_text_fmt(lv_obj_t * obj, const char * fmt, ...);
 
 ///////////////////////////////////////////////////
 
-void ui_creat_panel(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, lv_align_t align);
+void ui_create_panel(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, lv_align_t align);
 
 void ui_create_label(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, \
                     const lv_font_t *font, lv_text_align_t align, lv_color_t color, lv_opa_t opa, \
@@ -80,6 +80,8 @@ void ui_create_image_pointer(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_
 void ui_create_image_arc(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, \
                         int32_t angle_start, int32_t angle_end, lv_arc_mode_t mode, const void *img_main, const void *img_indicator);
 
+void ui_create_image(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, \
+                        int32_t radius, bool clip_corner, lv_image_align_t align, const void *image);
 ///////////////////////////////////////////////////
 
 void _lv_image_set_rotation(void *obj, int32_t v);

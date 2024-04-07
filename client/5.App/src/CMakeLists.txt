@@ -14,7 +14,12 @@ ADD_LIBRARY(thread_warpper ${THREAD_WARPPER_SRC})
 
 # compile ui
 SET(UI_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ui")
-FILE(GLOB UI_SRC ${UI_INCLUDE_PATH}/*.c ${UI_INCLUDE_PATH}/font/*.c ${UI_INCLUDE_PATH}/page/ui_page_monitor.c ${UI_INCLUDE_PATH}/page/ui_page_git.c )
+FILE(GLOB UI_SRC ${UI_INCLUDE_PATH}/*.c ${UI_INCLUDE_PATH}/font/*.c
+                    ${UI_INCLUDE_PATH}/page/ui_page_monitor.c
+                    ${UI_INCLUDE_PATH}/page/ui_page_git.c
+                    ${UI_INCLUDE_PATH}/page/ui_page_bili.c
+                    ${UI_INCLUDE_PATH}/page/ui_page_tomato.c
+                    ${UI_INCLUDE_PATH}/ui.c)
 ADD_LIBRARY(ui ${UI_SRC})
 TARGET_INCLUDE_DIRECTORIES(ui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
 TARGET_LINK_LIBRARIES(ui lvgl)
@@ -27,16 +32,17 @@ IF((${CMAKE_C_COMPILER} STREQUAL "/usr/bin/cc") AND ((${CMAKE_CXX_COMPILER} STRE
     ADD_DEFINITIONS(-DLV_BUILD_EXAMPLES=0 -DDEBUG)
     ADD_DEFINITIONS(-DX86 -DLV_USE_SDL=1 -DLV_CONF_PATH=${LVGL_INCLUDE_PATH}/lv_conf.h)
     FIND_PACKAGE(SDL2 REQUIRED)
+    FIND_PACKAGE(Freetype REQUIRED)
     FIND_PACKAGE(JPEG REQUIRED)
     add_subdirectory(thirdparty/lvgl)
-    TARGET_INCLUDE_DIRECTORIES(lvgl PRIVATE ${SDL2_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS})
+    TARGET_INCLUDE_DIRECTORIES(lvgl PRIVATE ${SDL2_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 
     add_executable(MonitorX main.c)
     TARGET_INCLUDE_DIRECTORIES(MonitorX PRIVATE ${LVGL_INCLUDE_PATH} ${UI_INCLUDE_PATH})
     target_link_libraries(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg 
                             ui 
                             m pthread
-                            ${SDL2_LIBRARIES} ${JPEG_LIBRARIES})
+                            ${SDL2_LIBRARIES} ${JPEG_LIBRARIES} ${FREETYPE_LIBRARIES})
 ELSE()
     MESSAGE(STATUS "-----------\n-----ARM------\n--------------")
     ADD_DEFINITIONS(-DARM -DLV_USE_LINUX_FBDEV=1 -DLV_USE_EVDEV=1)

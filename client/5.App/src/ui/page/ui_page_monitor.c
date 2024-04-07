@@ -70,7 +70,7 @@ void ui_monitor_connect(void) {
 void ui_monitor_init(void)
 {
     // Panel Disconnect
-    ui_creat_panel(NULL, &ui_monitor_disconnect_panel, 0, 0, 800, 480, LV_ALIGN_CENTER);
+    ui_create_panel(NULL, &ui_monitor_disconnect_panel, 0, 0, 800, 480, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_monitor_disconnect_panel, LV_PART_MAIN, lv_color_black(), LV_OPA_COVER, IMG(bg), LV_OPA_20);
     ui_disconnect_text = lv_label_create(ui_monitor_disconnect_panel);
     ui_obj_set_style_basic(ui_disconnect_text, 0, 100, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER);
@@ -83,12 +83,12 @@ void ui_monitor_init(void)
     lv_obj_remove_style(ui_disconnect_arc, NULL, LV_PART_KNOB);
 
     // Panel Connect
-    ui_creat_panel(NULL, &ui_monitor_connect_panel, 0, 0, 800, 480, LV_ALIGN_CENTER);
+    ui_create_panel(NULL, &ui_monitor_connect_panel, 0, 0, 800, 480, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_monitor_connect_panel, LV_PART_MAIN, lv_color_black(), LV_OPA_80, IMG(bg), LV_OPA_COVER);
 
     ///////////////////--CPU--/////////////////////////
 
-    ui_creat_panel(ui_monitor_connect_panel, &ui_monitor_cpu_panel, -196, 0, 388, 344, LV_ALIGN_CENTER);
+    ui_create_panel(ui_monitor_connect_panel, &ui_monitor_cpu_panel, -196, 0, 388, 344, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_monitor_cpu_panel, LV_PART_MAIN, lv_color_black(), LV_OPA_0, NULL, LV_OPA_0);
     ui_create_label(ui_monitor_cpu_panel, &ui_cpu_model, -40, -145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
                     &ui_font_ascii_24, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "CPU");
@@ -114,7 +114,7 @@ void ui_monitor_init(void)
 #endif
     ///////////////////--GPU--/////////////////////////
 
-    ui_creat_panel(ui_monitor_connect_panel, &ui_monitor_gpu_panel, 196, 0, 388, 344, LV_ALIGN_CENTER);
+    ui_create_panel(ui_monitor_connect_panel, &ui_monitor_gpu_panel, 196, 0, 388, 344, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_monitor_gpu_panel, LV_PART_MAIN, lv_color_black(), LV_OPA_0, NULL, LV_OPA_0);
     ui_create_label(ui_monitor_gpu_panel, &ui_gpu_model, 40, -145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
                     &ui_font_ascii_24, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "GPU");
@@ -141,7 +141,7 @@ void ui_monitor_init(void)
 
     ///////////////////--NET--/////////////////////////
 
-    ui_creat_panel(ui_monitor_connect_panel, &ui_monitor_middle_panel, 0, 45, 250, 480, LV_ALIGN_CENTER);
+    ui_create_panel(ui_monitor_connect_panel, &ui_monitor_middle_panel, 0, 45, 250, 480, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_monitor_middle_panel, LV_PART_MAIN, lv_color_black(), LV_OPA_0, NULL, LV_OPA_0);
     ui_create_label(ui_monitor_middle_panel, &ui_middle_time, 1, -48, 150, LV_SIZE_CONTENT, \
                     &ui_font_ascii_40, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "");

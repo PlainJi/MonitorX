@@ -51,7 +51,7 @@ void ui_event_git(lv_event_t * e)
 
 void ui_git_init(void)
 {
-    ui_creat_panel(NULL, &ui_git, 0, 0, 800, 480, LV_ALIGN_CENTER);
+    ui_create_panel(NULL, &ui_git, 0, 0, 800, 480, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_git, LV_PART_MAIN, lv_color_black(), LV_OPA_COVER, NULL, LV_OPA_COVER);
 
     ui_create_textarea(ui_git, &ui_git_username, -240, -30, 250, LV_SIZE_CONTENT, \
@@ -75,7 +75,7 @@ void ui_git_init(void)
         pos += ((357+360)/12.0 + 2);
     }
 
-    ui_creat_panel(ui_git, &ui_git_contri_panel, 0, 100, 750, 105, LV_ALIGN_CENTER);
+    ui_create_panel(ui_git, &ui_git_contri_panel, 0, 100, 750, 105, LV_ALIGN_CENTER);
 
     ui_git_logo_button = lv_imagebutton_create(ui_git);
     ui_obj_set_style_basic(ui_git_logo_button, 0, -90, 177, 177, LV_ALIGN_CENTER);
