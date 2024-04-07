@@ -187,6 +187,18 @@ void ui_create_image(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int
     lv_image_set_inner_align(*obj, align);
 }
 
+void ui_create_roller(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width,  int32_t vis_row, \
+                        lv_color_t color, lv_opa_t opa, const void *img, lv_opa_t img_opa, \
+                        lv_font_t *font, lv_color_t font_color, lv_text_align_t text_align, \
+                        const char *options, lv_roller_mode_t roller_mode) {
+    *obj = lv_roller_create(parent);
+    ui_obj_set_style_basic(*obj, x, y, width, LV_SIZE_CONTENT, LV_ALIGN_CENTER);
+    ui_obj_set_style_bg(*obj, LV_PART_MAIN, color, opa, img, img_opa);
+    ui_obj_set_style_text(*obj, LV_PART_MAIN, font, text_align, font_color, LV_OPA_COVER, 0, 0);
+    lv_roller_set_options(*obj, options, roller_mode);
+    lv_roller_set_visible_row_count(*obj, vis_row);
+}
+
 ///////////////////// ANIMATIONS ////////////////////
 
 void _lv_image_set_rotation(void *obj, int32_t v) {

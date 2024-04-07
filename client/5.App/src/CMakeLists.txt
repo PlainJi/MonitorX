@@ -19,6 +19,7 @@ FILE(GLOB UI_SRC ${UI_INCLUDE_PATH}/*.c ${UI_INCLUDE_PATH}/font/*.c
                     ${UI_INCLUDE_PATH}/page/ui_page_git.c
                     ${UI_INCLUDE_PATH}/page/ui_page_bili.c
                     ${UI_INCLUDE_PATH}/page/ui_page_tomato.c
+                    ${UI_INCLUDE_PATH}/page/ui_page_clock.c
                     ${UI_INCLUDE_PATH}/ui.c)
 ADD_LIBRARY(ui ${UI_SRC})
 TARGET_INCLUDE_DIRECTORIES(ui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")

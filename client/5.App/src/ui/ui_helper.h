@@ -82,6 +82,13 @@ void ui_create_image_arc(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y,
 
 void ui_create_image(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, \
                         int32_t radius, bool clip_corner, lv_image_align_t align, const void *image);
+
+
+void ui_create_roller(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width,  int32_t vis_row, \
+                        lv_color_t color, lv_opa_t opa, const void *img, lv_opa_t img_opa, \
+                        lv_font_t *font, lv_color_t font_color, lv_text_align_t text_align, \
+                        const char *options, lv_roller_mode_t roller_mode);
+
 ///////////////////////////////////////////////////
 
 void _lv_image_set_rotation(void *obj, int32_t v);
