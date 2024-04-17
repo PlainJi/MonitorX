@@ -1,10 +1,8 @@
 #include "bili.h"
+
 #include <pthread.h>
 #include "curldef.h"
-#include "curl/curl.h"
-#include "curl/easy.h"
 #include "json_parser.h"
-#include "ui_controller.h"
 #include "config.h"
 #include "util.h"
 
@@ -22,7 +20,6 @@ bili_t bili_info_all;
 
 time_t bili_last_update_relation = 0;
 time_t bili_last_update_stat = 0;
-extern pthread_mutex_t lvgl_mutex;
 
 int bili_curl_req(char *url) {
     // printf("curl %s\n", url);
@@ -153,7 +150,7 @@ void bili_reset(void) {
     bili_last_update_relation = 0;
     bili_last_update_stat = 0;
     memset(bili_video_list.author, 0, sizeof(bili_video_list.author));
-    ui_bili_reset();
+    //ui_bili_reset();      // TODO plain
 }
 
 int bili_init(void) {
@@ -199,9 +196,7 @@ void bili_start_update(void) {
 void update_relation(void) {
     // update relation, like followers
     if(!bili_req_relation(conf.bili_userid, &bili_relation)) {
-        pthread_mutex_lock(&lvgl_mutex);
-        ui_update_bili_relation(&bili_relation);
-        pthread_mutex_unlock(&lvgl_mutex);
+        // ui_update_bili_relation(&bili_relation);  // TODO PLAIN
         printf("[%s] [BILI] update_relation: %d\n", getasctime(&bili_last_update_relation), bili_relation.follower);
     }
 }
@@ -219,10 +214,8 @@ void update_detail(void) {
         // req video list succeed
         if (bili_video_list.count) {
             // update username
-            pthread_mutex_lock(&lvgl_mutex);
-            ui_update_bili_username(bili_video_list.author);
+            // ui_update_bili_username(bili_video_list.author); // TODO PLAIN
             printf("[%s] [BILI] update username %s.\n", getasctime(&bili_last_update_stat), bili_video_list.author);
-            pthread_mutex_unlock(&lvgl_mutex);
             // alloc buffer for each video info    
             bili_video_infos = realloc(bili_video_infos, bili_video_list.count * sizeof(bili_video_info_t));
             if (!bili_video_infos) {
@@ -236,7 +229,6 @@ void update_detail(void) {
     bili_updating = true;
 
     while (bili_updating) {
-        ui_update_bili_status_mutex(bili_updating_percent);
         // get detail of each video
         if (cur_video_cnt<bili_video_list.count) {
             if (!bili_req_video_detail(cur_video_cnt)) {
@@ -249,13 +241,11 @@ void update_detail(void) {
         } else {
             // get summary and update
             bili_get_summary();
-            pthread_mutex_lock(&lvgl_mutex);
-            ui_update_bili(&bili_info_all);
-            pthread_mutex_unlock(&lvgl_mutex);
+            // ui_update_bili(&bili_info_all);  // TODO PLAIN
 
             // ensure ui percent is 100
             bili_updating_percent = 100;
-            ui_update_bili_status_mutex(bili_updating_percent);
+            // ui_update_bili_status_mutex(bili_updating_percent);  // TODO PLAIN
             bili_updating = false;
             printf("[%s] [BILI] update_detail complete.\n", getasctime(&bili_last_update_stat));
         }
@@ -266,22 +256,20 @@ void update_detail(void) {
 void update_card(void) {
     int ret = 0;
 
-    ui_update_bili_status_mutex(0);
+    // ui_update_bili_status_mutex(0);  // TODO PLAIN
     memset(&bili_info_all, 0, sizeof(bili_info_all));
     if (bili_req_card(conf.bili_userid, &bili_info_all)) {
         // failed
-        ui_update_bili_status_mutex(100);
+        // ui_update_bili_status_mutex(100);    // TODO PLAIN
     } else {
         // update
-        pthread_mutex_lock(&lvgl_mutex);
-        ui_update_bili_card(&bili_info_all);
+        //ui_update_bili_card(&bili_info_all);  // TODO PLAIN
         // printf("%s %s\n", bili_info_all.userid, bili_info_all.username);
         // printf("%s %s\n", bili_info_all.sign, bili_info_all.title);
         // printf("%d %d\n", bili_info_all.following, bili_info_all.follower);
         // printf("%d %d\n", bili_info_all.video, bili_info_all.like);
         printf("[%s] [BILI] update info of %s.\n", getasctime(&bili_last_update_relation), bili_info_all.username);
-        pthread_mutex_unlock(&lvgl_mutex);
-        ui_update_bili_status_mutex(100);
+        // ui_update_bili_status_mutex(100);    // TODO PLAIN
     }
 }
 
@@ -291,9 +279,7 @@ void bili_thread(void) {
         sleep(1);
     }
 
-    pthread_mutex_lock(&lvgl_mutex);
-    ui_bili_init();
-    pthread_mutex_unlock(&lvgl_mutex);
+    //ui_bili_init();   // TODO PLAIN
 
     do {
         if (time(NULL) - bili_last_update_relation > conf.bili_update_folw_itv_m*60) {

@@ -12,38 +12,51 @@ ADD_LIBRARY(ini_parser ${INI_PARSER_SRC})
 FILE(GLOB_RECURSE THREAD_WARPPER_SRC ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/thread/*.c)
 ADD_LIBRARY(thread_warpper ${THREAD_WARPPER_SRC})
 
+SET(THIRDPARTY_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
+
 # compile ui
 SET(UI_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ui")
-FILE(GLOB UI_SRC ${UI_INCLUDE_PATH}/*.c ${UI_INCLUDE_PATH}/font/*.c
+FILE(GLOB UI_SRC    ${UI_INCLUDE_PATH}/*.c                      # ui.c ui_helper.c
+                    ${UI_INCLUDE_PATH}/font/*.c                 # fonts
                     ${UI_INCLUDE_PATH}/page/ui_page_monitor.c
                     ${UI_INCLUDE_PATH}/page/ui_page_git.c
                     ${UI_INCLUDE_PATH}/page/ui_page_bili.c
                     ${UI_INCLUDE_PATH}/page/ui_page_tomato.c
-                    ${UI_INCLUDE_PATH}/page/ui_page_clock.c
-                    ${UI_INCLUDE_PATH}/ui.c)
+                    ${UI_INCLUDE_PATH}/page/ui_page_clock.c)
 ADD_LIBRARY(ui ${UI_SRC})
-TARGET_INCLUDE_DIRECTORIES(ui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
+TARGET_INCLUDE_DIRECTORIES(ui PRIVATE ${THIRDPARTY_INCLUDE_PATH})
 TARGET_LINK_LIBRARIES(ui lvgl)
 
+# compile app
+SET(APP_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/app")
+FILE(GLOB APP_SRC   ${APP_INCLUDE_PATH}/json_parser.c
+                    ${APP_INCLUDE_PATH}/util.c
+                    ${APP_INCLUDE_PATH}/config.c
+                    ${APP_INCLUDE_PATH}/bili.c
+                    ${APP_INCLUDE_PATH}/monitor.c)
+#ADD_DEFINITIONS(-DnoWformat-overflow)
+ADD_LIBRARY(app ${APP_SRC})
+TARGET_INCLUDE_DIRECTORIES(app PRIVATE ${APP_INCLUDE_PATH} ${UI_INCLUDE_PATH} ${THIRDPARTY_INCLUDE_PATH})
+TARGET_LINK_LIBRARIES(app ui cjson ini_parser)
 
 IF((${CMAKE_C_COMPILER} STREQUAL "/usr/bin/cc") AND ((${CMAKE_CXX_COMPILER} STREQUAL "/usr/bin/c++")))
     MESSAGE(STATUS "-----------\n-----X86------\n--------------")
     # compile lvgl
-    SET(LVGL_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
-    ADD_DEFINITIONS(-DLV_BUILD_EXAMPLES=0 -DDEBUG)
-    ADD_DEFINITIONS(-DX86 -DLV_USE_SDL=1 -DLV_CONF_PATH=${LVGL_INCLUDE_PATH}/lv_conf.h)
+    ADD_DEFINITIONS(-DLV_BUILD_EXAMPLES=0)
+    ADD_DEFINITIONS(-DX86 -DLV_USE_SDL=1 -DLV_CONF_PATH=${THIRDPARTY_INCLUDE_PATH}/lv_conf.h)
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(Freetype REQUIRED)
     FIND_PACKAGE(JPEG REQUIRED)
+    FIND_PACKAGE(CURL REQUIRED)
     ADD_SUBDIRECTORY(thirdparty/lvgl)
-    TARGET_INCLUDE_DIRECTORIES(lvgl PRIVATE ${SDL2_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
+    TARGET_INCLUDE_DIRECTORIES(lvgl PRIVATE ${SDL2_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
 
     ADD_EXECUTABLE(MonitorX main.c)
-    TARGET_INCLUDE_DIRECTORIES(MonitorX PRIVATE ${LVGL_INCLUDE_PATH} ${UI_INCLUDE_PATH})
+    TARGET_INCLUDE_DIRECTORIES(MonitorX PRIVATE ${THIRDPARTY_INCLUDE_PATH} ${UI_INCLUDE_PATH} ${APP_INCLUDE_PATH})
     TARGET_LINK_LIBRARIES(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg 
-                            ui 
+                            ui app thread_warpper
                             m pthread
-                            ${SDL2_LIBRARIES} ${JPEG_LIBRARIES} ${FREETYPE_LIBRARIES})
+                            ${SDL2_LIBRARIES} ${JPEG_LIBRARIES} ${FREETYPE_LIBRARIES} ${CURL_LIBRARIES})
 ELSE()
     MESSAGE(STATUS "-----------\n-----ARM------\n--------------")
     ADD_DEFINITIONS(-DARM -DLV_USE_LINUX_FBDEV=1 -DLV_USE_EVDEV=1)

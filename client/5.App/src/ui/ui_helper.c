@@ -194,6 +194,7 @@ void ui_create_roller(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, in
     *obj = lv_roller_create(parent);
     ui_obj_set_style_basic(*obj, x, y, width, LV_SIZE_CONTENT, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(*obj, LV_PART_MAIN, color, opa, img, img_opa);
+    ui_obj_set_style_bg(*obj, LV_PART_SELECTED, color, opa, img, img_opa);
     ui_obj_set_style_text(*obj, LV_PART_MAIN, font, text_align, font_color, LV_OPA_COVER, 0, 0);
     lv_roller_set_options(*obj, options, roller_mode);
     lv_roller_set_visible_row_count(*obj, vis_row);
@@ -224,9 +225,7 @@ lv_anim_t *ui_animation(lv_obj_t *obj, int start, int stop, int duration, int pl
     lv_anim_init(&a0);
     lv_anim_set_var(&a0, obj);
     lv_anim_set_values(&a0, start, stop);
-    
     lv_anim_set_duration(&a0, duration);
-    //lv_anim_set_delay(&a0, 0);
 
     if (playback_duration>0){
         lv_anim_set_playback_duration(&a0, playback_duration);
@@ -241,6 +240,42 @@ lv_anim_t *ui_animation(lv_obj_t *obj, int start, int stop, int duration, int pl
     
     return lv_anim_start(&a0);
 }
+
+void ui_animation_for_pointer(lv_obj_t *obj, int new_angle, int time) {
+    int start = lv_image_get_rotation(obj);
+    // range of angle got from lv_image_get_rotation is 0 ~ 3600, no negative numbers
+    // but we can set negative numbers
+	if (start > 2700) start -= 3600;
+
+    lv_anim_t a0;
+    lv_anim_init(&a0);
+    lv_anim_set_var(&a0, obj);
+    lv_anim_set_values(&a0, start, new_angle);
+    lv_anim_set_duration(&a0, time);
+
+	lv_anim_set_repeat_count(&a0, 0);
+	lv_anim_set_repeat_delay(&a0, 0);
+
+    lv_anim_set_path_cb(&a0, lv_anim_path_ease_in_out);
+    lv_anim_set_exec_cb(&a0, _lv_image_set_rotation);
+
+    lv_anim_start(&a0);
+}
+
+void ui_animation_for_arc(lv_obj_t *obj, int new_angle, int time) {
+    int start = (int)lv_arc_get_value(obj);
+	if (start > 100) start = 100;
+
+    lv_anim_t a0;
+    lv_anim_init(&a0);
+    lv_anim_set_var(&a0, obj);
+    lv_anim_set_values(&a0, start, new_angle);
+    lv_anim_set_duration(&a0, time);
+    lv_anim_set_path_cb(&a0, lv_anim_path_ease_in_out);
+    lv_anim_set_exec_cb(&a0, _lv_arc_set_value);
+    lv_anim_start(&a0);
+}
+
 
 
 /*

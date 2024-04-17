@@ -1,7 +1,7 @@
 #pragma once
 
-#include "lvgl/lvgl.h"
+#include "../ui.h"
 
 extern lv_obj_t * ui_bili;
 
-void ui_bili_init(void);
+void ui_bili_init_page(void);

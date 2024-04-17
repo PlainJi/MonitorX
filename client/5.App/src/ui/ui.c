@@ -23,6 +23,7 @@ lv_font_t *lv_font_fzht_48;
 lv_font_t *lv_font_fzht_64;
 lv_font_t *lv_font_fzht_72;
 lv_font_t *lv_font_fzht_96;
+pthread_mutex_t lvgl_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /*
 ///////////////////// Event ////////////////////
@@ -135,11 +136,15 @@ void ui_font_init(void)
 }
 
 void ui_init(void) {
-    ui_font_init();
-    ui_monitor_init();
-    ui_git_init();
-    ui_bili_init();
-    ui_tomato_init();
-    ui_clock_init();
-    lv_screen_load(ui_clock);
+    // ui_font_init();
+    ui_git_init_page();
+    // ui_bili_init_page();
+    // ui_tomato_init_page();
+    // ui_clock_init_page();
+
+    // ui_monitor_load_page(true);
+    // ui_monitor_load_anim();
+
+    //lv_screen_load(ui_monitor_connect_panel);
+    lv_screen_load(ui_git);
 }

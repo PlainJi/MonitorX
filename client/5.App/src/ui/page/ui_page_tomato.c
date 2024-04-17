@@ -53,7 +53,7 @@ void _lv_scale_set_image_needle_value(void * obj, int32_t v)
     lv_scale_set_image_needle_value(obj, ui_tomato_needle, v);
 }
 
-void ui_tomato_init(void) {
+void ui_tomato_init_page(void) {
     ui_create_panel(NULL, &ui_tomato, 0, 0, 800, 480, LV_ALIGN_CENTER);
 
     // creat meter obj & init style

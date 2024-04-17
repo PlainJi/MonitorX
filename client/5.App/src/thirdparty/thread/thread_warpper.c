@@ -1,15 +1,3 @@
-#include <limits.h>
-#include <sched.h>
-#include <stdarg.h>
-#include <signal.h>
-#include <pthread.h>
-#include <mqueue.h>
-#include <semaphore.h>
-#include <sys/sem.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/time.h>
-#include <sys/types.h>
 #include "thread_warpper.h"
 
 static int getPriorityScope(int *minPriority, int *maxPriority)

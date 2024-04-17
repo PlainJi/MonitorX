@@ -4,4 +4,4 @@
 
 extern lv_obj_t *ui_clock;
 
-void ui_clock_init(void);
+void ui_clock_init_page(void);

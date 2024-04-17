@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "curl/curl.h"
+#include "curl/easy.h"
 
 struct MemoryStruct {
 	char *memory;

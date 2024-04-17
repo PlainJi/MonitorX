@@ -1,7 +1,7 @@
 #pragma once
 
-#include "stdbool.h"
-#include "curldef.h"
+#include <stdbool.h>
+#include "app.h"
 
 #define URL_GIT             "https://skyline.github.com"
 #define URL_GIT_PREFIX      "https://github.com/users/"

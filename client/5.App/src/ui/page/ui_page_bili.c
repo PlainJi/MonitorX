@@ -1,6 +1,4 @@
 #include "ui_page_bili.h"
-
-#include "../ui_helper.h"
 #include "../ui.h"
 
 extern bool bili_updating;
@@ -52,7 +50,7 @@ lv_obj_t * ui_bili_loading_bar;
 //     }
 // }
 
-void ui_bili_init(void)
+void ui_bili_init_page(void)
 {
     ui_create_panel(NULL, &ui_bili, 0, 0, 800, 480, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_bili, LV_PART_MAIN, lv_color_black(), LV_OPA_COVER, NULL, LV_OPA_COVER);

@@ -5,6 +5,8 @@
 
 
 lv_obj_t *ui_clock;
+lv_obj_t *ui_clock_colon1;
+lv_obj_t *ui_clock_colon2;
 lv_obj_t *ui_roller_hour1;
 lv_obj_t *ui_roller_hour2;
 lv_obj_t *ui_roller_min1;
@@ -98,30 +100,40 @@ void _lv_roller_set_selected(void *obj, int32_t v) {
     lv_roller_set_selected(obj, v, LV_ANIM_ON);
 }
 
-void ui_clock_init(void) {
+void ui_clock_init_page(void) {
     ui_create_panel(NULL, &ui_clock, 0, 0, 800, 480, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_clock, LV_PART_MAIN, lv_color_black(), LV_OPA_COVER, NULL, LV_OPA_COVER);
+    
+    // colon
+    ui_create_panel(ui_clock, &ui_clock_colon1, 0, -20, 20, 20, LV_ALIGN_CENTER);
+    ui_obj_set_style_bg(ui_clock_colon1, LV_PART_MAIN, lv_color_hex(0x333333), LV_OPA_COVER, NULL, LV_OPA_COVER);
+    ui_obj_set_style_radius(ui_clock_colon1, LV_PART_MAIN, 10);
+    ui_create_panel(ui_clock, &ui_clock_colon2, 0, 20, 20, 20, LV_ALIGN_CENTER);
+    ui_obj_set_style_bg(ui_clock_colon2, LV_PART_MAIN, lv_color_hex(0x333333), LV_OPA_COVER, NULL, LV_OPA_COVER);
+    ui_obj_set_style_radius(ui_clock_colon2, LV_PART_MAIN, 10);
 
-    ui_create_roller(ui_clock, &ui_roller_hour1, -200, 0, 100,  2, \
-                        lv_color_hex(0x303545), LV_OPA_COVER, NULL, LV_OPA_COVER, \
+    // hour & minute
+    ui_create_roller(ui_clock, &ui_roller_hour1, -200, 0, 100, 1, \
+                        lv_color_hex(0x333333), LV_OPA_COVER, NULL, LV_OPA_COVER, \
                         lv_font_fzht_96, lv_color_white(), LV_TEXT_ALIGN_CENTER, \
                         num0to2, LV_ROLLER_MODE_INFINITE);
-    ui_create_roller(ui_clock, &ui_roller_hour2, -90, 0, 100,  2, \
-                        lv_color_hex(0x303545), LV_OPA_COVER, NULL, LV_OPA_COVER, \
+    ui_create_roller(ui_clock, &ui_roller_hour2, -90, 0, 100, 1, \
+                        lv_color_hex(0x333333), LV_OPA_COVER, NULL, LV_OPA_COVER, \
                         lv_font_fzht_96, lv_color_white(), LV_TEXT_ALIGN_CENTER, \
                         num0to9, LV_ROLLER_MODE_INFINITE);
-    ui_create_roller(ui_clock, &ui_roller_min1, 90, 0, 100,  2, \
-                        lv_color_hex(0x303545), LV_OPA_COVER, NULL, LV_OPA_COVER, \
+    ui_create_roller(ui_clock, &ui_roller_min1, 90, 0, 100,  1, \
+                        lv_color_hex(0x333333), LV_OPA_COVER, NULL, LV_OPA_COVER, \
                         lv_font_fzht_96, lv_color_white(), LV_TEXT_ALIGN_CENTER, \
                         num0to9, LV_ROLLER_MODE_INFINITE);
-    ui_create_roller(ui_clock, &ui_roller_min2, 200, 0, 100,  2, \
-                        lv_color_hex(0x303545), LV_OPA_COVER, NULL, LV_OPA_COVER, \
+    ui_create_roller(ui_clock, &ui_roller_min2, 200, 0, 100, 1, \
+                        lv_color_hex(0x333333), LV_OPA_COVER, NULL, LV_OPA_COVER, \
                         lv_font_fzht_96, lv_color_white(), LV_TEXT_ALIGN_CENTER, \
                         num0to9, LV_ROLLER_MODE_INFINITE);
     //lv_obj_add_event_cb(ui_roller_hour1, mask_event_cb, LV_EVENT_ALL, NULL);
     
 #if DEBUG
     ui_animation(ui_roller_hour1, 0, 3, 3000, -1, 0, 0, LV_ANIM_REPEAT_INFINITE, _lv_roller_set_selected);
+    ui_animation(ui_roller_hour2, 1, 5, 10000, 10000, 0, 0, LV_ANIM_REPEAT_INFINITE, _lv_roller_set_selected);
     lv_obj_add_event_cb(ui_roller_hour2, event_handler, LV_EVENT_ALL, NULL);
 #endif
 }

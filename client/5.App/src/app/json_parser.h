@@ -1,7 +1,7 @@
 #ifndef __JSON_PARSER_H
 #define __JSON_PARSER_H
 
-#include "thirdparty/cJSON/cJSON.h"
+#include "cJSON/cJSON.h"
 #include "monitor.h"
 #include "git.h"
 #include "bili.h"

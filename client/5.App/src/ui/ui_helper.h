@@ -2,6 +2,7 @@
 
 #include "lvgl/lvgl.h"
 
+#define INVALID_ANGLE       (INT32_MAX)
 #define OBJ_DEFAULT_BG_COLOR    lv_color_hex(0xFFFFFF)
 #define OBJ_DEFAULT_FLAG    (LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE |  \
                             LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE |        \
@@ -99,3 +100,5 @@ void _lv_bar_set_value(void *obj, int32_t v);
 lv_anim_t *ui_animation(lv_obj_t *obj, int start, int stop, int duration, int playback_duration, \
                                     int playback_delay, int repeat_delay, int repeat_cnt, \
                                     lv_anim_exec_xcb_t cb);
+void ui_animation_for_pointer(lv_obj_t *obj, int new_angle, int time);
+void ui_animation_for_arc(lv_obj_t *obj, int new_angle, int time);

@@ -1,5 +1,5 @@
 #include "config.h"
-#include "thirdparty/iniparser/src/iniparser.h"
+#include "iniparser/src/iniparser.h"
 
 sys_config_t conf;
 dictionary *ini = NULL;
