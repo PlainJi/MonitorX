@@ -44,6 +44,10 @@ static lv_layer_t canvas_layer;
 static lv_draw_rect_dsc_t canvas_dsc;
 LV_DRAW_BUF_DEFINE(canvas_draw_buf, CONTRIBUTION_PANEL_W, CONTRIBUTION_PANEL_H, LV_COLOR_FORMAT_ARGB8888);
 
+/**********************
+ *   LOCAL FUNCTIONS
+ **********************/
+
 /*
 void ui_event_git(lv_event_t * e)
 {
@@ -203,56 +207,11 @@ void ui_git_draw_rect(int x, int y, int w, int h, lv_color_t background, lv_colo
     lv_canvas_finish_layer(ui_git_canvas, &canvas_layer);
 }
 
-// ------------------------------------------------------------------------------
-
-
-void ui_git_set_username(char *username) {
-	lv_textarea_set_text(ui_git_username, username);
-}
-
-int ui_git_set_year_list(int start_year, int end_year) {
-	ui_git_end_year = end_year;
-
-	if (end_year >= start_year) {
-		int length = (end_year-start_year+1)*5+1;
-		char *year_buf = malloc(length);
-        if (!year_buf) 
-            return 1;
-
-		int cnt = 0;
-		while (cnt <= (end_year-start_year)) {
-			snprintf(year_buf+cnt*5, length-cnt*5, "%d\n", end_year-cnt);
-			cnt++;
-		}
-		lv_dropdown_set_options(ui_git_year, year_buf);
-		lv_obj_t * dd_list = lv_dropdown_get_list(ui_git_year);
-		lv_dropdown_set_selected(ui_git_year, 0);
-		lv_obj_set_style_text_font(dd_list, &ui_font_ascii_24, LV_PART_MAIN | LV_STATE_DEFAULT);
-		free(year_buf);
-	}
-}
 
 int ui_git_get_select_year(void) {
 	char dd_buf[8];
 	lv_dropdown_get_selected_str(ui_git_year, dd_buf, sizeof(dd_buf));
 	return atoi(dd_buf);
-}
-
-void ui_update_git_status(char percent) {
-	static char cur_percent = 0;
-
-	if (cur_percent != percent) {
-		if (percent != 100) {
-			lv_obj_clear_flag(ui_git_loading_bar, LV_OBJ_FLAG_HIDDEN);
-		}
-        // TODO plain
-		//ui_animation(ui_git_loading_bar, cur_percent, percent, 1000, 0, 0, 0, 0, _lv_bar_set_value);
-        lv_bar_set_value(ui_git_loading_bar, percent, LV_ANIM_ON);
-		if (percent == 100) {
-			lv_obj_add_flag(ui_git_loading_bar, LV_OBJ_FLAG_HIDDEN);
-		}
-		cur_percent = percent;
-	}
 }
 
 // API for skyline.github.com
@@ -320,10 +279,41 @@ void ui_git_update_contribution_panel1(git_t info) {
 	}
 }
 
-void ui_update_contribution_panel_by_year(int year) {
+void ui_git_update_contribution_panel_by_year(int year) {
 	if (year >= START_YEAR && year <= ui_git_end_year) {
 		ui_git_update_contribution_panel(ui_git_info[year-START_YEAR]);
 	}
+}
+
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+
+int ui_git_set_year_list(int start_year, int end_year) {
+	ui_git_end_year = end_year;
+
+	if (end_year >= start_year) {
+		int length = (end_year-start_year+1)*5+1;
+		char *year_buf = malloc(length);
+        if (!year_buf) 
+            return 1;
+
+		int cnt = 0;
+		while (cnt <= (end_year-start_year)) {
+			snprintf(year_buf+cnt*5, length-cnt*5, "%d\n", end_year-cnt);
+			cnt++;
+		}
+		lv_dropdown_set_options(ui_git_year, year_buf);
+		lv_obj_t * dd_list = lv_dropdown_get_list(ui_git_year);
+		lv_dropdown_set_selected(ui_git_year, 0);
+		lv_obj_set_style_text_font(dd_list, &ui_font_ascii_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+		free(year_buf);
+	}
+}
+
+void ui_git_set_username(char *username) {
+	lv_textarea_set_text(ui_git_username, username);
 }
 
 int ui_git_check_username(const char *username) {
@@ -339,17 +329,38 @@ int ui_git_check_username(const char *username) {
 	// return 0;
 }
 
-
-/**********************************************************************/
-
 void ui_git_set_basic(char *username, int end_year) {
 	strncpy(ui_git_username_buf, username, sizeof(ui_git_username_buf)-1);
 	ui_git_end_year = end_year;
 }
 
-int ui_git_init(void) {
-	pthread_mutex_lock(&lvgl_mutex);
+int ui_git_update_basic(void) {
 	ui_git_set_username(ui_git_username_buf);
     ui_git_set_year_list(START_YEAR, ui_git_end_year);
-	pthread_mutex_unlock(&lvgl_mutex);
+}
+
+void ui_git_set_contribution(git_t **info) {
+	memcpy(ui_git_info, info, sizeof(git_t)*(ui_git_end_year-START_YEAR));
+}
+
+void ui_git_update_contribution(void) {
+	int year = ui_git_get_select_year();
+	ui_git_update_contribution_panel_by_year(year);
+}
+
+void ui_update_git_status(char percent) {
+	static char cur_percent = 0;
+
+	if (cur_percent != percent) {
+		if (percent != 100) {
+			lv_obj_clear_flag(ui_git_loading_bar, LV_OBJ_FLAG_HIDDEN);
+		}
+        // TODO plain
+		//ui_animation(ui_git_loading_bar, cur_percent, percent, 1000, 0, 0, 0, 0, _lv_bar_set_value);
+        lv_bar_set_value(ui_git_loading_bar, percent, LV_ANIM_ON);
+		if (percent == 100) {
+			lv_obj_add_flag(ui_git_loading_bar, LV_OBJ_FLAG_HIDDEN);
+		}
+		cur_percent = percent;
+	}
 }

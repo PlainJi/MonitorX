@@ -20,11 +20,20 @@ typedef struct _git_t {
     char contribution[53][7];
 }git_t;
 
-// local function
+/**********************
+ * LOCAL FUNCTIONS
+ **********************/
 void ui_git_draw_rect(int x, int y, int w, int h, lv_color_t background, lv_color_t border);
 
-// global function
+/**********************
+ * GLOBAL FUNCTIONS
+ **********************/
 void ui_git_init_page(void);
 int ui_git_set_year_list(int start_year, int end_year);
+
 void ui_git_set_basic(char *username, int end_year);
-int ui_git_init(void);
+int ui_git_update_basic(void);
+
+void ui_git_set_contribution(git_t **info);
+void ui_git_update_contribution(void);
+void ui_update_git_status(char percent);
