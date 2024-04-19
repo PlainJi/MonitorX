@@ -1,6 +1,6 @@
 #include "ui_page_tomato.h"
 
-#include "../ui_helper.h"
+#include "../ui.h"
 
 DEFINE_IMG(tomato);
 

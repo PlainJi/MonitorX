@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "../ui_helper.h"
+#include "../ui.h"
 
 DEFINE_IMG(bg);
 DEFINE_IMG(small_pointer);

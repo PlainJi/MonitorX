@@ -408,7 +408,7 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     /* U+007E "~" */
     0x73, 0xff, 0xb3, 0xc0,
 
-    /* U+FE40 "﹀" */
+    /* U+F078 "﹀" */
     0x80, 0x1e, 0x7, 0xf9, 0xf7, 0xfe, 0x1f, 0x80,
     0x60
 };
@@ -532,7 +532,7 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
     },
     {
-        .range_start = 65088, .range_length = 1, .glyph_id_start = 96,
+        .range_start = 61560, .range_length = 1, .glyph_id_start = 96,
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
     }
 };

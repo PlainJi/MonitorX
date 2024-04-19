@@ -1,8 +1,6 @@
 #include "ui_page_clock.h"
 
 #include "../ui.h"
-#include "../ui_helper.h"
-
 
 lv_obj_t *ui_clock;
 lv_obj_t *ui_clock_colon1;

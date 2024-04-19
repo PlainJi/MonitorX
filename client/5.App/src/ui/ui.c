@@ -1,13 +1,5 @@
 
 #include "ui.h"
-#include "ui_helper.h"
-#include "page/ui_page_monitor.h"
-#include "page/ui_page_git.h"
-#include "page/ui_page_bili.h"
-#include "page/ui_page_tomato.h"
-#include "page/ui_page_quicksetting.h"
-#include "page/ui_page_setting.h"
-#include "page/ui_page_clock.h"
 
 //#include "ui_controller.h"
 //#include "config.h"

@@ -32,6 +32,7 @@ SET(APP_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/app")
 FILE(GLOB APP_SRC   ${APP_INCLUDE_PATH}/json_parser.c
                     ${APP_INCLUDE_PATH}/util.c
                     ${APP_INCLUDE_PATH}/config.c
+                    ${APP_INCLUDE_PATH}/git.c
                     ${APP_INCLUDE_PATH}/bili.c
                     ${APP_INCLUDE_PATH}/monitor.c)
 #ADD_DEFINITIONS(-DnoWformat-overflow)

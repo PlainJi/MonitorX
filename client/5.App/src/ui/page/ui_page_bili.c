@@ -1,4 +1,5 @@
 #include "ui_page_bili.h"
+
 #include "../ui.h"
 
 extern bool bili_updating;
