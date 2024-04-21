@@ -108,15 +108,20 @@ int get_node(cJSON *father_node, char *key, cJSON **node) {
 
 int get_double_from_node(cJSON *node, char *key, double *value) {
 	if (!node) {
-		printf("not parsed!\n");
 		return 1;
 	}
 	const cJSON *name = cJSON_GetObjectItemCaseSensitive(node, key);
-	if (!cJSON_IsNumber(name))
-	{
+	if (!name) {
 		return 2;
 	}
+	if (cJSON_IsNull(name)) {	// treat null as 0
+		*value = 0;
+		return 0;
+	} else if (!cJSON_IsNumber(name)) {
+		return 3;
+	}
 	*value = name->valuedouble;
+
 	return 0;
 }
 
@@ -126,11 +131,17 @@ int get_int_from_node(cJSON *node, char *key, int *value) {
 		return 1;
 	}
 	const cJSON *name = cJSON_GetObjectItemCaseSensitive(node, key);
-	if (!cJSON_IsNumber(name))
-	{
+	if (!name) {
 		return 2;
 	}
+	if (cJSON_IsNull(name)) {	// treat null as 0
+		*value = 0;
+		return 0;
+	} else if (!cJSON_IsNumber(name)) {
+		return 3;
+	}
 	*value = name->valueint;
+
 	return 0;
 }
 
@@ -140,13 +151,15 @@ int get_string_from_node(cJSON *node, char *key, char *buf, int len) {
 		return 1;
 	}
 	const cJSON *name = cJSON_GetObjectItemCaseSensitive(node, key);
-	if (!cJSON_IsString(name))
-	{
+	if (!name) {
 		return 2;
 	}
-
+	if (!cJSON_IsString(name)) {
+		return 3;
+	}
 	strncpy(buf, name->valuestring, len-1);
 	buf[len-1] = 0;
+
 	return 0;
 }
 
@@ -156,8 +169,10 @@ char* get_string_pointer_from_node(cJSON *node, char *key) {
 		return NULL;
 	}
 	const cJSON *name = cJSON_GetObjectItemCaseSensitive(node, key);
-	if (!cJSON_IsString(name))
-	{
+	if (!name) {
+		return NULL;
+	}
+	if (!cJSON_IsString(name)) {
 		return NULL;
 	}
 
@@ -223,28 +238,32 @@ int parse_git_info(const char *str, git_t *ui_git) {
 		}
 
 		memset(ui_git, 0, sizeof(git_t));
-		get_string_from_node(root, "username", ui_git->username, sizeof(ui_git->username));
-		get_int_from_node(root, "year", &ui_git->year);
-		get_string_from_node(root, "year", temp_year, sizeof(temp_year));
+		if (get_string_from_node(root, "username", ui_git->username, sizeof(ui_git->username))) {res = 2; break;}
+		if (get_string_from_node(root, "year", temp_year, sizeof(temp_year))) {res = 4; break;}
 		ui_git->year = atoi(temp_year);
-		get_int_from_node(root, "min", (int*)&ui_git->min);
-		get_int_from_node(root, "max", (int*)&ui_git->max);
-		get_int_from_node(root, "median", (int*)&ui_git->median);
-		get_int_from_node(root, "p80", (int*)&ui_git->p80);
-		get_int_from_node(root, "p90", (int*)&ui_git->p90);
-		get_int_from_node(root, "p99", (int*)&ui_git->p99);
+		if (get_int_from_node(root, "min", (int*)&ui_git->min)) {res = 5; break;}
+		if (get_int_from_node(root, "max", (int*)&ui_git->max)) {res = 6; break;}
+		if (get_int_from_node(root, "median", (int*)&ui_git->median)) {res = 7; break;}
+		if (get_int_from_node(root, "p80", (int*)&ui_git->p80)) {res = 8; break;}
+		if (get_int_from_node(root, "p90", (int*)&ui_git->p90)) {res = 9; break;}
+		if (get_int_from_node(root, "p99", (int*)&ui_git->p99)) {res = 10; break;}
 
-		if (get_node(root, "contributions", &contributions)) {res = 2; break;}
+		if (get_node(root, "contributions", &contributions)) {res = 11; break;}
 		cJSON_ArrayForEach(week, contributions) {
-			if (get_int_from_node(week, "week", &week_num)) {res = 3; break;}
-			if (week_num < 0 || week_num > 52) {res = 4; break;}
-			if (get_node(week, "days", &days)) {res = 5; break;}
-			if (!cJSON_IsArray(days)) {res = 6; break;}
+			if (get_int_from_node(week, "week", &week_num)) {res = 12; break;}
+			if (week_num < 0 || week_num > 52) {
+				res = 13; break;
+			}
+
+			if (get_node(week, "days", &days)) {res = 14; break;}
+			if (!cJSON_IsArray(days)) {res = 15; break;}
 			days_count = cJSON_GetArraySize(days);
-			if (days_count > 7) {res = 7; break;}
+			if (days_count > 7) {
+				res = 16; break;
+			}
 			temp_cnt = 7 - days_count;
 			cJSON_ArrayForEach(day, days) {
-				if (get_int_from_node(day, "count", &count)) {res = 8; break;}
+				if (get_int_from_node(day, "count", &count)) {res = 17; break;}
 				ui_git->contribution[week_num][temp_cnt] = count;
 				temp_cnt += 1;
 			}
@@ -486,12 +505,33 @@ void json_parser_test(void) {
 }
 */
 
-/*
- * char *test_string = "{\"cpu_load\": 16.0, \"cpu_temp\": 52.0, \"cpu_clock\": 4009.0, \"ram_load\": 57.0}";
- *
+
+#if 0
+char *test_string = "{\"string\": \"16.0\", \"int\": 52, \"double\": 123.456}";
+
 void main(void) {
-	parse_json(test_string);
-	get_value("cpu_load");
-	get_value("cpu_temp");
+	int res = 0;
+	cJSON *root = NULL;
+
+	if (get_root(test_string, &root)) {
+		res = 1;
+		return;
+	}
+
+	char buf[16];
+	int int_value = 0;
+	double double_value = 0;
+
+	res = get_string_from_node(root, "string", buf, sizeof(buf));
+	printf("%d %s\n", res, buf);
+
+	res = get_int_from_node(root, "int", &int_value);
+	printf("%d %d\n", res, int_value);
+
+	res = get_double_from_node(root, "double", &double_value);
+	printf("%d %f\n", res, double_value);
+
+	res = get_double_from_node(root, "doubleddd", &double_value);
+	printf("%d %f\n", res, double_value);
 }
-*/
+#endif

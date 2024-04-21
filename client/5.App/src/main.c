@@ -107,7 +107,7 @@ int main(void)
 {
     lv_init();
     hal_init();
-
+#if LV_BUILD_EXAMPLES
     /*Create a Demo*/
     //lv_demo_widgets();
     //lv_demo_widgets_start_slideshow();
@@ -115,12 +115,16 @@ int main(void)
     //lv_demo_stress();
     //lv_example_libjpeg_turbo_1();
     //lv_example_scale_4();
-
+    //lv_example_msgbox_1();
+    lv_example_bar_3();
+#else
+    config_init();
     ui_init();
     //task_creat("monitor", 80, 32*1024, (FUNC)monitor_thread, NULL);
-    task_creat("git", 80, 128*1024, (FUNC)git_thread, NULL);
+    task_creat("git", 80, 1024*1024, (FUNC)git_thread, NULL);
     //task_creat("bili", 80, 128*1024, (FUNC)bili_thread, NULL);
     //task_creat("tomato", 80, 32*1024, (FUNC)tomato_thread, NULL);
+#endif
     while(1) {
         pthread_mutex_lock(&lvgl_mutex);
         lv_timer_handler();

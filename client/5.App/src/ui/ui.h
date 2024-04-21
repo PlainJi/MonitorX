@@ -5,6 +5,7 @@
 #include "lvgl/lvgl.h"
 #include "lvgl/demos/lv_demos.h"
 
+#include "util.h"
 #include "ui_helper.h"
 #include "page/ui_page_bili.h"
 #include "page/ui_page_clock.h"

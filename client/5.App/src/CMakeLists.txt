@@ -14,6 +14,11 @@ ADD_LIBRARY(thread_warpper ${THREAD_WARPPER_SRC})
 
 SET(THIRDPARTY_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty")
 
+# compile util
+SET(UTIL_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/util")
+FILE(GLOB UTIL_SRC  ${UTIL_INCLUDE_PATH}/*.c)
+ADD_LIBRARY(util ${UTIL_SRC})
+
 # compile ui
 SET(UI_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/ui")
 FILE(GLOB UI_SRC    ${UI_INCLUDE_PATH}/*.c                      # ui.c ui_helper.c
@@ -24,21 +29,19 @@ FILE(GLOB UI_SRC    ${UI_INCLUDE_PATH}/*.c                      # ui.c ui_helper
                     ${UI_INCLUDE_PATH}/page/ui_page_tomato.c
                     ${UI_INCLUDE_PATH}/page/ui_page_clock.c)
 ADD_LIBRARY(ui ${UI_SRC})
-TARGET_INCLUDE_DIRECTORIES(ui PRIVATE ${THIRDPARTY_INCLUDE_PATH})
-TARGET_LINK_LIBRARIES(ui lvgl)
+TARGET_INCLUDE_DIRECTORIES(ui PRIVATE ${THIRDPARTY_INCLUDE_PATH} ${UTIL_INCLUDE_PATH})
+TARGET_LINK_LIBRARIES(ui lvgl util)
 
 # compile app
 SET(APP_INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/app")
 FILE(GLOB APP_SRC   ${APP_INCLUDE_PATH}/json_parser.c
-                    ${APP_INCLUDE_PATH}/util.c
                     ${APP_INCLUDE_PATH}/config.c
                     ${APP_INCLUDE_PATH}/git.c
                     ${APP_INCLUDE_PATH}/bili.c
                     ${APP_INCLUDE_PATH}/monitor.c)
-#ADD_DEFINITIONS(-DnoWformat-overflow)
 ADD_LIBRARY(app ${APP_SRC})
-TARGET_INCLUDE_DIRECTORIES(app PRIVATE ${APP_INCLUDE_PATH} ${UI_INCLUDE_PATH} ${THIRDPARTY_INCLUDE_PATH})
-TARGET_LINK_LIBRARIES(app ui cjson ini_parser)
+TARGET_INCLUDE_DIRECTORIES(app PRIVATE ${APP_INCLUDE_PATH} ${UI_INCLUDE_PATH} ${THIRDPARTY_INCLUDE_PATH} ${UTIL_INCLUDE_PATH})
+TARGET_LINK_LIBRARIES(app ui cjson ini_parser util)
 
 IF((${CMAKE_C_COMPILER} STREQUAL "/usr/bin/cc") AND ((${CMAKE_CXX_COMPILER} STREQUAL "/usr/bin/c++")))
     MESSAGE(STATUS "-----------\n-----X86------\n--------------")
@@ -51,9 +54,9 @@ IF((${CMAKE_C_COMPILER} STREQUAL "/usr/bin/cc") AND ((${CMAKE_CXX_COMPILER} STRE
     FIND_PACKAGE(CURL REQUIRED)
     ADD_SUBDIRECTORY(thirdparty/lvgl)
     TARGET_INCLUDE_DIRECTORIES(lvgl PRIVATE ${SDL2_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
-
+    # compile main
     ADD_EXECUTABLE(MonitorX main.c)
-    TARGET_INCLUDE_DIRECTORIES(MonitorX PRIVATE ${THIRDPARTY_INCLUDE_PATH} ${UI_INCLUDE_PATH} ${APP_INCLUDE_PATH})
+    TARGET_INCLUDE_DIRECTORIES(MonitorX PRIVATE ${THIRDPARTY_INCLUDE_PATH} ${UI_INCLUDE_PATH} ${APP_INCLUDE_PATH} ${UTIL_INCLUDE_PATH})
     TARGET_LINK_LIBRARIES(MonitorX lvgl lvgl::examples lvgl::demos lvgl::thorvg 
                             ui app thread_warpper
                             m pthread

@@ -3,7 +3,7 @@
 #include <time.h>
 #include <pthread.h>
 
-static git_t **git_info;
+static git_t *git_info;
 static int end_year = 0, year_cnt = 0;
 static time_t git_last_update_time = 0;
 static bool git_updating = true;
@@ -59,7 +59,7 @@ int get_level_from_line(const char *buf, char *level, int *count) {
             *level = (char)atoi(temp1+12);
             return 0;
         } else {
-            printf("keyword not found!\n");
+            LOG_ERR("keyword not found!\n");
             return 1;
         }
     } else {
@@ -113,7 +113,7 @@ int git_parse_html(const char *str, git_t *ui_git) {
                 return 6;
             }
             if(get_level_from_line(line_buf, &level, &count)) {
-                printf("%s\n", "get level failed!\n");
+                LOG_ERR("get level failed!\n");
                 return 7;
             }
             ui_git->contribution[j][i] = level;
@@ -135,7 +135,7 @@ int git_curl_req(const char *username, int year, git_t *info) {
         //snprintf(url_buf, sizeof(url_buf), "%s%s%s%d%s%d%s", \
         //    URL_GIT_PREFIX, conf.git_username, URL_GIT_SUFFIX1, year, URL_GIT_SUFFIX2, year, URL_GIT_SUFFIX3);
     }
-    //printf("git_curl %s\n", url_buf);
+    //LOG_INFO("git_curl %s\n", url_buf);
     chunk.size = 0;
     curl_easy_setopt(git_curl, CURLOPT_URL, url_buf);
     curl_easy_setopt(git_curl, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -145,17 +145,17 @@ int git_curl_req(const char *username, int year, git_t *info) {
     curl_easy_setopt(git_curl, CURLOPT_WRITEDATA, (void*)&chunk);
     res = curl_easy_perform(git_curl);
     if (res != CURLE_OK) {
-        printf("[GIT] perform git_curl error:%d.\n", res);
+        LOG_ERR("perform git_curl error:%d.\n", res);
         return 1;
     }
 
-    printf("%lu %s\n", (long unsigned int)chunk.size, chunk.memory);
-    //int parse_res = parse_git_info(chunk.memory, info);
-    //int parse_res = git_parse_html(chunk.memory, info);
-    // if (parse_res) {
-    //     printf("git_parse error! res=%d\n", parse_res);
-    //     return 2;
-    // }
+    // LOG_INFO("%lu %s\n", (long unsigned int)chunk.size, chunk.memory);
+    int parse_res = parse_git_info(chunk.memory, info);
+    // int parse_res = git_parse_html(chunk.memory, info);
+    if (parse_res) {
+        LOG_INFO("git_parse error! res=%d\n", parse_res);
+        return 2;
+    }
 
     return 0;
 }
@@ -163,83 +163,72 @@ int git_curl_req(const char *username, int year, git_t *info) {
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-
-/*
-int git_check_username(const char *username) {
-    git_t tmp;
-    memset(&tmp, 0, sizeof(tmp));
-    printf("[GIT CHECK]\n");
-    return git_curl_req(username, 2008, &tmp);
-}
-
-// lvgl is not thread-safe by default.
-// But in event and timer it's valid.
-// Beshure this func is only called in kb_event_cb.
-void git_reset(void) {
-    git_last_update_time = 0;
-    ui_update_contribution_panel(NULL);
-}
-
-
-
 void git_stop_update(void) {
-    printf("git stop update!\n");
+    LOG_INFO("git stop update!\n");
     git_last_update_time = time(NULL);
     git_updating = false;
 }
 
 void git_start_update(void) {
-    printf("git start update!\n");
+    LOG_INFO("git start update!\n");
     git_last_update_time = 0;
 }
 
-void git_update(void) {
-	int year = ui_git_get_select_year();
-	ui_update_contribution_panel(git_info[year-START_YEAR]);
+// lvgl is not thread-safe by default.
+// But it's valid in lv_event and lv_timer.
+// Beshure this func can only be called in kb_event_cb.
+void git_reset(void) {
+    git_last_update_time = 0;
+    ui_git_update_contribution_panel(NULL);
 }
 
-*/
+void git_set_username(const char *username) {
+    LOG_INFO("git set username: %s\n", username);
+    memset(conf.git_username, 0, sizeof(conf.git_username));
+    strncpy(conf.git_username, username, sizeof(conf.git_username-1));
+    git_reset();
+}
 
+int git_check_username(const char *username) {
+    git_t tmp;
+    memset(&tmp, 0, sizeof(tmp));
+    LOG_INFO("git checking username: %s\n", username);
+    return git_curl_req(username, START_YEAR, &tmp);
+}
+
+////////////////////////////////////////////////////////////
 
 int git_get_basic(void) {
     time_t t = time(NULL);
     struct tm *s_tm = localtime(&t);
     end_year = s_tm->tm_year+1900;
     year_cnt = end_year - START_YEAR + 1;
-    printf("[%s] [GIT] Years from %d to %d, total %d years!\n", getasctime(&t), START_YEAR, end_year, year_cnt);
+    LOG_INFO("Years from %d to %d, total %d years!\n", START_YEAR, end_year, year_cnt);
 
     if (!strlen(conf.git_username)) {
-        LOG_ERR("Invalid config for git username! Use PlainJi instead!");
-        strncpy(conf.git_username, "PlainJi", sizeof(conf.git_username));
+        LOG_ERR("Invalid config for git username! Use unknown instead!\n");
+        strncpy(conf.git_username, "unknown", sizeof(conf.git_username));
         return 1;
     }
 }
 
 int git_init(void) {
-    // malloc buffer for pointers to git_t
-    git_info = malloc(sizeof(git_t*)*year_cnt);
+    git_get_basic();       // make sure git_get_basic is the first to be called!
+
+    git_info = (git_t*)calloc(year_cnt, sizeof(git_t));
     if (!git_info) {
-        printf("git_init1 Out of memory!\n");
+        LOG_INFO("git_init1 Out of memory!\n");
         return 1;
     }
-    memset(git_info, 0, sizeof(git_info)*year_cnt);
-
-    // malloc buffer for git_t of each year
-    for (int i=0; i<year_cnt; i++) {
-        git_info[i] = malloc(sizeof(git_t));
-        if (!git_info) {
-            printf("git_init2, out of memory!\n");
-            return 2;
-        }
-        memset(git_info[i], 0, sizeof(git_t));
-    }
-
     memset(&chunk, 0, sizeof(chunk));
     curl_global_init(CURL_GLOBAL_ALL);
     git_curl = curl_easy_init();
     //curl_easy_setopt(git_curl, CURLOPT_VERBOSE, 1);
 
-    git_get_basic();
+    git_cb.git_check_username_cb = git_check_username;
+    git_cb.git_set_username_cb = git_set_username;
+    git_cb.git_start_update_cb = git_start_update;
+    git_cb.git_stop_update_cb = git_stop_update;
     pthread_mutex_lock(&lvgl_mutex);
     ui_git_set_basic(conf.git_username, end_year);
     ui_git_update_basic();
@@ -249,9 +238,6 @@ int git_init(void) {
 }
 
 void git_uninit(void) {
-    for (int i=0; i<year_cnt; i++) {
-        if (git_info[i]) free(git_info[i]);
-    }
     if (git_info) free(git_info);
     if(chunk.memory) free(chunk.memory);
 	if(git_curl) curl_easy_cleanup(git_curl);
@@ -270,9 +256,9 @@ void git_update(void) {
 
         int temp = current_year-START_YEAR;
         time_t t = time(NULL);
-        printf("[%s] [GIT] getting contribution of year %d\n", getasctime(&t), current_year);
+        LOG_INFO("getting contribution of year %d\n", current_year);
 
-        if (!git_curl_req(NULL, current_year, git_info[temp]) ) {
+        if (!git_curl_req(NULL, current_year, &git_info[temp])) {
             current_year++;
             git_updating_percent = (current_year-START_YEAR)*100/(end_year-START_YEAR);
             if (current_year > end_year) {
@@ -285,7 +271,7 @@ void git_update(void) {
                 ui_git_update_contribution();
                 ui_update_git_status(git_updating_percent);
                 pthread_mutex_unlock(&lvgl_mutex);
-                printf("[%s] [GIT] update contribution wall complete\n", getasctime(&git_last_update_time));
+                LOG_INFO("update contribution wall complete\n");
             }
         }
         usleep((rand()%1000+500) * 1000);
