@@ -174,19 +174,15 @@ void git_start_update(void) {
     git_last_update_time = 0;
 }
 
-// lvgl is not thread-safe by default.
-// But it's valid in lv_event and lv_timer.
-// Beshure this func can only be called in kb_event_cb.
-void git_reset(void) {
-    git_last_update_time = 0;
-    ui_git_update_contribution_panel(NULL);
-}
-
 void git_set_username(const char *username) {
     LOG_INFO("git set username: %s\n", username);
-    memset(conf.git_username, 0, sizeof(conf.git_username));
-    strncpy(conf.git_username, username, sizeof(conf.git_username-1));
-    git_reset();
+    config_set_git_username(username);
+    
+    git_last_update_time = 0;
+    // lvgl is not thread-safe by default.
+    // But it's valid in lv_event and lv_timer.
+    // Beshure this func can only be called in kb_event_cb.
+    ui_git_update_contribution_panel(NULL);
 }
 
 int git_check_username(const char *username) {
@@ -251,14 +247,20 @@ void git_update(void) {
 
     while (git_updating) {
         pthread_mutex_lock(&lvgl_mutex);
-        ui_update_git_status(git_updating_percent);
+        ui_git_update_status(git_updating_percent);
         pthread_mutex_unlock(&lvgl_mutex);
 
         int temp = current_year-START_YEAR;
         time_t t = time(NULL);
         LOG_INFO("getting contribution of year %d\n", current_year);
 
-        if (!git_curl_req(NULL, current_year, &git_info[temp])) {
+        if (git_curl_req(NULL, current_year, &git_info[temp])) {
+            // failed
+            pthread_mutex_lock(&lvgl_mutex);
+            ui_git_update_status(100);
+            pthread_mutex_unlock(&lvgl_mutex);
+        } else {
+            // succeed
             current_year++;
             git_updating_percent = (current_year-START_YEAR)*100/(end_year-START_YEAR);
             if (current_year > end_year) {
@@ -269,7 +271,7 @@ void git_update(void) {
                 pthread_mutex_lock(&lvgl_mutex);
                 ui_git_set_contribution(git_info);
                 ui_git_update_contribution();
-                ui_update_git_status(git_updating_percent);
+                ui_git_update_status(git_updating_percent);
                 pthread_mutex_unlock(&lvgl_mutex);
                 LOG_INFO("update contribution wall complete\n");
             }

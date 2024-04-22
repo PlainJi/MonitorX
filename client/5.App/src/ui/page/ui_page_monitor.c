@@ -86,15 +86,15 @@ void ui_monitor_panel_connected(void) {
 
     ui_create_panel(ui_monitor_connect_panel, &ui_monitor_cpu_panel, -196, 0, 388, 344, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_monitor_cpu_panel, LV_PART_MAIN, lv_color_black(), LV_OPA_0, NULL, LV_OPA_0);
-    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_model, -40, -145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_model, -40, -145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_24, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 2, 0, "CPU");
-    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_usage_percent, -40, 21, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_usage_percent, -40, 21, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_38, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "--");
-    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_frequency, -40, 45, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_frequency, -40, 45, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_20, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "--");
-    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_mem_usage_percent, -40, 109, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_mem_usage_percent, -40, 109, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_28, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "--");
-    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_mem_capacity, -40, 145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_cpu_panel, &ui_cpu_mem_capacity, -40, 145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_20, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "--");
 
     ui_create_image_pointer(ui_monitor_cpu_panel, &ui_cpu_usage_pointer, \
@@ -112,15 +112,15 @@ void ui_monitor_panel_connected(void) {
 
     ui_create_panel(ui_monitor_connect_panel, &ui_monitor_gpu_panel, 196, 0, 388, 344, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_monitor_gpu_panel, LV_PART_MAIN, lv_color_black(), LV_OPA_0, NULL, LV_OPA_0);
-    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_model, 40, -145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_model, 40, -145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_24, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 2, 0, "GPU");
-    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_usage_percent, 40, 21, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_usage_percent, 40, 21, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_38, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "--");
-    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_frequency, 40, 45, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_frequency, 40, 45, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_20, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "--");
-    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_mem_usage_percent, 40, 109, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_mem_usage_percent, 40, 109, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_28, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "--");
-    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_mem_capacity, 40, 145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_gpu_panel, &ui_gpu_mem_capacity, 40, 145, LV_SIZE_CONTENT, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_20, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, "--");
 
     ui_create_image_pointer(ui_monitor_gpu_panel, &ui_gpu_usage_pointer, \
@@ -139,19 +139,19 @@ void ui_monitor_panel_connected(void) {
 
     ui_create_panel(ui_monitor_connect_panel, &ui_monitor_middle_panel, 0, 45, 250, 480, LV_ALIGN_CENTER);
     ui_obj_set_style_bg(ui_monitor_middle_panel, LV_PART_MAIN, lv_color_black(), LV_OPA_0, NULL, LV_OPA_0);
-    ui_create_label(ui_monitor_middle_panel, &ui_middle_time, 0, -28, 150, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_middle_panel, &ui_middle_time, 0, -28, 150, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_40, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 1, 0, "");
-    ui_create_label(ui_monitor_middle_panel, &ui_middle_week, 0, 12, 150, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_middle_panel, &ui_middle_week, 0, 12, 150, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_32, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 1, 0, "");
-    ui_create_label(ui_monitor_middle_panel, &ui_middle_date, 0, 46, 200, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_middle_panel, &ui_middle_date, 0, 46, 200, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_24, LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 1, 0, "");
-    ui_create_label(ui_monitor_middle_panel, &ui_middle_upload, -30, 76, 90, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_middle_panel, &ui_middle_upload, -30, 76, 90, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_20, LV_TEXT_ALIGN_RIGHT, lv_color_white(), LV_OPA_COVER, 0, 0, "0KB");
-    ui_create_label(ui_monitor_middle_panel, &ui_middle_download, 78, 76, 90, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_middle_panel, &ui_middle_download, 78, 76, 90, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_20, LV_TEXT_ALIGN_RIGHT, lv_color_white(), LV_OPA_COVER, 0, 0, "0KB");
-    ui_create_label(ui_monitor_middle_panel, &ui_middle_read, -30, 104, 90, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_middle_panel, &ui_middle_read, -30, 104, 90, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_20, LV_TEXT_ALIGN_RIGHT, lv_color_white(), LV_OPA_COVER, 0, 0, "0KB");
-    ui_create_label(ui_monitor_middle_panel, &ui_middle_write, 78, 104, 90, LV_SIZE_CONTENT, \
+    ui_create_label(ui_monitor_middle_panel, &ui_middle_write, 78, 104, 90, LV_SIZE_CONTENT, LV_ALIGN_CENTER, \
                     &ui_font_ascii_20, LV_TEXT_ALIGN_RIGHT, lv_color_white(), LV_OPA_COVER, 0, 0, "0KB");
 }
 

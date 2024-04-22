@@ -1,3 +1,4 @@
 .vscode/
 client/build
 /__pycache__
+res/image/face.jpg

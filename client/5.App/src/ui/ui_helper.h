@@ -67,8 +67,8 @@ void lv_textarea_set_text_fmt(lv_obj_t * obj, const char * fmt, ...);
 
 void ui_create_panel(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, lv_align_t align);
 
-void ui_create_label(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, \
-                    const lv_font_t *font, lv_text_align_t align, lv_color_t color, lv_opa_t opa, \
+void ui_create_label(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, lv_align_t align, \
+                    const lv_font_t *font, lv_text_align_t text_align, lv_color_t color, lv_opa_t opa, \
                     int32_t letter_space, int32_t line_space, const char *str);
 
 void ui_create_textarea(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, \

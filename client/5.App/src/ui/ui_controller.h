@@ -48,7 +48,7 @@ void ui_monitor_reconnected(void);
 
 void ui_bili_reset(void);
 void ui_git_init(int end_year);
-void ui_update_git_status(char percent);
+void ui_git_update_status(char percent);
 void ui_update_contribution_panel(git_t *info);
 void ui_update_contribution_panel1(git_t *info);
 void ui_update_contribution_panel_by_year(int year);

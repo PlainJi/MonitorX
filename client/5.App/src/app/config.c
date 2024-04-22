@@ -55,12 +55,14 @@ int config_init(void) {
 }
 
 void config_set_git_username(const char *username) {
-    strncpy(conf.git_username, username, sizeof(conf.git_username));
+    memset(conf.git_username, 0, sizeof(conf.git_username));
+    strncpy(conf.git_username, username, sizeof(conf.git_username)-1);
     save_config();
 }
 
 void config_set_bili_userid(const char *id) {
-    strncpy(conf.bili_userid, id, sizeof(conf.bili_userid));
+    memset(conf.bili_userid, 0, sizeof(conf.bili_userid));
+    strncpy(conf.bili_userid, id, sizeof(conf.bili_userid)-1);
     save_config();
 }
 

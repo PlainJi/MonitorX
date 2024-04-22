@@ -132,12 +132,12 @@ void ui_create_panel(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int
     ui_obj_set_style_border(*obj, LV_PART_MAIN, 0, lv_color_black(), LV_OPA_COVER);
 }
 
-void ui_create_label(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, \
-                    const lv_font_t *font, lv_text_align_t align, lv_color_t color, lv_opa_t opa, \
+void ui_create_label(lv_obj_t *parent, lv_obj_t **obj, int32_t x, int32_t y, int32_t width, int32_t height, lv_align_t align, \
+                    const lv_font_t *font, lv_text_align_t text_align, lv_color_t color, lv_opa_t opa, \
                     int32_t letter_space, int32_t line_space, const char *str) {
     *obj = lv_label_create(parent);
-    ui_obj_set_style_basic(*obj, x, y, width, height, LV_ALIGN_CENTER);
-    ui_obj_set_style_text(*obj, LV_PART_MAIN, font, align, color, opa, letter_space, line_space);
+    ui_obj_set_style_basic(*obj, x, y, width, height, align);
+    ui_obj_set_style_text(*obj, LV_PART_MAIN, font, text_align, color, opa, letter_space, line_space);
     lv_label_set_text(*obj, str);
 }
 

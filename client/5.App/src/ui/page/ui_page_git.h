@@ -25,14 +25,14 @@ typedef void (*git_set_username_cb_)(const char*);
 typedef void (*git_stop_update_cb_)(void);
 typedef void (*git_start_update_cb_)(void);
 
-typedef struct _git_callback {
+typedef struct _git_callback_t {
     git_check_username_cb_ git_check_username_cb;
     git_set_username_cb_ git_set_username_cb;
     git_stop_update_cb_ git_stop_update_cb;
     git_start_update_cb_ git_start_update_cb;
-}git_callback;
+}git_callback_t;
 
-extern git_callback git_cb;
+extern git_callback_t git_cb;
 
 /**********************
  * LOCAL FUNCTIONS
@@ -54,4 +54,4 @@ int ui_git_update_basic(void);
 void ui_git_set_contribution(git_t *info);
 void ui_git_update_contribution(void);
 void ui_git_update_contribution_panel(git_t *info);
-void ui_update_git_status(char percent);
+void ui_git_update_status(char percent);

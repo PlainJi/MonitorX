@@ -31,7 +31,7 @@ lv_obj_t * ui_git_logo_button;
 lv_obj_t * ui_git_loading_bar;
 
 git_t *ui_git_info;
-git_callback git_cb;
+git_callback_t git_cb;
 static int ui_git_end_year = 0;
 static char ui_git_username_buf[32];
 static lv_color_t color_bg0;
@@ -109,6 +109,7 @@ void ui_git_init_page(void)
 	memset(ui_git_username_buf, 0, sizeof(ui_git_username_buf));
 	ui_git_end_year = 2024;
 	ui_git_info = NULL;
+	memset(&git_cb, 0, sizeof(git_cb));
 
 	// init page resource
     ui_create_panel(NULL, &ui_git, 0, 0, 800, 480, LV_ALIGN_CENTER);
@@ -135,7 +136,7 @@ void ui_git_init_page(void)
     lv_obj_t *month_obj[] = {ui_git_Jan, ui_git_Feb, ui_git_Mar, ui_git_Apr, ui_git_May, ui_git_Jun, \
                             ui_git_Jul, ui_git_Aug, ui_git_Sep, ui_git_Oct, ui_git_Nov, ui_git_Dec};
     for (int i=0; i<12; i++) {
-        ui_create_label(ui_git, &month_obj[i], (int)pos, 40, 50, LV_SIZE_CONTENT, &ui_font_ascii_14, \
+        ui_create_label(ui_git, &month_obj[i], (int)pos, 40, 50, LV_SIZE_CONTENT, LV_ALIGN_CENTER, &ui_font_ascii_14, \
                     LV_TEXT_ALIGN_CENTER, lv_color_white(), LV_OPA_COVER, 0, 0, month_str[i]);
         pos += ((357+360)/12.0 + 2);
     }
@@ -329,7 +330,7 @@ int ui_git_check_username(const char *username) {
 		snprintf(error_msg, sizeof(error_msg), "  Invalid username %s, error code: %d.", username, ret);
 		lv_obj_t *mbox = lv_msgbox_create(NULL);
 		lv_obj_center(mbox);
-    	lv_msgbox_add_title(mbox, "Error");
+    	lv_msgbox_add_title(mbox, "Git Error");
 		lv_msgbox_add_text(mbox, error_msg);
 		lv_msgbox_add_close_button(mbox);
 		return 1;
@@ -366,7 +367,7 @@ void ui_git_update_contribution(void) {
 	ui_git_update_contribution_panel_by_year(year);
 }
 
-void ui_update_git_status(char percent) {
+void ui_git_update_status(char percent) {
 	static char cur_percent = 0;
 
 	if (cur_percent != percent) {

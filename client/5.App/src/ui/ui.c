@@ -1,11 +1,8 @@
 
 #include "ui.h"
 
-//#include "ui_controller.h"
-//#include "config.h"
 #include <stdio.h>
 #include <time.h>
-
 
 ///////////////////// VARIABLES ////////////////////
 lv_font_t *lv_font_fzht_14;
@@ -16,64 +13,6 @@ lv_font_t *lv_font_fzht_64;
 lv_font_t *lv_font_fzht_72;
 lv_font_t *lv_font_fzht_96;
 pthread_mutex_t lvgl_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-/*
-///////////////////// Event ////////////////////
-
-void kb_event_cb(lv_event_t * e)
-{
-    int ret = 0;
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * ta = lv_event_get_target(e);
-    lv_obj_t * kb = lv_event_get_user_data(e);
-    if(code == LV_EVENT_LONG_PRESSED) {
-        lv_keyboard_set_textarea(kb, ta);
-        lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        if (ta == ui_TextGitUserName) {
-            git_stop_update();
-        } else if (ta == ui_TextBiliUserName) {
-            bili_stop_update();
-        }
-    }
-
-    if (code == LV_EVENT_READY) {
-        const char *input = lv_textarea_get_text(ta);
-        if (ta == ui_TextGitUserName) {
-            if (ui_git_check_username(input)) {
-                ret = 1;
-            } else {
-                config_set_git_username(input);
-                git_reset();
-            }
-        } else if (ta == ui_TextBiliUserName) {
-            if (ui_bili_check_userid(input)) {
-                ret = 1;
-            } else {
-                config_set_bili_userid(input);
-                bili_reset();
-            }
-        }
-        if (!ret) {
-            lv_keyboard_set_textarea(kb, NULL);
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_state(ta, LV_STATE_ANY);
-            lv_indev_reset(NULL, ta);
-        }
-    } else if (code == LV_EVENT_CANCEL) {
-        if (ta == ui_TextGitUserName) {
-            lv_textarea_set_text(ui_TextGitUserName, conf.git_username);
-            git_start_update();
-        } else if (ta == ui_TextBiliUserName) {
-            bili_start_update();
-        }
-        lv_keyboard_set_textarea(kb, NULL);
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_clear_state(ta, LV_STATE_ANY);
-        lv_indev_reset(NULL, ta);
-    }
-}
-
-*/
 
 void ui_font_init(void)
 {
@@ -128,15 +67,15 @@ void ui_font_init(void)
 }
 
 void ui_init(void) {
-    // ui_font_init();
-    ui_git_init_page();
-    // ui_bili_init_page();
+    ui_font_init();
+    
+    // ui_git_init_page();
+    ui_bili_init_page();
     // ui_tomato_init_page();
     // ui_clock_init_page();
 
-    // ui_monitor_load_page(true);
-    // ui_monitor_load_anim();
+    //ui_monitor_load_page(true);
+    //ui_monitor_load_anim();
 
-    //lv_screen_load(ui_monitor_connect_panel);
-    lv_screen_load(ui_git);
+    lv_screen_load(ui_bili);
 }
