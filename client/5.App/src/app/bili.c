@@ -117,20 +117,19 @@ int bili_check_userid(const char *userid) {
 }
 
 void bili_set_userid(const char *userid) {
-    LOG_INFO("bili set userid: %s\n", userid);
+    // 1. save to config
     config_set_bili_userid(userid);
-    LOG_INFO("config_set_bili_userid, userid=%s\n", userid);
 
+    // 2. update bili_info
     memset(&bili_info, 0, sizeof(bili_info));
     strncpy(bili_info.userid, userid, sizeof(bili_info.userid)-1);
-    LOG_INFO("strncpy, userid=%s\n", userid);
 
+    // 3. update ui
     // lvgl is not thread-safe by default.
     // But it's valid in lv_event and lv_timer.
     // Beshure these funcs can only be called in kb_event_cb.
     ui_bili_reset_info();
-    LOG_INFO("bili_set_userid, userid=%s\n", userid);
-    ui_bili_set_basic(userid);
+    ui_bili_set_basic(bili_info.userid);
     ui_bili_update_basic();
     bili_last_update_stat = 0;
 }

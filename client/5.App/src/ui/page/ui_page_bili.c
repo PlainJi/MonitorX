@@ -178,11 +178,9 @@ int ui_bili_check_userid(const char *userid) {
 void ui_bili_set_basic(const char *userid) {
     memset(ui_bili_info.userid, 0, sizeof(ui_bili_info.userid));
     strncpy(ui_bili_info.userid, userid, sizeof(ui_bili_info.userid)-1);
-    LOG_INFO("ui_bili_set_basic, userid:=%s, ui_bili_info.userid=%s\n", userid, ui_bili_info.userid);
 }
 
 void ui_bili_update_basic(void) {
-    LOG_INFO("ui_bili_update_basic USER ID: %s\n", ui_bili_info.userid);
     lv_label_set_text_fmt(ui_bili_userid, "ID: %s", ui_bili_info.userid);
     lv_textarea_set_text(ui_bili_username, ui_bili_info.userid);
 }
@@ -207,7 +205,7 @@ void ui_bili_update_info(void) {
 }
 
 void ui_bili_reset_info(void) {
-    memset(&ui_bili_info, 0, sizeof(bili_t));
+    memset(&ui_bili_info, 0, sizeof(ui_bili_info));
     ui_bili_update_info();
 }
 
