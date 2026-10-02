@@ -1,40 +1,57 @@
 #include "bili.h"
 
+#include <ctype.h>
 #include <pthread.h>
 #include "curldef.h"
 #include "json_parser.h"
 #include "config.h"
 #include "util.h"
 
-char bili_url_buf[128];
+char bili_url_buf[256];
 CURLcode bili_res;
 CURL *bili_curl = NULL;
 struct MemoryStruct bili_chunk;
 struct curl_slist *bili_header_chunk = NULL;
 
 bool bili_updating = false;
+// true while the user is editing the userid, background refresh is suspended.
+static volatile bool bili_paused = false;
 static bili_t bili_info;
 time_t bili_last_update_stat = 0;
 
-int bili_curl_req(const char *url) {
-    //LOG_INFO("curl %s\n", url);
-    bili_chunk.size = 0;
-    
-    curl_easy_setopt(bili_curl, CURLOPT_URL, url);
-    curl_easy_setopt(bili_curl, CURLOPT_HTTPHEADER, bili_header_chunk);
-    curl_easy_setopt(bili_curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    curl_easy_setopt(bili_curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    curl_easy_setopt(bili_curl, CURLOPT_ACCEPT_ENCODING, "gzip");
-    curl_easy_setopt(bili_curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-    curl_easy_setopt(bili_curl, CURLOPT_WRITEDATA, (void*)&bili_chunk);
-    bili_res = curl_easy_perform(bili_curl);
-    if (bili_res != CURLE_OK) {
-        LOG_ERR("[BILI] perform curl error:%d.\n", bili_res);
+static int bili_curl_perform(CURL *curl, const char *url, struct MemoryStruct *chunk) {
+    long http_code = 0;
+    CURLcode ret;
+
+    chunk->size = 0;
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, bili_header_chunk);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "gzip");
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, BILI_CONNECT_TIMEOUT_S);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT, BILI_TIMEOUT_S);
+    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)chunk);
+    ret = curl_easy_perform(curl);
+    if (ret != CURLE_OK) {
+        LOG_ERR("[BILI] perform curl error: %d (%s).\n", ret, curl_easy_strerror(ret));
         return 1;
     }
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+    if (http_code != 200 || !chunk->memory) {
+        LOG_ERR("[BILI] http error: %ld, url: %s\n", http_code, url);
+        return 2;
+    }
 
-    //LOG_INFO("%lu %s\n", (long unsigned int)bili_chunk.size, bili_chunk.memory);
     return 0;
+}
+
+int bili_curl_req(const char *url) {
+    bili_res = bili_curl_perform(bili_curl, url, &bili_chunk) ? CURLE_RECV_ERROR : CURLE_OK;
+    return bili_res != CURLE_OK;
 }
 
 int bili_req_relation(const char *userid, bili_relation_t *info) {
@@ -46,7 +63,7 @@ int bili_req_relation(const char *userid, bili_relation_t *info) {
     }while(0);
 
     if(res) {
-        printf("bili_req_relation faile, res = %d\n", res);
+        LOG_ERR("bili_req_relation failed, res = %d\n", res);
     }
 
     return res;
@@ -61,7 +78,7 @@ int bili_req_card(const char *userid, bili_t *info) {
     }while(0);
 
     if(res) {
-        LOG_ERR("bili_req_card faile, res = %d\n", res);
+        LOG_ERR("bili_req_card failed, res = %d\n", res);
     }
 
     return res;
@@ -72,21 +89,19 @@ int bili_save_face(const void *buf, size_t size, const char *path) {
     lv_fs_res_t res;
     int ret = 0;
 
-    do {
-        // open
-        res = lv_fs_open(&f, path, LV_FS_MODE_WR);
-        if(res != LV_FS_RES_OK) {
-            ret = 1; break;
-        }
-        // write
-        uint32_t bytes_writen = 0;
-        res = lv_fs_write(&f, buf, (uint32_t)size, &bytes_writen);
-        if(res != LV_FS_RES_OK || bytes_writen != size) {
-            ret = 2; break;
-        }
-        // close
-        lv_fs_close(&f);
-    } while(0);
+    // open
+    res = lv_fs_open(&f, path, LV_FS_MODE_WR);
+    if(res != LV_FS_RES_OK) {
+        return 1;
+    }
+    // write
+    uint32_t bytes_writen = 0;
+    res = lv_fs_write(&f, buf, (uint32_t)size, &bytes_writen);
+    if(res != LV_FS_RES_OK || bytes_writen != size) {
+        ret = 2;
+    }
+    // close
+    lv_fs_close(&f);
 
     return ret;
 }
@@ -94,43 +109,85 @@ int bili_save_face(const void *buf, size_t size, const char *path) {
 int bili_req_face(const char *face_url) {
     int res = 0;
     do {
-        if (bili_curl_req(face_url)) {
+        if (!strlen(face_url)) {
             res = 1; break;
         }
-        LOG_INFO("face size: %d\n", bili_chunk.size);
-        if (bili_save_face(bili_chunk.memory, bili_chunk.size, REAL_FACE_PATH)) {
+        // let bilibili image server scale the face and convert it to jpg,
+        // so that the image is small and can always be decoded by libjpeg.
+        snprintf(bili_url_buf, sizeof(bili_url_buf), "%s%s", face_url, BILI_FACE_SUFFIX);
+        if (bili_curl_req(bili_url_buf)) {
             res = 2; break;
+        }
+        LOG_INFO("face size: %d\n", (int)bili_chunk.size);
+        pthread_mutex_lock(&lvgl_mutex);    // lv_fs and image decoder are used by lvgl thread too
+        int save_res = bili_save_face(bili_chunk.memory, bili_chunk.size, REAL_FACE_PATH);
+        pthread_mutex_unlock(&lvgl_mutex);
+        if (save_res) {
+            res = 3; break;
         }
     }while(0);
 
     if(res) {
-        LOG_ERR("bili_req_face faile, res = %d\n", res);
+        LOG_ERR("bili_req_face failed, res = %d\n", res);
     }
 
     return res;
 }
 
-int bili_check_userid(const char *userid) {
-    bili_relation_t tmp;
-    LOG_INFO("bili checking userid: %s\n", userid);
-    return bili_req_relation(userid, &tmp);
+static bool bili_userid_is_valid(const char *userid) {
+    size_t len = strlen(userid);
+    if (len == 0 || len >= sizeof(((bili_t*)0)->userid)) return false;
+    for (size_t i=0; i<len; i++) {
+        if (!isdigit((unsigned char)userid[i])) return false;
+    }
+    return true;
 }
 
+// Called from the lvgl thread, so use a dedicated curl handle instead of bili_curl,
+// which may be in use by bili_thread at the same time.
+int bili_check_userid(const char *userid) {
+    char url[128];
+    bili_relation_t tmp;
+    struct MemoryStruct chunk;
+    CURL *curl = NULL;
+    int res = 0;
+
+    LOG_INFO("bili checking userid: %s\n", userid);
+    if (!bili_userid_is_valid(userid)) {
+        return 1;
+    }
+
+    memset(&chunk, 0, sizeof(chunk));
+    memset(&tmp, 0, sizeof(tmp));
+    snprintf(url, sizeof(url), "%s%s", URL_BILI_RELATION, userid);
+    do {
+        curl = curl_easy_init();
+        if (!curl) { res = 2; break; }
+        if (bili_curl_perform(curl, url, &chunk)) { res = 3; break; }
+        if (parse_bili_relation(chunk.memory, &tmp)) { res = 4; break; }
+    } while(0);
+
+    if (chunk.memory) free(chunk.memory);
+    if (curl) curl_easy_cleanup(curl);
+    return res;
+}
+
+// Called from the lvgl thread (keyboard event), lvgl_mutex is already held.
 void bili_set_userid(const char *userid) {
+    bili_t tmp;
+
     // 1. save to config
     config_set_bili_userid(userid);
 
-    // 2. update bili_info
-    memset(&bili_info, 0, sizeof(bili_info));
-    strncpy(bili_info.userid, userid, sizeof(bili_info.userid)-1);
-
-    // 3. update ui
-    // lvgl is not thread-safe by default.
-    // But it's valid in lv_event and lv_timer.
-    // Beshure these funcs can only be called in kb_event_cb.
-    ui_bili_reset_info();
-    ui_bili_set_basic(bili_info.userid);
+    // 2. update ui
+    memset(&tmp, 0, sizeof(tmp));
+    strncpy(tmp.userid, userid, sizeof(tmp.userid)-1);
+    ui_bili_set_info(&tmp);
+    ui_bili_update_info();
     ui_bili_update_basic();
+
+    // 3. refresh at once
+    bili_paused = false;
     bili_last_update_stat = 0;
 }
 
@@ -138,20 +195,25 @@ int bili_init(void) {
     bili_last_update_stat = 0;
     memset(&bili_chunk, 0, sizeof(bili_chunk));
     memset(&bili_info, 0, sizeof(bili_info));
-    bili_header_chunk = curl_slist_append(bili_header_chunk, \
-        "user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
+    bili_header_chunk = curl_slist_append(bili_header_chunk, "User-Agent: " BILI_USER_AGENT);
+    bili_header_chunk = curl_slist_append(bili_header_chunk, "Referer: https://www.bilibili.com/");
     curl_global_init(CURL_GLOBAL_ALL);
     bili_curl = curl_easy_init();
+    if (!bili_curl) {
+        return 1;
+    }
     //curl_easy_setopt(bili_curl, CURLOPT_VERBOSE, 1);
+    // keep cookies (e.g. buvid3) returned by bilibili in memory, reduces the chance of risk control.
+    curl_easy_setopt(bili_curl, CURLOPT_COOKIEFILE, "");
 
+    pthread_mutex_lock(&lvgl_mutex);
     bili_cb.bili_check_userid_cb = bili_check_userid;
     bili_cb.bili_set_userid_cb = bili_set_userid;
     bili_cb.bili_start_update_cb = bili_start_update;
     bili_cb.bili_stop_update_cb = bili_stop_update;
 
-    // init ui, show userid.
+    // init ui, show userid read from config.
     strncpy(bili_info.userid, conf.bili_userid, sizeof(bili_info.userid)-1);
-    pthread_mutex_lock(&lvgl_mutex);
     ui_bili_reset_info();
     ui_bili_set_basic(bili_info.userid);
     ui_bili_update_basic();
@@ -161,71 +223,81 @@ int bili_init(void) {
 }
 
 int bili_uninit(void) {
-    if (bili_header_chunk) curl_slist_free_all(bili_header_chunk);
-    if (bili_chunk.memory) free(bili_chunk.memory);
-	if(bili_curl) curl_easy_cleanup(bili_curl);
+    if (bili_header_chunk) { curl_slist_free_all(bili_header_chunk); bili_header_chunk = NULL; }
+    if (bili_chunk.memory) { free(bili_chunk.memory); bili_chunk.memory = NULL; }
+    if (bili_curl) { curl_easy_cleanup(bili_curl); bili_curl = NULL; }
     curl_global_cleanup();
 
     return 0;
 }
 
+// Called from the lvgl thread when user starts to edit the userid.
 void bili_stop_update(void) {
     LOG_INFO("bili stop update!\n");
-    bili_last_update_stat = time(NULL);
+    bili_paused = true;
     bili_updating = false;
 }
 
+// Called from the lvgl thread when user cancels editing the userid.
 void bili_start_update(void) {
     LOG_INFO("bili start update!\n");
+    bili_paused = false;
     bili_last_update_stat = 0;
 }
 
+// Must be called with lvgl_mutex held.
+// Drop the result if user is editing, or the userid has been changed during requesting.
+static bool bili_result_is_valid(const char *userid) {
+    return !bili_paused && !strcmp(userid, conf.bili_userid);
+}
+
 void bili_update(void) {
-    int ret = 0;
+    char userid[sizeof(conf.bili_userid)];
 
     pthread_mutex_lock(&lvgl_mutex);
+    strncpy(userid, conf.bili_userid, sizeof(userid)-1);
+    userid[sizeof(userid)-1] = 0;
     ui_bili_update_status(0);
     pthread_mutex_unlock(&lvgl_mutex);
 
     memset(&bili_info, 0, sizeof(bili_info));
-    do {
-        // step 1, get card info
-        if (bili_req_card(conf.bili_userid, &bili_info)) {
-            // failed
-            pthread_mutex_lock(&lvgl_mutex);
-            ui_bili_update_status(100);
-            pthread_mutex_unlock(&lvgl_mutex);
-            return;
-        }
+    // step 1, get card info: username, face, like, video, follower, sign, title
+    if (bili_req_card(userid, &bili_info)) {
         pthread_mutex_lock(&lvgl_mutex);
-        ui_bili_update_status(50);
-        pthread_mutex_unlock(&lvgl_mutex);
-
-        // step 2, get face image
-        if (bili_req_face(bili_info.face_url)) {
-            // failed
-            strncpy(bili_info.face_path, UNKNOWN_FACE_PATH, sizeof(bili_info.face_path)-1);
-            pthread_mutex_lock(&lvgl_mutex);
-            ui_bili_update_status(100);
-            pthread_mutex_unlock(&lvgl_mutex);
-            return;
-        }
-        strncpy(bili_info.face_path, REAL_FACE_PATH, sizeof(bili_info.face_path)-1);
-        
-        // step 3, update
-        LOG_INFO("UserID: %s UserName: %s\n", bili_info.userid, bili_info.username);
-        LOG_INFO("Following: %d Follower: %d\n", bili_info.following, bili_info.follower);
-        LOG_INFO("Video: %d Like: %d\n", bili_info.video, bili_info.like);
-        LOG_INFO("Title: %s\n", bili_info.title);
-        LOG_INFO("Sign: %s\n", bili_info.sign);
-        LOG_INFO("Face path: %s\n", bili_info.face_path);
-
-        pthread_mutex_lock(&lvgl_mutex);
-        ui_bili_set_info(&bili_info);
-        ui_bili_update_info();
         ui_bili_update_status(100);
         pthread_mutex_unlock(&lvgl_mutex);
-    } while(0);
+        return;
+    }
+    // userid in card may be empty, keep the requested one.
+    strncpy(bili_info.userid, userid, sizeof(bili_info.userid)-1);
+    pthread_mutex_lock(&lvgl_mutex);
+    ui_bili_update_status(50);
+    pthread_mutex_unlock(&lvgl_mutex);
+
+    // step 2, get face image
+    if (bili_req_face(bili_info.face_url)) {
+        strncpy(bili_info.face_path, UNKNOWN_FACE_PATH, sizeof(bili_info.face_path)-1);
+    } else {
+        strncpy(bili_info.face_path, REAL_FACE_PATH, sizeof(bili_info.face_path)-1);
+    }
+
+    // step 3, update
+    LOG_INFO("UserID: %s UserName: %s\n", bili_info.userid, bili_info.username);
+    LOG_INFO("Following: %d Follower: %d\n", bili_info.following, bili_info.follower);
+    LOG_INFO("Video: %d Like: %d\n", bili_info.video, bili_info.like);
+    LOG_INFO("Title: %s\n", bili_info.title);
+    LOG_INFO("Sign: %s\n", bili_info.sign);
+    LOG_INFO("Face path: %s\n", bili_info.face_path);
+
+    pthread_mutex_lock(&lvgl_mutex);
+    if (bili_result_is_valid(userid)) {
+        ui_bili_set_info(&bili_info);
+        ui_bili_update_info();
+    } else {
+        LOG_INFO("bili userid changed or editing, drop result of %s\n", userid);
+    }
+    ui_bili_update_status(100);
+    pthread_mutex_unlock(&lvgl_mutex);
 }
 
 void bili_thread(void) {
@@ -235,11 +307,11 @@ void bili_thread(void) {
     }
 
     do {
-        if (time(NULL) - bili_last_update_stat > conf.bili_update_folw_itv_m*60) {
+        if (!bili_paused && (time(NULL) - bili_last_update_stat > conf.bili_update_folw_itv_m*60)) {
             bili_last_update_stat = time(NULL);
             bili_update();
         }
-        sleep(1);        
+        sleep(1);
     }while(1);
 
     bili_uninit();
