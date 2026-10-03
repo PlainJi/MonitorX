@@ -63,8 +63,8 @@ void kb_event_cb(lv_event_t * e)
         return;
     }
 
-    if (code == LV_EVENT_CLICKED) {
-        // click username to input userid with the number keyboard
+    if (code == LV_EVENT_LONG_PRESSED) {
+        // long press username to input userid with the number keyboard, avoid mis-touch
         if (lv_obj_has_flag(kb, LV_OBJ_FLAG_HIDDEN)) {
             if (bili_cb.bili_stop_update_cb) bili_cb.bili_stop_update_cb();
             lv_textarea_set_accepted_chars(ta, "0123456789");
