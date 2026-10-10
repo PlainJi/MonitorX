@@ -11,6 +11,10 @@
 //#define URL_BILI_VIDEO_INFO "https://api.bilibili.com/x/web-interface/archive/stat?aid="    // 590023490
 #define URL_BILI_VIDEO_INFO "https://api.bilibili.com/x/web-interface/wbi/view/detail?aid="     
 #define URL_BILI_CARD       "https://api.bilibili.com/x/web-interface/card?mid="            // 20259914
+#define BILI_FACE_SUFFIX    "@120w_120h.jpg"    // bilibili image server: scale to 120x120 and convert to jpg
+#define BILI_USER_AGENT     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+#define BILI_CONNECT_TIMEOUT_S  5L
+#define BILI_TIMEOUT_S          10L
 #define REAL_FACE_PATH      "A:./res/image/face.jpg"
 #define UNKNOWN_FACE_PATH   "A:./res/image/face_unknown.png"
 

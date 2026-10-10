@@ -2,6 +2,13 @@
 1. `make platform=x86`  
 2. `./monitorX.x86`  
 
+## 无开发板/无显示器的仿真调试（SDL + Xvfb）
+1. 拉取子模块 `git submodule update --init`（lvgl、iniparser）
+2. 安装依赖 `sudo apt install libsdl2-dev libfreetype-dev libjpeg-dev libcurl4-openssl-dev xvfb xdotool imagemagick`
+3. 编译 `mkdir build && cd build && cmake .. -DCMAKE_C_COMPILER=/usr/bin/cc -DCMAKE_CXX_COMPILER=/usr/bin/c++ && make -j`，可执行文件 `MonitorX` 生成在本目录
+4. 运行 `Xvfb :99 -screen 0 800x480x24 &`，然后在本目录执行 `DISPLAY=:99 SDL_RENDER_DRIVER=software ./MonitorX`
+5. 截图 `DISPLAY=:99 import -window root shot.png`，模拟点击 `DISPLAY=:99 xdotool mousemove 160 168 click 1`
+
 ## 部署到嵌入式平台
 1. `make platform=t113 clean`  
 2. `make platform=t113`  

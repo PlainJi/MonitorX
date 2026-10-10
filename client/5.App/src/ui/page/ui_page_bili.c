@@ -43,43 +43,49 @@ bili_callback_t bili_cb;
  *   LOCAL FUNCTIONS
  **********************/
 
+static void ui_bili_exit_edit(lv_obj_t *ta, lv_obj_t *kb) {
+    lv_keyboard_set_textarea(kb, NULL);
+    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    // remove the input filter, so that the chinese username can be shown again.
+    lv_textarea_set_accepted_chars(ta, NULL);
+    lv_textarea_set_max_length(ta, 0);
+    lv_obj_clear_state(ta, LV_STATE_ANY);
+    lv_indev_reset(NULL, ta);
+}
+
 void kb_event_cb(lv_event_t * e)
 {
-    int ret = 0;
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * ta = lv_event_get_target(e);
     lv_obj_t * kb = lv_event_get_user_data(e);
 
-    if(code == LV_EVENT_LONG_PRESSED) {
-        lv_keyboard_set_textarea(kb, ta);
-        lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        if (ta == ui_bili_username) {
-            bili_cb.bili_stop_update_cb();
-        }
+    if (ta != ui_bili_username) {
+        return;
     }
-    if (code == LV_EVENT_READY) {
-        const char *input = lv_textarea_get_text(ta);
-        if (ta == ui_bili_username) {
-            if (ui_bili_check_userid(input)) {
-                ret = 1;
-            } else {
-                bili_cb.bili_set_userid_cb(input);
-            }
+
+    if (code == LV_EVENT_LONG_PRESSED) {
+        // long press username to input userid with the number keyboard, avoid mis-touch
+        if (lv_obj_has_flag(kb, LV_OBJ_FLAG_HIDDEN)) {
+            if (bili_cb.bili_stop_update_cb) bili_cb.bili_stop_update_cb();
+            lv_textarea_set_accepted_chars(ta, "0123456789");
+            lv_textarea_set_max_length(ta, sizeof(ui_bili_info.userid)-1);
+            lv_textarea_set_text(ta, ui_bili_info.userid);
+            lv_keyboard_set_textarea(kb, ta);
+            lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
         }
-        if (!ret) {
-            lv_keyboard_set_textarea(kb, NULL);
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-            lv_obj_clear_state(ta, LV_STATE_ANY);
-            lv_indev_reset(NULL, ta);
+    } else if (code == LV_EVENT_READY) {
+        char input[sizeof(ui_bili_info.userid)];
+        strncpy(input, lv_textarea_get_text(ta), sizeof(input)-1);
+        input[sizeof(input)-1] = 0;
+        if (!ui_bili_check_userid(input)) {
+            ui_bili_exit_edit(ta, kb);
+            if (bili_cb.bili_set_userid_cb) bili_cb.bili_set_userid_cb(input);
         }
     } else if (code == LV_EVENT_CANCEL) {
-        if (ta == ui_bili_username) {
-            bili_cb.bili_start_update_cb();
-        }
-        lv_keyboard_set_textarea(kb, NULL);
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_clear_state(ta, LV_STATE_ANY);
-        lv_indev_reset(NULL, ta);
+        ui_bili_exit_edit(ta, kb);
+        // restore the username
+        ui_bili_update_info();
+        if (bili_cb.bili_start_update_cb) bili_cb.bili_start_update_cb();
     }
 }
 
@@ -158,7 +164,7 @@ void ui_bili_init_page(void) {
 int ui_bili_check_userid(const char *userid) {
 	char error_msg[128];
 
-	int ret = bili_cb.bili_check_userid_cb(userid);
+	int ret = bili_cb.bili_check_userid_cb ? bili_cb.bili_check_userid_cb(userid) : -1;
 	if (ret) {
 		snprintf(error_msg, sizeof(error_msg), "  Invalid UserID %s, Error Code: %d.", userid, ret);
 		lv_obj_t *mbox = lv_msgbox_create(NULL);
@@ -197,9 +203,13 @@ void ui_bili_update_info(void) {
 	lv_label_set_text_fmt(ui_bili_like_label, "%d", ui_bili_info.like);
 	lv_label_set_text_fmt(ui_bili_video_label, "%d", ui_bili_info.video);
 	lv_label_set_text_fmt(ui_bili_follower_label, "%d", ui_bili_info.follower);
-    if (!strlen(ui_bili_info.face_path)) {
+    lv_image_header_t header;
+    if (!strlen(ui_bili_info.face_path) || \
+        lv_image_decoder_get_info(ui_bili_info.face_path, &header) != LV_RESULT_OK) {
         lv_image_set_src(ui_bili_face, IMG(face_unknown));
     } else {
+        // face file may be overwritten by a new user, drop the cache.
+        lv_image_cache_drop(ui_bili_info.face_path);
         lv_image_set_src(ui_bili_face, ui_bili_info.face_path);
     }
 }
